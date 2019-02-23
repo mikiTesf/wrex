@@ -1,0 +1,17 @@
+apply plugin : 'java'
+
+repositories() {
+    mavenCentral()
+}
+
+jar {
+    baseName = 'wrex'
+    version  = '0.1'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile group: 'org.apache.poi', name: 'poi', version: '3.9'
+}
