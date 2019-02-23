@@ -1,0 +1,8 @@
+# IntelliJ
+.idea/
+
+# Gradle
+.gradle/
+
+# Other
+OEBPS_data
