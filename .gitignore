@@ -1,9 +1,14 @@
 # IntelliJ
 .idea/
+out/
+target/
 
 # Gradle
 .gradle/
+build/
 
 # Other
-OEBPS_data
+.content/
 sample_mwb/
+sample_results/
+
