@@ -1,17 +1,23 @@
 apply plugin : 'java'
+apply plugin : 'application'
 
 repositories() {
     mavenCentral()
 }
 
-jar {
-    baseName = 'wrex'
-    version  = '0.1'
+dependencies {
+    compile group: 'org.apache.poi', name: 'poi', version: '3.9'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-dependencies {
-    compile group: 'org.apache.poi', name: 'poi', version: '3.9'
+application {
+    mainClassName = 'App'
+}
+
+jar {
+    baseName = 'wrex'
+    version  = '0.1'
 }
