@@ -62,39 +62,38 @@ class EPUBContentExtractor {
 
     private void removeNonWeekSpanFiles (File OEBPSFolder) throws IOException {
         File[] XHTMLFiles = OEBPSFolder.listFiles();
-        final String INDEX_CLASS = "shadedHeader treasures";
 
         for (File XHTMLFile : Objects.requireNonNull(XHTMLFiles)) {
-            Document XHTMLDocument = Jsoup.parse(XHTMLFile, null);
-            if (!XHTMLDocument.html().contains(INDEX_CLASS))
+            Document XHTMLDocument = Jsoup.parse(XHTMLFile, "UTF-8");
+            if (!XHTMLDocument.html().contains("shadedHeader treasures"))
                 XHTMLFile.delete();
         }
     }
 
     private void moveContentFilesToPublicationFolder (File OEBPSFolder) {
         for (File XHTMLFile : Objects.requireNonNull(OEBPSFolder.listFiles())) {
-            XHTMLFile.renameTo(new File(OEBPSFolder.getParent() + "/" + XHTMLFile.getName()));
+            XHTMLFile.renameTo(new File(OEBPSFolder.getParent() + '/' + XHTMLFile.getName()));
         }
         // remove the "OEBPS/" folder when done
         OEBPSFolder.delete();
     }
 
     private boolean unnecessaryFile(String fileName) {
-        boolean unnecessaryFile = false;
-        if (
-                fileName.contains("mimetype")    ||
-                fileName.contains("META-INF")    ||
-                fileName.contains("css")         ||
-                fileName.contains("images")      ||
-                fileName.contains("extracted")   ||
-                fileName.contains("pagenav")     ||
-                fileName.contains("content.opf") ||
-                fileName.contains("cover.xhtml") ||
-                fileName.contains("toc.")
-        )
-            unnecessaryFile = true;
 
-        return unnecessaryFile;
+        switch (fileName) {
+            case "mimetype":
+            case "META-INF":
+            case "css":
+            case "images":
+            case "extracted":
+            case "pagenav": // different numbers appear after "pagenav"
+            case "content.opf":
+            case "cover.xhtml":
+            case "toc.": // both "toc.ncx" and "toc.xhtml"
+                return true;
+            default:
+                return false;
+        }
     }
 
     private void extractFile(ZipInputStream zipIn, File file)
