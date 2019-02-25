@@ -6,7 +6,7 @@ repositories() {
 }
 
 dependencies {
-    compile group: 'org.apache.poi', name: 'poi', version: '3.9'
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.0.1'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
 }
 
