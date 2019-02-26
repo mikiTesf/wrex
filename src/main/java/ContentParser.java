@@ -15,18 +15,19 @@ class ContentParser {
     private Document treasureDoc;
     private Element treasureElement;
 
-    ContentParser() {}
+    ContentParser(File XHTMLFile) {
+        try {
+            treasureDoc = Jsoup.parse(XHTMLFile, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-    ArrayList<Meeting> parse(File XHTMLFile) throws IOException {
-        Meeting treasures;
-        Meeting improveInMinistry;
-        Meeting livingAsChristians;
-        treasureDoc = Jsoup.parse(XHTMLFile, "UTF-8");
-        /* *** Treasures ***/
+    ArrayList<Meeting> getMeetings() {
+        Meeting treasures, improveInMinistry, livingAsChristians;
+
         treasures = getTreasures();
-        /* *** Improve in your ministry ***/
         improveInMinistry = getMinistryImprovements();
-        /* *** Living as Christians ***/
         livingAsChristians = getLivingAsChristians();
 
         ArrayList<Meeting> meetings = new ArrayList<>();
