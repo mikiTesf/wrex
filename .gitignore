@@ -11,4 +11,4 @@ build/
 .content/
 sample_mwb/
 sample_results/
-
+*.xlsx
