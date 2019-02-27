@@ -1,64 +1,73 @@
+package com.extraction;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.meeting.MeetingSection;
 import com.meeting.ImproveInMinistry;
 import com.meeting.LivingAsChristians;
-import com.meeting.Meeting;
 import com.meeting.Treasures;
+import com.meeting.Meeting;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-class ContentParser {
-    private Document treasureDoc;
+public class ContentParser {
+    private ArrayList<Document> meetingExtracts;
     private Element treasureElement;
 
-    ContentParser(File XHTMLFile) {
+    public ContentParser(File publicationFolder) {
+        meetingExtracts = new ArrayList<>();
         try {
-            treasureDoc = Jsoup.parse(XHTMLFile, "UTF-8");
+            //noinspection ConstantConditions
+            for (File XHTMLFile : publicationFolder.listFiles()) {
+                meetingExtracts.add(Jsoup.parse(XHTMLFile, "UTF-8"));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    ArrayList<Meeting> getMeetings() {
-        Meeting treasures, improveInMinistry, livingAsChristians;
-
-        treasures = getTreasures();
-        improveInMinistry = getMinistryImprovements();
-        livingAsChristians = getLivingAsChristians();
-
+    public ArrayList<Meeting> getMeetings() {
         ArrayList<Meeting> meetings = new ArrayList<>();
-        meetings.add(treasures);
-        meetings.add(improveInMinistry);
-        meetings.add(livingAsChristians);
+
+        for (Document meetingDocument : meetingExtracts) {
+            String weekSpan = getWeekSpan(meetingDocument);
+            Treasures treasures = getTreasures(meetingDocument);
+            ImproveInMinistry improveInMinistry = getMinistryImprovements(meetingDocument);
+            LivingAsChristians livingAsChristians = getLivingAsChristians(meetingDocument);
+
+            Meeting meeting = new Meeting(weekSpan, treasures, improveInMinistry, livingAsChristians);
+            meetings.add(meeting);
+        }
 
         return meetings;
     }
 
-    String getWeekSpan () {
-        treasureElement = treasureDoc.selectFirst("title");
+    private String getWeekSpan(Document meetingDoc) {
+        treasureElement = meetingDoc.selectFirst("title");
         return treasureElement.text();
     }
 
-    private Treasures getTreasures() {
-        treasureElement = treasureDoc.getElementById("section2").selectFirst("ul");
+    private Treasures getTreasures(Document meetingDoc) {
+        treasureElement = meetingDoc.getElementById("section2").selectFirst("ul");
         Elements presentations = treasureElement.getElementsByTag("li");
 
         return (Treasures) addPartsToMeeting(presentations, new Treasures());
     }
 
-    private ImproveInMinistry getMinistryImprovements() {
-        treasureElement = treasureDoc.getElementById("section3").selectFirst("ul");
+    private ImproveInMinistry getMinistryImprovements(Document meetingDoc) {
+        treasureElement = meetingDoc.getElementById("section3").selectFirst("ul");
         Elements presentations = treasureElement.getElementsByTag("li");
 
         return (ImproveInMinistry) addPartsToMeeting(presentations, new ImproveInMinistry());
     }
 
-    private LivingAsChristians getLivingAsChristians() {
-        treasureElement = treasureDoc.getElementById("section4").selectFirst("ul");
+    private LivingAsChristians getLivingAsChristians(Document meetingDoc) {
+        treasureElement = meetingDoc.getElementById("section4").selectFirst("ul");
         Elements presentations = treasureElement.getElementsByTag("li");
         // The paragraphs inside the first (index -> 0) and the last two list items should not
         // be included in the schedule. They must be removed in advance
@@ -72,16 +81,16 @@ class ContentParser {
         return (LivingAsChristians) addPartsToMeeting(presentations, new LivingAsChristians());
     }
 
-    private Meeting addPartsToMeeting(Elements presentations, Meeting meeting) {
+    private MeetingSection addPartsToMeeting(Elements presentations, MeetingSection meetingSection) {
         String title;
         for (Element listItem : presentations) {
             title = listItem.selectFirst("p").text();
             // filter for ደቂቃ
             if (!title.contains("ደቂቃ")) continue;
-            title = title.substring(0, title.indexOf("ደቂቃ")) + "ደቂቃ)";
-            meeting.addPart(title);
+            title = title.substring(0, title.indexOf(" ደቂቃ")) + " ደቂቃ)";
+            meetingSection.addPart(title);
         }
 
-        return meeting;
+        return meetingSection;
     }
 }

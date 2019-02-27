@@ -1,7 +1,7 @@
 package com.meeting;
 
-public class ImproveInMinistry extends Meeting {
+public class ImproveInMinistry extends MeetingSection {
     public ImproveInMinistry () {
-        super(Meeting.IMPROVE_IN_MINISTRY);
+        super(MeetingSection.IMPROVE_IN_MINISTRY);
     }
 }

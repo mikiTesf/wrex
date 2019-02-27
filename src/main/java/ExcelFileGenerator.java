@@ -1,7 +1,5 @@
-import com.meeting.ImproveInMinistry;
-import com.meeting.LivingAsChristians;
-import com.meeting.Meeting;
-import com.meeting.Treasures;
+import com.extraction.ContentParser;
+import com.meeting.*;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -27,14 +25,15 @@ class ExcelFileGenerator {
     private XSSFRichTextString formattedText;
     private XSSFFont boldFont;
     private ContentParser contentParser;
-    private final int BEGIN_CELL_INDEX = 1;
+    private int CELL_INDEX = 1;
+    private int ROW_INDEX = 4;
 
-    ExcelFileGenerator(File XHTMLFile) {
+    ExcelFileGenerator(File publicationFolder) {
         workbook = new XSSFWorkbook();
-        sheet = workbook.createSheet();
+        sheet = workbook.createSheet("wrex_01");
         boldFont = new XSSFFont();
         boldFont.setBold(true);
-        contentParser = new ContentParser(XHTMLFile);
+        contentParser = new ContentParser(publicationFolder);
     }
 
     private void insertPageTitle() {
@@ -45,140 +44,140 @@ class ExcelFileGenerator {
         formattedText.setString("ክርስቲያናዊ ህይወታችንና አገልግሎታችን");
         formattedText.applyFont(boldFont);
         // set the header of the page
-        row.createCell(BEGIN_CELL_INDEX).setCellValue(formattedText);
-        row.getCell(BEGIN_CELL_INDEX).setCellStyle(getCellStyle
+        row.createCell(CELL_INDEX).setCellValue(formattedText);
+        row.getCell(CELL_INDEX).setCellStyle(getCellStyle
                 (false, false, false, true, false));
         sheet.addMergedRegion(new CellRangeAddress
-                (row.getRowNum(), row.getRowNum(), BEGIN_CELL_INDEX, BEGIN_CELL_INDEX + 9));
+                (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 6));
     }
 
-    private void insertHeaderSection() {
+    private void insertHeaderSection(String weekSpan) {
         // 4th (index -> 3) row is free
         // 5th row has "week span" in it
-        Row row = sheet.createRow(sheet.getLastRowNum() + 2);
-        boldFont.setBold(true);
-        formattedText.setString(contentParser.getWeekSpan());
+        Row row = getRowIfExists(ROW_INDEX);
+        formattedText.setString(weekSpan);
         formattedText.applyFont(boldFont);
-        row.createCell(BEGIN_CELL_INDEX).setCellValue(formattedText);
+        row.createCell(CELL_INDEX).setCellValue(formattedText);
         // 6th row has the chairman's name
-        row = sheet.createRow(sheet.getLastRowNum() + 1);
-        boldFont.setBold(true);
+        row = getRowIfExists(++ROW_INDEX);
         formattedText.setString("ሊቀመንበር");
         formattedText.applyFont(boldFont);
-        row.createCell(BEGIN_CELL_INDEX).setCellValue(formattedText);
+        row.createCell(CELL_INDEX).setCellValue(formattedText);
         // 7th row has the name of the brother who does the opening prayer
-        row = sheet.createRow(sheet.getLastRowNum() + 1);
+        row = getRowIfExists(++ROW_INDEX);
         formattedText.setString("የመክፈቻ ፀሎት");
-        row.createCell(BEGIN_CELL_INDEX + 1).setCellValue(formattedText);
+        row.createCell(CELL_INDEX + 1).setCellValue(formattedText);
     }
 
     private void insertTreasuresParts(Treasures treasures) {
         // 8th row has the title of the "Treasures" section
-        Row row = sheet.createRow(sheet.getLastRowNum() + 1);
+        Row row = getRowIfExists(++ROW_INDEX);
         sheet.addMergedRegion(new CellRangeAddress
-                (row.getRowNum(), row.getRowNum(), BEGIN_CELL_INDEX, BEGIN_CELL_INDEX + 2));
-        formattedText.setString("ከአምላክ ቃል የሚገኝ ውድ ሀብት");
-        formattedText.applyFont(boldFont); // unchanged since last made bold
-        row.createCell(BEGIN_CELL_INDEX).setCellValue(formattedText);
-        row.getCell(BEGIN_CELL_INDEX).setCellStyle(getCellStyle
-                (true, true, false, false, false));
+                (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
+        insertSectionTitle("ከአምላክ ቃል የሚገኝ ውድ ሀብት" ,row);
         // 10 minute talk, digging for spiritual gems and bible reading
         for (String part : treasures.getParts()) {
             if (part.contains("የመጽሐፍ ቅዱስ ንባብ")) {
-                row = sheet.createRow(sheet.getLastRowNum() + 1);
+                row = getRowIfExists(++ROW_INDEX);
                 insertHallDivisionHeaders(row);
             }
-            row = sheet.createRow(sheet.getLastRowNum() + 1);
+            row = getRowIfExists(++ROW_INDEX);
             if (!part.contains("የመጽሐፍ ቅዱስ ንባብ")) {
                 sheet.addMergedRegion(new CellRangeAddress
-                        (row.getRowNum(), row.getRowNum(), BEGIN_CELL_INDEX, BEGIN_CELL_INDEX + 1));
+                        (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 1));
             }
-            row.createCell(BEGIN_CELL_INDEX).setCellValue(part);
-            row.getCell(BEGIN_CELL_INDEX).setCellStyle(getCellStyle
+            row.createCell(CELL_INDEX).setCellValue(part);
+            row.getCell(CELL_INDEX).setCellStyle(getCellStyle
                     (false, false, true, false, false));
         }
     }
 
     private void insertMinistryParts(ImproveInMinistry improveInMinistry) {
-        Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-        formattedText.setString("በአገልግሎት ውጤታማ ለመሆን ተጣጣር");
-        formattedText.applyFont(boldFont);
-        row.createCell(BEGIN_CELL_INDEX).setCellValue(formattedText);
-        row.getCell(BEGIN_CELL_INDEX).setCellStyle(getCellStyle
-                (true, true, false, false, false));
+        Row row = getRowIfExists(++ROW_INDEX);
+        insertSectionTitle("በአገልግሎት ውጤታማ ለመሆን ተጣጣር", row);
         insertHallDivisionHeaders(row);
         // the number of parts is not fixed for all months hence the for loop
         for (String part : improveInMinistry.getParts()) {
-            row = sheet.createRow(sheet.getLastRowNum() + 1);
-            row.createCell(BEGIN_CELL_INDEX).setCellValue(part);
-            row.getCell(BEGIN_CELL_INDEX).setCellStyle(getCellStyle
+            row.createCell(CELL_INDEX).setCellValue(part);
+            row.getCell(CELL_INDEX).setCellStyle(getCellStyle
                     (false, false, true, false, false));
         }
     }
 
+    private void insertSectionTitle(String sectionTitle, Row row) {
+        formattedText.setString(sectionTitle);
+        formattedText.applyFont(boldFont);
+        row.createCell(CELL_INDEX).setCellValue(formattedText);
+        row.getCell(CELL_INDEX).setCellStyle(getCellStyle
+                (true, true, false, false, false));
+    }
+
     private void insertHallDivisionHeaders(Row row) {
-        row.createCell(BEGIN_CELL_INDEX + 1).setCellValue("በዋናው አዳራሽ");
-        row.getCell(BEGIN_CELL_INDEX + 1).setCellStyle(getCellStyle
+        row.createCell(CELL_INDEX + 1).setCellValue("በዋናው አዳራሽ");
+        row.getCell(CELL_INDEX + 1).setCellStyle(getCellStyle
                 (true, true, false, true, true));
-        row.createCell(BEGIN_CELL_INDEX + 2).setCellValue("በሁለተኛው አዳራሽ");
-        row.getCell(BEGIN_CELL_INDEX + 2).setCellStyle(getCellStyle
+        row.createCell(CELL_INDEX + 2).setCellValue("በሁለተኛው አዳራሽ");
+        row.getCell(CELL_INDEX + 2).setCellStyle(getCellStyle
                 (true, true, false, true, true));
     }
 
     private void insertChristianLifeParts(LivingAsChristians livingAsChristians) {
-        Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-        formattedText.setString("ክርስቲያናዊ ህይወት");
-        formattedText.applyFont(boldFont);
-        row.createCell(BEGIN_CELL_INDEX).setCellValue(formattedText);
-        row.getCell(BEGIN_CELL_INDEX).setCellStyle(getCellStyle
-                (true, true, false, false, false));
+        Row row = getRowIfExists(++ROW_INDEX);
+        insertSectionTitle("ክርስቲያናዊ ህይወት", row);
         sheet.addMergedRegion(new CellRangeAddress
-                (row.getRowNum(), row.getRowNum(), BEGIN_CELL_INDEX, BEGIN_CELL_INDEX + 2));
+                (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
         // the number of parts is not fixed for all months hence the for loop
         for (String part : livingAsChristians.getParts()) {
-            row = sheet.createRow(sheet.getLastRowNum() + 1);
-            row.createCell(BEGIN_CELL_INDEX).setCellValue(part);
+            row = getRowIfExists(++ROW_INDEX);
+            row.createCell(CELL_INDEX).setCellValue(part);
             sheet.addMergedRegion(new CellRangeAddress
-                    (row.getRowNum(), row.getRowNum(), BEGIN_CELL_INDEX, BEGIN_CELL_INDEX + 1));
-            row.getCell(BEGIN_CELL_INDEX).setCellStyle(getCellStyle
+                    (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 1));
+            row.getCell(CELL_INDEX).setCellStyle(getCellStyle
                     (false, false, true, false ,false));
         }
     }
 
-    private void fillFooterSection() {
+    private void insertFooterSection() {
         // Congregation Bible study reader row
-        Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-        row.createCell(BEGIN_CELL_INDEX);
-        row.createCell(row.getLastCellNum()).setCellValue("አንባቢ");
-        row.getCell(row.getLastCellNum() - 1).setCellStyle(getCellStyle
+        Row row = getRowIfExists(++ROW_INDEX);
+        row.createCell(CELL_INDEX + 1).setCellValue("አንባቢ");
+        row.getCell(CELL_INDEX + 1).setCellStyle(getCellStyle
                 (false, false, true, false, false));
-        // Last prayer row
-        row = sheet.createRow(sheet.getLastRowNum() + 1);
-        row.createCell(BEGIN_CELL_INDEX);
-        row.createCell(row.getLastCellNum()).setCellValue("ፀሎት");
-        row.getCell(row.getLastCellNum() - 1).setCellStyle(getCellStyle
+        // closing prayer row
+        row = getRowIfExists(++ROW_INDEX);
+        row.createCell(CELL_INDEX + 1).setCellValue("ፀሎት");
+        row.getCell(CELL_INDEX + 1).setCellStyle(getCellStyle
                 (false, false, true, false, false));
+        ROW_INDEX += 3;
     }
 
     void makeExcel() {
+        int meetingCount = 0;
         insertPageTitle();
-        insertHeaderSection();
         for (Meeting meeting : contentParser.getMeetings()) {
-            switch (meeting.getKind()) {
-                case Meeting.TREASURES:
-                    insertTreasuresParts((Treasures) meeting);
-                    break;
-                case Meeting.IMPROVE_IN_MINISTRY:
-                    insertMinistryParts((ImproveInMinistry) meeting);
-                    break;
-                case Meeting.LIVING_AS_CHRISTIANS:
-                    insertChristianLifeParts((LivingAsChristians) meeting);
-                    break;
-                default:
-                    break;
+            if (meetingCount == 3){
+                CELL_INDEX = 5;
+                ROW_INDEX = 4;
             }
+            insertHeaderSection(meeting.getWeekSpan());
+            for (MeetingSection meetingSection : meeting.getSections()) {
+                switch (meetingSection.getKind()) {
+                    case MeetingSection.TREASURES:
+                        insertTreasuresParts((Treasures) meetingSection);
+                        break;
+                    case MeetingSection.IMPROVE_IN_MINISTRY:
+                        insertMinistryParts((ImproveInMinistry) meetingSection);
+                        break;
+                    case MeetingSection.LIVING_AS_CHRISTIANS:
+                        insertChristianLifeParts((LivingAsChristians) meetingSection);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            insertFooterSection();
+            ++meetingCount;
         }
-        fillFooterSection();
         // finalize page properties and look
         resizeColumnsAndFixPageSize();
         // write the document on disk
@@ -189,6 +188,11 @@ class ExcelFileGenerator {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private Row getRowIfExists(int rowIndex) {
+        return sheet.getRow(rowIndex) == null ?
+                sheet.createRow(rowIndex) : sheet.getRow(rowIndex);
     }
 
     private XSSFCellStyle getCellStyle(
@@ -224,8 +228,9 @@ class ExcelFileGenerator {
     private void resizeColumnsAndFixPageSize() {
         // finalize page setup
         sheet.getPrintSetup().setPaperSize(PrintSetup.A4_PAPERSIZE);
-        for (int i = BEGIN_CELL_INDEX; i < 11; i++) {
-            sheet.autoSizeColumn(i);
+        sheet.setFitToPage(true);
+        for (int column = CELL_INDEX; column < 11; column++) {
+            sheet.autoSizeColumn(column);
         }
     }
 }

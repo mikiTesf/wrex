@@ -1,7 +1,7 @@
 package com.meeting;
 
-public class LivingAsChristians extends Meeting {
+public class LivingAsChristians extends MeetingSection {
     public LivingAsChristians () {
-        super(Meeting.LIVING_AS_CHRISTIANS);
+        super(MeetingSection.LIVING_AS_CHRISTIANS);
     }
 }

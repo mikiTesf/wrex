@@ -1,29 +1,44 @@
 package com.meeting;
 
-import java.util.ArrayList;
+public class Meeting {
+    private String weekSpan;
+    private Treasures treasures;
+    private ImproveInMinistry improveInMinistry;
+    private LivingAsChristians livingAsChristians;
 
-public abstract class Meeting {
-    private String kind;
-    public static final String TREASURES            = "TREASURES";
-    public static final String IMPROVE_IN_MINISTRY  = "IMPROVE_IN_MINISTRY";
-    public static final String LIVING_AS_CHRISTIANS = "LIVING_AS_CHRISTIANS";
-    // demonstrations, talks, etc...
-    ArrayList<String> parts;
-
-    Meeting (String kind) {
-        this.kind = kind;
-        parts = new ArrayList<>();
+    public Meeting (
+            String weekSpan,
+            Treasures treasures,
+            ImproveInMinistry improveInMinistry,
+            LivingAsChristians livingAsChristians
+    ) {
+        this.weekSpan = weekSpan;
+        this.treasures = treasures;
+        this.improveInMinistry = improveInMinistry;
+        this.livingAsChristians = livingAsChristians;
     }
 
-    public String getKind () {
-        return this.kind;
+    public String getWeekSpan () {
+        return this.weekSpan;
     }
 
-    public ArrayList<String> getParts () {
-        return this.parts;
+    public Treasures getTreasures() {
+        return this.treasures;
     }
 
-    public void addPart (String part) {
-        parts.add(part);
+    public ImproveInMinistry getImproveInMinistry() {
+        return improveInMinistry;
+    }
+
+    public LivingAsChristians getLivingAsChristians() {
+        return livingAsChristians;
+    }
+
+    public MeetingSection[] getSections() {
+        return new MeetingSection[] {
+                this.treasures,
+                this.improveInMinistry,
+                this.livingAsChristians
+        };
     }
 }
