@@ -1,3 +1,5 @@
+package com.excel;
+
 import com.extraction.ContentParser;
 import com.meeting.*;
 
@@ -19,7 +21,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-class ExcelFileGenerator {
+public class ExcelFileGenerator {
     private XSSFWorkbook workbook;
     private XSSFSheet sheet;
     private XSSFRichTextString formattedText;
@@ -28,7 +30,7 @@ class ExcelFileGenerator {
     private int CELL_INDEX = 1;
     private int ROW_INDEX = 4;
 
-    ExcelFileGenerator(File publicationFolder) {
+    public ExcelFileGenerator(File publicationFolder) {
         workbook = new XSSFWorkbook();
         sheet = workbook.createSheet("wrex_01");
         boldFont = new XSSFFont();
@@ -151,7 +153,7 @@ class ExcelFileGenerator {
         ROW_INDEX += 3;
     }
 
-    void makeExcel() {
+    public void makeExcel() {
         int meetingCount = 0;
         insertPageTitle();
         for (Meeting meeting : contentParser.getMeetings()) {
