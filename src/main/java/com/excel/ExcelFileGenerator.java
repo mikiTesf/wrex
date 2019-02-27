@@ -23,22 +23,20 @@ import java.io.IOException;
 
 public class ExcelFileGenerator {
     private XSSFWorkbook workbook;
-    private XSSFSheet sheet;
     private XSSFRichTextString formattedText;
     private XSSFFont boldFont;
     private ContentParser contentParser;
     private int CELL_INDEX = 1;
-    private int ROW_INDEX = 4;
+    private int ROW_INDEX  = 4;
 
-    public ExcelFileGenerator(File publicationFolder) {
+    public ExcelFileGenerator() {
+        contentParser = new ContentParser();
         workbook = new XSSFWorkbook();
-        sheet = workbook.createSheet("wrex_01");
         boldFont = new XSSFFont();
         boldFont.setBold(true);
-        contentParser = new ContentParser(publicationFolder);
     }
 
-    private void insertPageTitle() {
+    private void insertPageTitle(XSSFSheet sheet) {
         // data population starts from the 3rd row
         Row row = sheet.createRow(2);
 
@@ -53,37 +51,37 @@ public class ExcelFileGenerator {
                 (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 6));
     }
 
-    private void insertHeaderSection(String weekSpan) {
+    private void insertHeaderSection(String weekSpan, XSSFSheet sheet) {
         // 4th (index -> 3) row is free
         // 5th row has "week span" in it
-        Row row = getRowIfExists(ROW_INDEX);
+        Row row = getRowIfExists(ROW_INDEX, sheet);
         formattedText.setString(weekSpan);
         formattedText.applyFont(boldFont);
         row.createCell(CELL_INDEX).setCellValue(formattedText);
         // 6th row has the chairman's name
-        row = getRowIfExists(++ROW_INDEX);
+        row = getRowIfExists(++ROW_INDEX, sheet);
         formattedText.setString("ሊቀመንበር");
         formattedText.applyFont(boldFont);
         row.createCell(CELL_INDEX).setCellValue(formattedText);
         // 7th row has the name of the brother who does the opening prayer
-        row = getRowIfExists(++ROW_INDEX);
+        row = getRowIfExists(++ROW_INDEX, sheet);
         formattedText.setString("የመክፈቻ ፀሎት");
         row.createCell(CELL_INDEX + 1).setCellValue(formattedText);
     }
 
-    private void insertTreasuresParts(Treasures treasures) {
+    private void insertTreasuresParts(Treasures treasures, XSSFSheet sheet) {
         // 8th row has the title of the "Treasures" section
-        Row row = getRowIfExists(++ROW_INDEX);
+        Row row = getRowIfExists(++ROW_INDEX, sheet);
         sheet.addMergedRegion(new CellRangeAddress
                 (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
         insertSectionTitle("ከአምላክ ቃል የሚገኝ ውድ ሀብት" ,row);
         // 10 minute talk, digging for spiritual gems and bible reading
         for (String part : treasures.getParts()) {
             if (part.contains("የመጽሐፍ ቅዱስ ንባብ")) {
-                row = getRowIfExists(++ROW_INDEX);
+                row = getRowIfExists(++ROW_INDEX, sheet);
                 insertHallDivisionHeaders(row);
             }
-            row = getRowIfExists(++ROW_INDEX);
+            row = getRowIfExists(++ROW_INDEX, sheet);
             if (!part.contains("የመጽሐፍ ቅዱስ ንባብ")) {
                 sheet.addMergedRegion(new CellRangeAddress
                         (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 1));
@@ -94,12 +92,13 @@ public class ExcelFileGenerator {
         }
     }
 
-    private void insertMinistryParts(ImproveInMinistry improveInMinistry) {
-        Row row = getRowIfExists(++ROW_INDEX);
+    private void insertMinistryParts(ImproveInMinistry improveInMinistry, XSSFSheet sheet) {
+        Row row = getRowIfExists(++ROW_INDEX, sheet);
         insertSectionTitle("በአገልግሎት ውጤታማ ለመሆን ተጣጣር", row);
         insertHallDivisionHeaders(row);
         // the number of parts is not fixed for all months hence the for loop
         for (String part : improveInMinistry.getParts()) {
+            row = getRowIfExists(++ROW_INDEX, sheet);
             row.createCell(CELL_INDEX).setCellValue(part);
             row.getCell(CELL_INDEX).setCellStyle(getCellStyle
                     (false, false, true, false, false));
@@ -123,14 +122,14 @@ public class ExcelFileGenerator {
                 (true, true, false, true, true));
     }
 
-    private void insertChristianLifeParts(LivingAsChristians livingAsChristians) {
-        Row row = getRowIfExists(++ROW_INDEX);
+    private void insertChristianLifeParts(LivingAsChristians livingAsChristians, XSSFSheet sheet) {
+        Row row = getRowIfExists(++ROW_INDEX, sheet);
         insertSectionTitle("ክርስቲያናዊ ህይወት", row);
         sheet.addMergedRegion(new CellRangeAddress
                 (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
         // the number of parts is not fixed for all months hence the for loop
         for (String part : livingAsChristians.getParts()) {
-            row = getRowIfExists(++ROW_INDEX);
+            row = getRowIfExists(++ROW_INDEX, sheet);
             row.createCell(CELL_INDEX).setCellValue(part);
             sheet.addMergedRegion(new CellRangeAddress
                     (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 1));
@@ -139,60 +138,81 @@ public class ExcelFileGenerator {
         }
     }
 
-    private void insertFooterSection() {
+    private void insertFooterSection(XSSFSheet sheet) {
         // Congregation Bible study reader row
-        Row row = getRowIfExists(++ROW_INDEX);
+        Row row = getRowIfExists(++ROW_INDEX, sheet);
         row.createCell(CELL_INDEX + 1).setCellValue("አንባቢ");
         row.getCell(CELL_INDEX + 1).setCellStyle(getCellStyle
                 (false, false, true, false, false));
         // closing prayer row
-        row = getRowIfExists(++ROW_INDEX);
+        row = getRowIfExists(++ROW_INDEX, sheet);
         row.createCell(CELL_INDEX + 1).setCellValue("ፀሎት");
         row.getCell(CELL_INDEX + 1).setCellStyle(getCellStyle
                 (false, false, true, false, false));
         ROW_INDEX += 3;
     }
 
-    public void makeExcel() {
+    private void addPopulatedSheet(File publicationFolder) {
+        contentParser.setPublicationFolder(publicationFolder);
+        contentParser.extractXHTML();
+
+        XSSFSheet sheet = workbook.createSheet(publicationFolder.getName());
+
         int meetingCount = 0;
-        insertPageTitle();
+
+        insertPageTitle(sheet);
         for (Meeting meeting : contentParser.getMeetings()) {
             if (meetingCount == 3){
                 CELL_INDEX = 5;
                 ROW_INDEX = 4;
             }
-            insertHeaderSection(meeting.getWeekSpan());
+            insertHeaderSection(meeting.getWeekSpan(), sheet);
             for (MeetingSection meetingSection : meeting.getSections()) {
                 switch (meetingSection.getKind()) {
                     case MeetingSection.TREASURES:
-                        insertTreasuresParts((Treasures) meetingSection);
+                        insertTreasuresParts((Treasures) meetingSection, sheet);
                         break;
                     case MeetingSection.IMPROVE_IN_MINISTRY:
-                        insertMinistryParts((ImproveInMinistry) meetingSection);
+                        insertMinistryParts((ImproveInMinistry) meetingSection, sheet);
                         break;
                     case MeetingSection.LIVING_AS_CHRISTIANS:
-                        insertChristianLifeParts((LivingAsChristians) meetingSection);
+                        insertChristianLifeParts((LivingAsChristians) meetingSection, sheet);
                         break;
                     default:
                         break;
                 }
             }
-            insertFooterSection();
+            insertFooterSection(sheet);
             ++meetingCount;
         }
+        // reset indexes
+        CELL_INDEX = 1;
+        ROW_INDEX  = 4;
         // finalize page properties and look
-        resizeColumnsAndFixPageSize();
-        // write the document on disk
-        try {
-            FileOutputStream out = new FileOutputStream(new File("WREX_01.xlsx"));
-            workbook.write(out);
-            out.close();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        resizeColumnsAndFixPageSize(sheet);
     }
 
-    private Row getRowIfExists(int rowIndex) {
+    public int makeExcel() {
+        final File publicationsFolder = new File(".content/");
+        File[] cacheFolder = publicationsFolder.listFiles();
+
+        if (!publicationsFolder.exists()) return 1;
+        if (cacheFolder == null)          return 2;
+
+        for (File publicationFolder : cacheFolder) {
+            addPopulatedSheet(publicationFolder);
+        }
+
+        try {
+            FileOutputStream out = new FileOutputStream(new File("WREX.xlsx"));
+            workbook.write(out);
+            out.close();
+        } catch (IOException e) { return 3; }
+
+        return 0;
+    }
+
+    private Row getRowIfExists(int rowIndex, XSSFSheet sheet) {
         return sheet.getRow(rowIndex) == null ?
                 sheet.createRow(rowIndex) : sheet.getRow(rowIndex);
     }
@@ -227,7 +247,7 @@ public class ExcelFileGenerator {
         return cellStyle;
     }
 
-    private void resizeColumnsAndFixPageSize() {
+    private void resizeColumnsAndFixPageSize(XSSFSheet sheet) {
         // finalize page setup
         sheet.getPrintSetup().setPaperSize(PrintSetup.A4_PAPERSIZE);
         sheet.setFitToPage(true);

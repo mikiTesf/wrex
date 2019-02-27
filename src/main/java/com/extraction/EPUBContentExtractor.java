@@ -15,9 +15,10 @@ import java.util.zip.ZipInputStream;
 
 class EPUBContentExtractor {
 
-    void unzip(File[] EPUBFiles, File destination, Charset charset)
-            throws IOException {
+    void unzip(File[] EPUBFiles, Charset charset) throws IOException {
+        final File destination = new File("./content");
         String OEBPSFolderPath = "";
+
         for (File EPUBFile : EPUBFiles) {
             try (ZipInputStream zipIn = new ZipInputStream
                     (new FileInputStream(EPUBFile), charset)) {

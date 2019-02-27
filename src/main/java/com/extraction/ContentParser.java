@@ -18,8 +18,11 @@ import org.jsoup.select.Elements;
 public class ContentParser {
     private ArrayList<Document> meetingExtracts;
     private Element treasureElement;
+    private File publicationFolder;
 
-    public ContentParser(File publicationFolder) {
+    public ContentParser() {}
+
+    public void extractXHTML() {
         meetingExtracts = new ArrayList<>();
         try {
             //noinspection ConstantConditions
@@ -92,5 +95,9 @@ public class ContentParser {
         }
 
         return meetingSection;
+    }
+
+    public void setPublicationFolder(File publicationFolder) {
+        this.publicationFolder = publicationFolder;
     }
 }
