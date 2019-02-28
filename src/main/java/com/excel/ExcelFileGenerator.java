@@ -41,7 +41,7 @@ public class ExcelFileGenerator {
         Row row = sheet.createRow(2);
 
         formattedText = new XSSFRichTextString();
-        formattedText.setString("ክርስቲያናዊ ህይወታችንና አገልግሎታችን");
+        formattedText.setString(MarginalTexts.PAGE_TITLE);
         formattedText.applyFont(boldFont);
         // set the header of the page
         row.createCell(CELL_INDEX).setCellValue(formattedText);
@@ -60,12 +60,12 @@ public class ExcelFileGenerator {
         row.createCell(CELL_INDEX).setCellValue(formattedText);
         // 6th row has the chairman's name
         row = getRowIfExists(++ROW_INDEX, sheet);
-        formattedText.setString("ሊቀመንበር");
+        formattedText.setString(MarginalTexts.CHAIRMAN);
         formattedText.applyFont(boldFont);
         row.createCell(CELL_INDEX).setCellValue(formattedText);
         // 7th row has the name of the brother who does the opening prayer
         row = getRowIfExists(++ROW_INDEX, sheet);
-        formattedText.setString("የመክፈቻ ፀሎት");
+        formattedText.setString(MarginalTexts.OPENING_PRAYER);
         row.createCell(CELL_INDEX + 1).setCellValue(formattedText);
     }
 
@@ -74,15 +74,15 @@ public class ExcelFileGenerator {
         Row row = getRowIfExists(++ROW_INDEX, sheet);
         sheet.addMergedRegion(new CellRangeAddress
                 (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
-        insertSectionTitle("ከአምላክ ቃል የሚገኝ ውድ ሀብት" ,row);
+        insertSectionTitle(treasures.getSectionTitle(), row);
         // 10 minute talk, digging for spiritual gems and bible reading
         for (String part : treasures.getParts()) {
-            if (part.contains("የመጽሐፍ ቅዱስ ንባብ")) {
+            if (part.contains(MarginalTexts.BIBLE_READING)) {
                 row = getRowIfExists(++ROW_INDEX, sheet);
                 insertHallDivisionHeaders(row);
             }
             row = getRowIfExists(++ROW_INDEX, sheet);
-            if (!part.contains("የመጽሐፍ ቅዱስ ንባብ")) {
+            if (!part.contains(MarginalTexts.BIBLE_READING)) {
                 sheet.addMergedRegion(new CellRangeAddress
                         (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 1));
             }
@@ -94,7 +94,7 @@ public class ExcelFileGenerator {
 
     private void insertMinistryParts(ImproveInMinistry improveInMinistry, XSSFSheet sheet) {
         Row row = getRowIfExists(++ROW_INDEX, sheet);
-        insertSectionTitle("በአገልግሎት ውጤታማ ለመሆን ተጣጣር", row);
+        insertSectionTitle(improveInMinistry.getSectionTitle(), row);
         insertHallDivisionHeaders(row);
         // the number of parts is not fixed for all months hence the for loop
         for (String part : improveInMinistry.getParts()) {
@@ -105,26 +105,18 @@ public class ExcelFileGenerator {
         }
     }
 
-    private void insertSectionTitle(String sectionTitle, Row row) {
-        formattedText.setString(sectionTitle);
-        formattedText.applyFont(boldFont);
-        row.createCell(CELL_INDEX).setCellValue(formattedText);
-        row.getCell(CELL_INDEX).setCellStyle(getCellStyle
-                (true, true, false, false, false));
-    }
-
     private void insertHallDivisionHeaders(Row row) {
-        row.createCell(CELL_INDEX + 1).setCellValue("በዋናው አዳራሽ");
+        row.createCell(CELL_INDEX + 1).setCellValue(MarginalTexts.MAIN_HALL);
         row.getCell(CELL_INDEX + 1).setCellStyle(getCellStyle
                 (true, true, false, true, true));
-        row.createCell(CELL_INDEX + 2).setCellValue("በሁለተኛው አዳራሽ");
+        row.createCell(CELL_INDEX + 2).setCellValue(MarginalTexts.SECOND_HALL);
         row.getCell(CELL_INDEX + 2).setCellStyle(getCellStyle
                 (true, true, false, true, true));
     }
 
     private void insertChristianLifeParts(LivingAsChristians livingAsChristians, XSSFSheet sheet) {
         Row row = getRowIfExists(++ROW_INDEX, sheet);
-        insertSectionTitle("ክርስቲያናዊ ህይወት", row);
+        insertSectionTitle(livingAsChristians.getSectionTitle(), row);
         sheet.addMergedRegion(new CellRangeAddress
                 (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
         // the number of parts is not fixed for all months hence the for loop
@@ -138,15 +130,23 @@ public class ExcelFileGenerator {
         }
     }
 
+    private void insertSectionTitle(String sectionTitle, Row row) {
+        formattedText.setString(sectionTitle);
+        formattedText.applyFont(boldFont);
+        row.createCell(CELL_INDEX).setCellValue(formattedText);
+        row.getCell(CELL_INDEX).setCellStyle(getCellStyle
+                (true, true, false, false, false));
+    }
+
     private void insertFooterSection(XSSFSheet sheet) {
         // Congregation Bible study reader row
         Row row = getRowIfExists(++ROW_INDEX, sheet);
-        row.createCell(CELL_INDEX + 1).setCellValue("አንባቢ");
+        row.createCell(CELL_INDEX + 1).setCellValue(MarginalTexts.READER);
         row.getCell(CELL_INDEX + 1).setCellStyle(getCellStyle
                 (false, false, true, false, false));
         // closing prayer row
         row = getRowIfExists(++ROW_INDEX, sheet);
-        row.createCell(CELL_INDEX + 1).setCellValue("ፀሎት");
+        row.createCell(CELL_INDEX + 1).setCellValue(MarginalTexts.CONCLUDING_PRAYER);
         row.getCell(CELL_INDEX + 1).setCellStyle(getCellStyle
                 (false, false, true, false, false));
         ROW_INDEX += 3;
