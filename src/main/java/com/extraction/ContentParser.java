@@ -17,7 +17,7 @@ import org.jsoup.select.Elements;
 
 public class ContentParser {
     private ArrayList<Document> meetingExtracts;
-    private Element treasureElement;
+    private Element sectionElement;
     private File publicationFolder;
 
     public ContentParser() {}
@@ -51,47 +51,62 @@ public class ContentParser {
     }
 
     private String getWeekSpan(Document meetingDoc) {
-        treasureElement = meetingDoc.selectFirst("title");
-        return treasureElement.text();
+        sectionElement = meetingDoc.selectFirst("title");
+        return sectionElement.text();
     }
 
     private Treasures getTreasures(Document meetingDoc) {
-        treasureElement = meetingDoc.getElementById("section2").selectFirst("ul");
-        Elements presentations = treasureElement.getElementsByTag("li");
+        Elements presentations = new Elements();
+        sectionElement = meetingDoc.getElementById("section2");
+        // the section's topic is in the first "h2" element under the corresponding "section*"
+        presentations.add(sectionElement.selectFirst("h2"));
+        sectionElement.selectFirst("ul");
+        presentations.addAll(sectionElement.getElementsByTag("li"));
 
-        return (Treasures) addPartsToMeeting(presentations, new Treasures());
+        return (Treasures) addTitleAndPartsToSection(presentations, new Treasures());
     }
 
     private ImproveInMinistry getMinistryImprovements(Document meetingDoc) {
-        treasureElement = meetingDoc.getElementById("section3").selectFirst("ul");
-        Elements presentations = treasureElement.getElementsByTag("li");
+        Elements presentations = new Elements();
+        sectionElement = meetingDoc.getElementById("section3");
+        presentations.add(sectionElement.selectFirst("h2"));
+        sectionElement.selectFirst("ul");
+        presentations.addAll(sectionElement.getElementsByTag("li"));
 
-        return (ImproveInMinistry) addPartsToMeeting(presentations, new ImproveInMinistry());
+        return (ImproveInMinistry) addTitleAndPartsToSection(presentations, new ImproveInMinistry());
     }
 
     private LivingAsChristians getLivingAsChristians(Document meetingDoc) {
-        treasureElement = meetingDoc.getElementById("section4").selectFirst("ul");
-        Elements presentations = treasureElement.getElementsByTag("li");
-        // The paragraphs inside the first (index -> 0) and the last two list items should not
-        // be included in the schedule. They must be removed in advance
-        presentations.remove(0); // transition song element
+        Elements presentations = new Elements();
+        sectionElement = meetingDoc.getElementById("section4");
+        presentations.add(sectionElement.selectFirst("h2"));
+        sectionElement.selectFirst("ul");
+        presentations.addAll(sectionElement.getElementsByTag("li"));
+        // The paragraphs inside the 2nd (index -> 1) and the last two list items should not
+        // be included in the schedule. They must be removed before passing them to the method
+        // that adds the presentations to this MeetingSection
+        presentations.remove(1); // transition song element
         presentations.remove(presentations.size() - 1); // concluding song and prayer element
         // the ArrayList re-sizes on the previous `remove` so the index of
-        // the last element must be found with the same expression:
+        // the last element can only be calculated with the same expression:
         // `presentations.size() - 1`
         presentations.remove(presentations.size() - 1); // next week preview element
 
-        return (LivingAsChristians) addPartsToMeeting(presentations, new LivingAsChristians());
+        return (LivingAsChristians) addTitleAndPartsToSection(presentations, new LivingAsChristians());
     }
 
-    private MeetingSection addPartsToMeeting(Elements presentations, MeetingSection meetingSection) {
-        String title;
+    private MeetingSection addTitleAndPartsToSection(Elements presentations, MeetingSection meetingSection) {
+        String topic;
+        meetingSection.setSectionTitle(presentations.get(0).text());
+        // not to add an exception in the next loop, the
+        // first element (an "h2") is better removed
+        presentations.remove(0);
         for (Element listItem : presentations) {
-            title = listItem.selectFirst("p").text();
+            topic = listItem.selectFirst("p").text();
             // filter for ደቂቃ
-            if (!title.contains("ደቂቃ")) continue;
-            title = title.substring(0, title.indexOf(" ደቂቃ")) + " ደቂቃ)";
-            meetingSection.addPart(title);
+            if (!topic.contains(" ደቂቃ")) continue;
+            topic = topic.substring(0, topic.indexOf(" ደቂቃ")) + " ደቂቃ)";
+            meetingSection.addPart(topic);
         }
 
         return meetingSection;
