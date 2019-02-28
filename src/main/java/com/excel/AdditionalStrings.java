@@ -1,6 +1,6 @@
 package com.excel;
 
-class MarginalTexts {
+class AdditionalStrings {
     static final String PAGE_TITLE        = "ክርስቲያናዊ ህይወታችንና አገልግሎታችን";
     static final String CHAIRMAN          = "ሊቀመንበር";
     static final String OPENING_PRAYER    = "የመክፈቻ ፀሎት";
