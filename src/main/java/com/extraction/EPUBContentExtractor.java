@@ -13,10 +13,10 @@ import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-class EPUBContentExtractor {
+public class EPUBContentExtractor {
 
-    void unzip(File[] EPUBFiles, Charset charset) throws IOException {
-        final File destination = new File("./content");
+    public void unzip(File[] EPUBFiles, Charset charset) throws IOException {
+        final File destination = new File(".content/");
         String OEBPSFolderPath = "";
 
         for (File EPUBFile : EPUBFiles) {
@@ -39,7 +39,6 @@ class EPUBContentExtractor {
                     }
                     String filePath = publicationFolder + File.separator + entry.getName();
                     File entryFile = new File(filePath);
-                    System.out.println(filePath);
 
                     if (entry.isDirectory()) { entryFile.mkdir(); }
                     else {
@@ -58,17 +57,21 @@ class EPUBContentExtractor {
                     entry = zipIn.getNextEntry();
                 }
             }
-            removeNonWeekSpanFiles(new File(OEBPSFolderPath));
+            removeNonMeetingFiles(new File(OEBPSFolderPath));
             moveContentFilesToPublicationFolder(new File(OEBPSFolderPath));
         }
     }
 
-    private void removeNonWeekSpanFiles (File OEBPSFolder) throws IOException {
+    private void removeNonMeetingFiles(File OEBPSFolder) throws IOException {
         File[] XHTMLFiles = OEBPSFolder.listFiles();
 
         for (File XHTMLFile : Objects.requireNonNull(XHTMLFiles)) {
             Document XHTMLDocument = Jsoup.parse(XHTMLFile, "UTF-8");
-            if (!XHTMLDocument.html().contains("shadedHeader treasures"))
+            if (
+                    !XHTMLDocument.html().contains("treasures") &&
+                    !XHTMLDocument.html().contains("ministry") &&
+                    !XHTMLDocument.html().contains("christianLiving")
+            )
                 XHTMLFile.delete();
         }
     }
@@ -82,21 +85,18 @@ class EPUBContentExtractor {
     }
 
     private boolean unnecessaryFile(String fileName) {
-
-        switch (fileName) {
-            case "mimetype":
-            case "META-INF":
-            case "css":
-            case "images":
-            case "extracted":
-            case "pagenav": // different numbers appear after "pagenav"
-            case "content.opf":
-            case "cover.xhtml":
-            case "toc.": // both "toc.ncx" and "toc.xhtml"
-                return true;
-            default:
-                return false;
-        }
+        return
+                fileName.contains("mimetype")    ||
+                fileName.contains("META-INF")    ||
+                fileName.contains("css")         ||
+                fileName.contains("images")      ||
+                fileName.contains("extracted")   ||
+                // different numbers appear after "pagenav"
+                fileName.contains("pagenav")     ||
+                fileName.contains("content.opf") ||
+                fileName.contains("cover.xhtml") ||
+                // both "toc.ncx" and "toc.xhtml"
+                fileName.contains("toc.");
     }
 
     private void extractFile(ZipInputStream zipIn, File file)
