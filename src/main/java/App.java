@@ -1,10 +1,9 @@
-import com.excel.ExcelFileGenerator;
+import com.gui.GUI;
 
 class App {
 
     public static void main(String[] args) {
-
-        ExcelFileGenerator generator = new ExcelFileGenerator();
-        generator.makeExcel();
+        GUI gui = new GUI();
+        gui.setupAndDrawUI();
     }
 }

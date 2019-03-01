@@ -29,6 +29,7 @@ public class ExcelFileGenerator {
     private ContentParser contentParser;
     private int CELL_INDEX = 1;
     private int ROW_INDEX = 4;
+    private final File cacheFolder = new File(".content/");
 
     public ExcelFileGenerator() {
         contentParser = new ContentParser();
@@ -183,13 +184,11 @@ public class ExcelFileGenerator {
     }
 
     public int makeExcel() {
-        final File publicationsFolder = new File(".content/");
-        File[] cacheFolder = publicationsFolder.listFiles();
+        File[] publicationFolders = cacheFolder.listFiles();
 
-        if (!publicationsFolder.exists()) return 1;
-        if (cacheFolder == null) return 2;
+        if (publicationFolders == null) { return 1; }
 
-        for (File publicationFolder : cacheFolder) {
+        for (File publicationFolder : publicationFolders) {
             addPopulatedSheet(publicationFolder);
         }
 
@@ -197,10 +196,9 @@ public class ExcelFileGenerator {
             FileOutputStream out = new FileOutputStream(new File("wrex.xlsx"));
             workbook.write(out);
             out.close();
-        } catch (IOException e) {
-            return 3;
-        }
+        } catch (IOException e) { return 2; }
 
+        removeCacheAndPublicationFolders();
         return 0;
     }
 
@@ -253,5 +251,17 @@ public class ExcelFileGenerator {
                 sheet.autoSizeColumn(cell.getColumnIndex());
             }
         }
+    }
+
+    private void removeCacheAndPublicationFolders() {
+        // noinspection ConstantConditions
+        for (File publicationFolder : cacheFolder.listFiles()) {
+            // noinspection ConstantConditions
+            for (File XHTMLFile : publicationFolder.listFiles()) {
+                XHTMLFile.delete();
+            }
+            publicationFolder.delete();
+        }
+        cacheFolder.delete();
     }
 }
