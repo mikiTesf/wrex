@@ -3,20 +3,16 @@ package com.gui;
 import com.excel.ExcelFileGenerator;
 import com.extraction.EPUBContentExtractor;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JTable;
-import javax.swing.JFileChooser;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
 
+import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
+import java.awt.Dimension;
+import java.awt.Color;
 import java.io.File;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -28,12 +24,14 @@ public class GUI extends JFrame {
     private JButton generateButton;
     private JPanel mainPanel;
     private JTable publicationTable;
+    private JScrollPane scrollPane;
+    private JLabel statusLabel;
 
     private File[] publicationFolders = null;
 
     public GUI() {
         setContentPane(mainPanel);
-        setSize(new Dimension(370, 400));
+        setSize(new Dimension(300, 350));
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -50,9 +48,12 @@ public class GUI extends JFrame {
         }
 
         // setup table properties;
+        publicationTable.setFillsViewportHeight(true);
         DefaultTableModel tableModel = new DefaultTableModel();
         tableModel.addColumn("Publication(s)");
         publicationTable.setModel(tableModel);
+
+        scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
         FileNameExtensionFilter filter = new FileNameExtensionFilter
                 ("Meeting Workbook (EPUB)", "epub");
@@ -72,6 +73,16 @@ public class GUI extends JFrame {
 
                 fileChooser.showDialog(thisFrame, "Open");
                 publicationFolders = fileChooser.getSelectedFiles();
+
+                for (int rowIndex = 0; rowIndex < tableModel.getColumnCount(); rowIndex++) {
+                    if (tableModel.getRowCount() == 0) break;
+                    tableModel.removeRow(rowIndex);
+                }
+
+                for (File publicationFolder : publicationFolders) {
+                    tableModel.addRow(new Object[]{publicationFolder.getName()});
+                }
+
                 generateButton.setEnabled(publicationFolders.length != 0);
             }
         });
@@ -81,15 +92,29 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (publicationFolders == null) return;
 
-                try {
-                    new EPUBContentExtractor().unzip(publicationFolders, Charset.defaultCharset());
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                new ExcelFileGenerator().makeExcel();
-                generateButton.setEnabled(false);
+                new Thread() {
+                    @Override
+                    public void run() {
+                        generateButton.setEnabled(false);
+                        openButton.setEnabled(false);
+                        statusLabel.setText("Generating...");
+
+                        try {
+                            new EPUBContentExtractor().unzip(publicationFolders, Charset.defaultCharset());
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                        new ExcelFileGenerator().makeExcel();
+
+                        statusLabel.setText("Done!");
+                        generateButton.setEnabled(true);
+                        openButton.setEnabled(true);
+                    }
+                }.start();
             }
         });
+
+        statusLabel.setText("...");
 
         setVisible(true);
     }
