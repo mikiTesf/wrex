@@ -4,18 +4,23 @@ import com.extraction.ContentParser;
 import com.meeting.*;
 
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import static com.meeting.MeetingSection.*;
 
 public class ExcelFileGenerator {
     private XSSFWorkbook workbook;
@@ -164,21 +169,9 @@ public class ExcelFileGenerator {
                 ROW_INDEX = 4;
             }
             insertHeaderSection(meeting.getWeekSpan(), sheet);
-            for (MeetingSection meetingSection : meeting.getSections()) {
-                switch (meetingSection.getKind()) {
-                    case TREASURES:
-                        insertTreasuresParts((Treasures) meetingSection, sheet);
-                        break;
-                    case IMPROVE_IN_MINISTRY:
-                        insertMinistryParts((ImproveInMinistry) meetingSection, sheet);
-                        break;
-                    case LIVING_AS_CHRISTIANS:
-                        insertChristianLifeParts((LivingAsChristians) meetingSection, sheet);
-                        break;
-                    default:
-                        break;
-                }
-            }
+            insertTreasuresParts(meeting.getTreasures(), sheet);
+            insertMinistryParts(meeting.getImproveInMinistry(), sheet);
+            insertChristianLifeParts(meeting.getLivingAsChristians(), sheet);
             insertFooterSection(sheet);
             ++meetingCount;
         }
@@ -201,7 +194,7 @@ public class ExcelFileGenerator {
         }
 
         try {
-            FileOutputStream out = new FileOutputStream(new File("WREX.xlsx"));
+            FileOutputStream out = new FileOutputStream(new File("wrex.xlsx"));
             workbook.write(out);
             out.close();
         } catch (IOException e) {
@@ -212,8 +205,8 @@ public class ExcelFileGenerator {
     }
 
     private Row getRowIfExists(int rowIndex, XSSFSheet sheet) {
-        return sheet.getRow(rowIndex) == null ?
-                sheet.createRow(rowIndex) : sheet.getRow(rowIndex);
+        Row row = sheet.getRow(rowIndex);
+        return (row == null) ? sheet.createRow(rowIndex) : row;
     }
 
     private XSSFCellStyle getCellStyle(
@@ -255,8 +248,10 @@ public class ExcelFileGenerator {
         // finalize page setup
         sheet.getPrintSetup().setPaperSize(PrintSetup.A4_PAPERSIZE);
         sheet.setFitToPage(true);
-        for (int column = CELL_INDEX; column < 11; column++) {
-            sheet.autoSizeColumn(column);
+        for (Row row : sheet) {
+            for (Cell cell : row) {
+                sheet.autoSizeColumn(cell.getColumnIndex());
+            }
         }
     }
 }

@@ -33,12 +33,4 @@ public class Meeting {
     public LivingAsChristians getLivingAsChristians() {
         return livingAsChristians;
     }
-
-    public MeetingSection[] getSections() {
-        return new MeetingSection[] {
-                this.treasures,
-                this.improveInMinistry,
-                this.livingAsChristians
-        };
-    }
 }
