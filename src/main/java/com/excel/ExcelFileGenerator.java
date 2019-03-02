@@ -30,8 +30,10 @@ public class ExcelFileGenerator {
     private int CELL_INDEX = 1;
     private int ROW_INDEX = 4;
     private final File cacheFolder = new File(".content/");
+    private final File destination;
 
-    public ExcelFileGenerator() {
+    public ExcelFileGenerator(File destination) {
+        this.destination = destination;
         contentParser = new ContentParser();
         workbook = new XSSFWorkbook();
         boldFont = new XSSFFont();
@@ -193,7 +195,7 @@ public class ExcelFileGenerator {
         }
 
         try {
-            FileOutputStream out = new FileOutputStream(new File("wrex.xlsx"));
+            FileOutputStream out = new FileOutputStream(new File(destination.getPath() + "/wrex.xlsx"));
             workbook.write(out);
             out.close();
         } catch (IOException e) { return 2; }
