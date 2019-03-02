@@ -157,7 +157,7 @@ public class ExcelFileGenerator {
 
     private void addPopulatedSheet(File publicationFolder) {
         contentParser.setPublicationFolder(publicationFolder);
-        contentParser.extractXHTML();
+        contentParser.readRawHTML();
 
         XSSFSheet sheet = workbook.createSheet(publicationFolder.getName());
 

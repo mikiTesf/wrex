@@ -3,6 +3,7 @@ package com.extraction;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.meeting.MeetingSection;
 import com.meeting.ImproveInMinistry;
@@ -22,11 +23,18 @@ public class ContentParser {
 
     public ContentParser() {}
 
-    public void extractXHTML() {
+    public void readRawHTML() {
         meetingExtracts = new ArrayList<>();
         try {
+            File[] XHTMLFiles = publicationFolder.listFiles();
+            /*
+            * Sorting the 'XHTMLFiles' array is important because `listFiles()` does not guarantee
+            * order neither through path or name (both would have worked in this case). This in
+            * turn affects the order of the schedule in the Excel file that gets generated next
+            * */
             //noinspection ConstantConditions
-            for (File XHTMLFile : publicationFolder.listFiles()) {
+            Arrays.sort(XHTMLFiles);
+            for (File XHTMLFile : XHTMLFiles) {
                 meetingExtracts.add(Jsoup.parse(XHTMLFile, "UTF-8"));
             }
         } catch (IOException e) {
