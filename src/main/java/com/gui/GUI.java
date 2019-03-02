@@ -3,9 +3,18 @@ package com.gui;
 import com.excel.ExcelFileGenerator;
 import com.extraction.EPUBContentExtractor;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.JFileChooser;
+import javax.swing.BorderFactory;
+import javax.swing.JOptionPane;
 
-import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
@@ -26,6 +35,10 @@ public class GUI extends JFrame {
     private JTable publicationTable;
     private JScrollPane scrollPane;
     private JLabel statusLabel;
+
+    private final int NO_PUBLICATIONS = 1;
+    private final int COULD_NOT_SAVE_FILE = 2;
+    private final int SUCCESS = 0;
 
     private File[] publicationFolders = null;
 
@@ -49,7 +62,12 @@ public class GUI extends JFrame {
 
         // setup table properties;
         publicationTable.setFillsViewportHeight(true);
-        DefaultTableModel tableModel = new DefaultTableModel();
+        DefaultTableModel tableModel = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         tableModel.addColumn("Publication(s)");
         publicationTable.setModel(tableModel);
 
@@ -104,7 +122,25 @@ public class GUI extends JFrame {
                         } catch (IOException e1) {
                             e1.printStackTrace();
                         }
-                        new ExcelFileGenerator().makeExcel();
+
+                        int status = new ExcelFileGenerator().makeExcel();
+                        switch (status) {
+                            case NO_PUBLICATIONS:
+                                JOptionPane.showMessageDialog
+                                        (thisFrame, "", "Problem", JOptionPane.ERROR_MESSAGE);
+                                break;
+                            case COULD_NOT_SAVE_FILE:
+                                JOptionPane.showMessageDialog
+                                        (thisFrame, "", "Problem", JOptionPane.ERROR_MESSAGE);
+                                break;
+                            case SUCCESS:
+                                JOptionPane.showMessageDialog
+                                        (thisFrame, "", "Done", JOptionPane.INFORMATION_MESSAGE);
+                                break;
+                            default:
+                                JOptionPane.showMessageDialog
+                                        (thisFrame, "An unknown problem has occured", "Problem", JOptionPane.ERROR_MESSAGE);
+                        }
 
                         statusLabel.setText("Done!");
                         generateButton.setEnabled(true);
