@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.TableView;
 
 import java.awt.Dimension;
 import java.awt.Color;
@@ -41,7 +42,7 @@ public class GUI extends JFrame {
     private final int COULD_NOT_SAVE_FILE = 2;
     private final int SUCCESS = 0;
 
-    private File[] publicationFolders = null;
+    private File[] EPUBFiles = null;
 
     public GUI() {
         setContentPane(mainPanel);
@@ -89,25 +90,21 @@ public class GUI extends JFrame {
                 fileChooser.setFileFilter(filter);
 
                 fileChooser.showDialog(thisFrame, "Open");
-                publicationFolders = fileChooser.getSelectedFiles();
+                EPUBFiles = fileChooser.getSelectedFiles();
 
-                for (int rowIndex = 0; rowIndex < tableModel.getColumnCount(); rowIndex++) {
-                    if (tableModel.getRowCount() == 0) break;
-                    tableModel.removeRow(rowIndex);
+                tableModel.setRowCount(0);
+                for (File EPUBFile : EPUBFiles) {
+                    tableModel.addRow(new Object[]{EPUBFile.getName()});
                 }
 
-                for (File publicationFolder : publicationFolders) {
-                    tableModel.addRow(new Object[]{publicationFolder.getName()});
-                }
-
-                generateButton.setEnabled(publicationFolders.length != 0);
+                generateButton.setEnabled(EPUBFiles.length != 0);
             }
         });
 
         generateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (publicationFolders == null) return;
+                if (EPUBFiles == null) return;
 
                 new Thread() {
                     @Override
@@ -126,7 +123,7 @@ public class GUI extends JFrame {
                         statusLabel.setText("Generating...");
 
                         try {
-                            new EPUBContentExtractor().unzip(publicationFolders, Charset.defaultCharset());
+                            new EPUBContentExtractor().unzip(EPUBFiles, Charset.defaultCharset());
                         } catch (IOException e1) {
                             e1.printStackTrace();
                         }
