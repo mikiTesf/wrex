@@ -35,6 +35,7 @@ public class GUI extends JFrame {
     private JTable publicationTable;
     private JScrollPane scrollPane;
     private JLabel statusLabel;
+    private final JFileChooser fileChooser = new JFileChooser();
 
     private final int NO_PUBLICATIONS = 1;
     private final int COULD_NOT_SAVE_FILE = 2;
@@ -59,7 +60,8 @@ public class GUI extends JFrame {
                  IllegalAccessException | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
-
+        // I got nothing to say about the next line of code
+        fileChooser.setDragEnabled(false);
         // setup table properties;
         publicationTable.setFillsViewportHeight(true);
         DefaultTableModel tableModel = new DefaultTableModel() {
@@ -79,14 +81,11 @@ public class GUI extends JFrame {
         openButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser
-                        (System.getProperty("user.home"));
-                fileChooser.setDragEnabled(false);
-                fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+                fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
                 fileChooser.setDialogTitle("Open...");
-                fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 fileChooser.setMultiSelectionEnabled(true);
+                fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
                 fileChooser.setFileFilter(filter);
 
                 fileChooser.showDialog(thisFrame, "Open");
@@ -113,6 +112,15 @@ public class GUI extends JFrame {
                 new Thread() {
                     @Override
                     public void run() {
+                        fileChooser.resetChoosableFileFilters();
+                        fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+                        fileChooser.setDialogTitle("Save...");
+                        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                        fileChooser.setMultiSelectionEnabled(false);
+                        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+
+                        fileChooser.showDialog(thisFrame, "Save");
+
                         generateButton.setEnabled(false);
                         openButton.setEnabled(false);
                         statusLabel.setText("Generating...");
@@ -123,34 +131,36 @@ public class GUI extends JFrame {
                             e1.printStackTrace();
                         }
 
-                        int status = new ExcelFileGenerator().makeExcel();
+                        int status = new ExcelFileGenerator(fileChooser.getSelectedFile()).makeExcel();
 
                         generateButton.setEnabled(true);
                         openButton.setEnabled(true);
 
                         switch (status) {
                             case NO_PUBLICATIONS:
+                                statusLabel.setText("...");
                                 JOptionPane.showMessageDialog
                                         (thisFrame, "You didn't select any publications",
                                                 "Problem", JOptionPane.ERROR_MESSAGE);
                                 break;
                             case COULD_NOT_SAVE_FILE:
+                                statusLabel.setText("...");
                                 JOptionPane.showMessageDialog
                                         (thisFrame, "Could not save generated document",
                                                 "Problem", JOptionPane.ERROR_MESSAGE);
                                 break;
                             case SUCCESS:
+                                statusLabel.setText("Done!");
                                 JOptionPane.showMessageDialog
                                         (thisFrame, "Schedule generated", "Done",
                                                 JOptionPane.INFORMATION_MESSAGE);
                                 break;
                             default:
+                                statusLabel.setText("...");
                                 JOptionPane.showMessageDialog
                                         (thisFrame, "An unknown problem has occurred",
                                                 "Problem", JOptionPane.ERROR_MESSAGE);
                         }
-
-                        statusLabel.setText("Done!");
                     }
                 }.start();
             }
