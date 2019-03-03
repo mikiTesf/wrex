@@ -8,9 +8,13 @@ public class MeetingSection {
     // demonstrations, talks, etc...
     private ArrayList<String> parts;
 
-    public MeetingSection (SectionKind sectionKind) {
+    public MeetingSection(SectionKind sectionKind) {
         this.sectionKind = sectionKind;
         parts = new ArrayList<>();
+    }
+
+    public SectionKind getSectionKind() {
+        return this.sectionKind;
     }
 
     public void setSectionTitle(String title) {
@@ -19,10 +23,6 @@ public class MeetingSection {
 
     public String getSectionTitle() {
         return this.title;
-    }
-
-    public SectionKind getSectionKind() {
-        return this.sectionKind;
     }
 
     public ArrayList<String> getParts () {

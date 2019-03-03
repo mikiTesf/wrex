@@ -19,11 +19,11 @@ public class Meeting {
     }
 
     public String getWeekSpan () {
-        return this.weekSpan;
+        return weekSpan;
     }
 
     public MeetingSection getTreasures() {
-        return this.treasures;
+        return treasures;
     }
 
     public MeetingSection getImproveInMinistry() {
