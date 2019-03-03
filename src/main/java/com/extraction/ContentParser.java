@@ -6,11 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.meeting.MeetingSection;
-import com.meeting.ImproveInMinistry;
-import com.meeting.LivingAsChristians;
-import com.meeting.Treasures;
 import com.meeting.Meeting;
 
+import com.meeting.SectionKind;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -47,9 +45,9 @@ public class ContentParser {
 
         for (Document meetingDocument : meetingExtracts) {
             String weekSpan = getWeekSpan(meetingDocument);
-            Treasures treasures = getTreasures(meetingDocument);
-            ImproveInMinistry improveInMinistry = getMinistryImprovements(meetingDocument);
-            LivingAsChristians livingAsChristians = getLivingAsChristians(meetingDocument);
+            MeetingSection treasures = getTreasures(meetingDocument);
+            MeetingSection improveInMinistry = getMinistryImprovements(meetingDocument);
+            MeetingSection livingAsChristians = getLivingAsChristians(meetingDocument);
 
             Meeting meeting = new Meeting(weekSpan, treasures, improveInMinistry, livingAsChristians);
             meetings.add(meeting);
@@ -63,7 +61,7 @@ public class ContentParser {
         return sectionElement.text();
     }
 
-    private Treasures getTreasures(Document meetingDoc) {
+    private MeetingSection getTreasures(Document meetingDoc) {
         Elements presentations = new Elements();
         sectionElement = meetingDoc.getElementById("section2");
         // the section's topic is in the first "h2" element under the corresponding "section*"
@@ -71,20 +69,20 @@ public class ContentParser {
         sectionElement.selectFirst("ul");
         presentations.addAll(sectionElement.getElementsByTag("li"));
 
-        return (Treasures) addTitleAndPartsToSection(presentations, new Treasures());
+        return addTitleAndPartsToSection(presentations, new MeetingSection(SectionKind.TREASURES));
     }
 
-    private ImproveInMinistry getMinistryImprovements(Document meetingDoc) {
+    private MeetingSection getMinistryImprovements(Document meetingDoc) {
         Elements presentations = new Elements();
         sectionElement = meetingDoc.getElementById("section3");
         presentations.add(sectionElement.selectFirst("h2"));
         sectionElement.selectFirst("ul");
         presentations.addAll(sectionElement.getElementsByTag("li"));
 
-        return (ImproveInMinistry) addTitleAndPartsToSection(presentations, new ImproveInMinistry());
+        return addTitleAndPartsToSection(presentations, new MeetingSection(SectionKind.IMPROVE_IN_MINISTRY));
     }
 
-    private LivingAsChristians getLivingAsChristians(Document meetingDoc) {
+    private MeetingSection getLivingAsChristians(Document meetingDoc) {
         Elements presentations = new Elements();
         sectionElement = meetingDoc.getElementById("section4");
         presentations.add(sectionElement.selectFirst("h2"));
@@ -100,7 +98,7 @@ public class ContentParser {
         // `presentations.size() - 1`
         presentations.remove(presentations.size() - 1); // next week preview element
 
-        return (LivingAsChristians) addTitleAndPartsToSection(presentations, new LivingAsChristians());
+        return addTitleAndPartsToSection(presentations, new MeetingSection(SectionKind.LIVING_AS_CHRISTIANS));
     }
 
     private MeetingSection addTitleAndPartsToSection(Elements presentations, MeetingSection meetingSection) {

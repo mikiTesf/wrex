@@ -73,7 +73,7 @@ public class ExcelFileGenerator {
         row.createCell(CELL_INDEX + 1).setCellValue(formattedText);
     }
 
-    private void insertTreasuresParts(Treasures treasures, XSSFSheet sheet) {
+    private void insertTreasuresParts(MeetingSection treasures, XSSFSheet sheet) {
         // 8th row has the title of the "Treasures" section
         Row row = getRowIfExists(++ROW_INDEX, sheet);
         sheet.addMergedRegion(new CellRangeAddress
@@ -96,7 +96,7 @@ public class ExcelFileGenerator {
         }
     }
 
-    private void insertMinistryParts(ImproveInMinistry improveInMinistry, XSSFSheet sheet) {
+    private void insertMinistryParts(MeetingSection improveInMinistry, XSSFSheet sheet) {
         Row row = getRowIfExists(++ROW_INDEX, sheet);
         insertSectionTitle(improveInMinistry.getSectionTitle(), row);
         insertHallDivisionHeaders(row);
@@ -119,7 +119,7 @@ public class ExcelFileGenerator {
                 (true, true, false, true, true));
     }
 
-    private void insertChristianLifeParts(LivingAsChristians livingAsChristians, XSSFSheet sheet) {
+    private void insertChristianLifeParts(MeetingSection livingAsChristians, XSSFSheet sheet) {
         Row row = getRowIfExists(++ROW_INDEX, sheet);
         insertSectionTitle(livingAsChristians.getSectionTitle(), row);
         sheet.addMergedRegion(new CellRangeAddress
