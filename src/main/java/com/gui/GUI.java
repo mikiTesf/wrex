@@ -17,7 +17,6 @@ import javax.swing.JOptionPane;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.TableView;
 
 import java.awt.Dimension;
 import java.awt.Color;
@@ -75,6 +74,8 @@ public class GUI extends JFrame {
         publicationTable.setModel(tableModel);
 
         scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+
+        statusLabel.setText("...");
 
         FileNameExtensionFilter filter = new FileNameExtensionFilter
                 ("Meeting Workbook (EPUB)", "epub");
@@ -135,13 +136,11 @@ public class GUI extends JFrame {
 
                         switch (status) {
                             case NO_PUBLICATIONS:
-                                statusLabel.setText("...");
                                 JOptionPane.showMessageDialog
                                         (thisFrame, "You didn't select any publications",
                                                 "Problem", JOptionPane.ERROR_MESSAGE);
                                 break;
                             case COULD_NOT_SAVE_FILE:
-                                statusLabel.setText("...");
                                 JOptionPane.showMessageDialog
                                         (thisFrame, "Could not save generated document",
                                                 "Problem", JOptionPane.ERROR_MESSAGE);
@@ -153,17 +152,15 @@ public class GUI extends JFrame {
                                                 JOptionPane.INFORMATION_MESSAGE);
                                 break;
                             default:
-                                statusLabel.setText("...");
                                 JOptionPane.showMessageDialog
                                         (thisFrame, "An unknown problem has occurred",
                                                 "Problem", JOptionPane.ERROR_MESSAGE);
                         }
+                        statusLabel.setText("...");
                     }
                 }.start();
             }
         });
-
-        statusLabel.setText("...");
 
         setVisible(true);
     }
