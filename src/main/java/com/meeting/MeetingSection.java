@@ -2,17 +2,14 @@ package com.meeting;
 
 import java.util.ArrayList;
 
-public abstract class MeetingSection {
-    private String kind;
+public class MeetingSection {
+    private SectionKind sectionKind;
     private String title;
-    public static final String TREASURES            = "TREASURES";
-    public static final String IMPROVE_IN_MINISTRY  = "IMPROVE_IN_MINISTRY";
-    public static final String LIVING_AS_CHRISTIANS = "LIVING_AS_CHRISTIANS";
     // demonstrations, talks, etc...
     private ArrayList<String> parts;
 
-    MeetingSection (String kind) {
-        this.kind = kind;
+    public MeetingSection (SectionKind sectionKind) {
+        this.sectionKind = sectionKind;
         parts = new ArrayList<>();
     }
 
@@ -24,8 +21,8 @@ public abstract class MeetingSection {
         return this.title;
     }
 
-    public String getKind () {
-        return this.kind;
+    public SectionKind getSectionKind() {
+        return this.sectionKind;
     }
 
     public ArrayList<String> getParts () {

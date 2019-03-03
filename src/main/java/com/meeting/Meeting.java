@@ -2,15 +2,15 @@ package com.meeting;
 
 public class Meeting {
     private String weekSpan;
-    private Treasures treasures;
-    private ImproveInMinistry improveInMinistry;
-    private LivingAsChristians livingAsChristians;
+    private MeetingSection treasures;
+    private MeetingSection improveInMinistry;
+    private MeetingSection livingAsChristians;
 
     public Meeting (
             String weekSpan,
-            Treasures treasures,
-            ImproveInMinistry improveInMinistry,
-            LivingAsChristians livingAsChristians
+            MeetingSection treasures,
+            MeetingSection improveInMinistry,
+            MeetingSection livingAsChristians
     ) {
         this.weekSpan = weekSpan;
         this.treasures = treasures;
@@ -22,15 +22,15 @@ public class Meeting {
         return this.weekSpan;
     }
 
-    public Treasures getTreasures() {
+    public MeetingSection getTreasures() {
         return this.treasures;
     }
 
-    public ImproveInMinistry getImproveInMinistry() {
+    public MeetingSection getImproveInMinistry() {
         return improveInMinistry;
     }
 
-    public LivingAsChristians getLivingAsChristians() {
+    public MeetingSection getLivingAsChristians() {
         return livingAsChristians;
     }
 }
