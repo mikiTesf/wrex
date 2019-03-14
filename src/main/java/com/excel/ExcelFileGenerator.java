@@ -4,7 +4,7 @@ import com.extraction.ContentParser;
 import com.meeting.*;
 
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -245,13 +245,19 @@ public class ExcelFileGenerator {
     }
 
     private void resizeColumnsAndFixPageSize(XSSFSheet sheet) {
-        // finalize page setup
+        final double MARGIN_LENGTH = 0.1; // 0.393701 in = 1 cm
+        final int FIRST_COLUMN = 1;
+        final int LAST_COLUMN = 7;
+
         sheet.getPrintSetup().setPaperSize(PrintSetup.A4_PAPERSIZE);
+        sheet.setMargin(Sheet.LeftMargin, MARGIN_LENGTH);
+        sheet.setMargin(Sheet.RightMargin, MARGIN_LENGTH);
+        sheet.setMargin(Sheet.TopMargin, MARGIN_LENGTH);
+        sheet.setMargin(Sheet.BottomMargin, MARGIN_LENGTH);
         sheet.setFitToPage(true);
-        for (Row row : sheet) {
-            for (Cell cell : row) {
-                sheet.autoSizeColumn(cell.getColumnIndex());
-            }
+
+        for (int column = FIRST_COLUMN; column <= LAST_COLUMN; column++) {
+            sheet.autoSizeColumn(column, false);
         }
     }
 

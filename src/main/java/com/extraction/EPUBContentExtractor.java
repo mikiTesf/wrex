@@ -32,8 +32,7 @@ public class EPUBContentExtractor {
                 publicationFolder.mkdirs();
 
                 while (entry != null) {
-                    // ignore unnecessary files ("css/" and "image/" folders)
-                    if (unnecessaryFile(entry.getName())){
+                    if (unnecessaryFile(entry.getName())) {
                         entry = zipIn.getNextEntry();
                         continue;
                     }

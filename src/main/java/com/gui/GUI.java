@@ -122,7 +122,7 @@ public class GUI extends JFrame {
                         generateButton.setEnabled(false);
                         openButton.setEnabled(false);
                         statusLabel.setText("Generating...");
-
+                        // TODO: make sure the destination doesn't contain a duplicate file
                         try {
                             new EPUBContentExtractor().unzip(EPUBFiles, Charset.defaultCharset());
                         } catch (IOException e1) {
@@ -150,6 +150,7 @@ public class GUI extends JFrame {
                                 JOptionPane.showMessageDialog
                                         (thisFrame, "Schedule generated", "Done",
                                                 JOptionPane.INFORMATION_MESSAGE);
+                                // TODO: open the excel file upon successful generation
                                 break;
                             default:
                                 JOptionPane.showMessageDialog

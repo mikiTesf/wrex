@@ -29,7 +29,7 @@ public class ContentParser {
             File[] XHTMLFiles = publicationFolder.listFiles();
             /*
             * Sorting the 'XHTMLFiles' array is important because `listFiles()` does not guarantee
-            * order neither through path or name (both would have worked in this case). This in
+            * order through neither path nor name (both would have worked in this case). This in
             * turn affects the order of the schedule in the Excel file that gets generated next
             * */
             // noinspection ConstantConditions
@@ -48,11 +48,11 @@ public class ContentParser {
         for (Document meetingDocument : meetingExtracts) {
             String weekSpan = getWeekSpan(meetingDocument);
 
-            MeetingSection treasures = getTitleAndPartsOfSection
+            MeetingSection treasures = getMeetingSection
                     (TREASURES, meetingDocument);
-            MeetingSection improveInMinistry = getTitleAndPartsOfSection
+            MeetingSection improveInMinistry = getMeetingSection
                     (IMPROVE_IN_MINISTRY, meetingDocument);
-            MeetingSection livingAsChristians = getTitleAndPartsOfSection
+            MeetingSection livingAsChristians = getMeetingSection
                     (LIVING_AS_CHRISTIANS, meetingDocument);
 
             Meeting meeting = new Meeting(weekSpan, treasures, improveInMinistry, livingAsChristians);
@@ -67,11 +67,10 @@ public class ContentParser {
         return sectionElement.text();
     }
 
-    private MeetingSection selectAppropriateSectionAndSetTitle
-            (SectionKind sectionKind, Document meetingDoc) {
-        MeetingSection meetingSection = new MeetingSection(sectionKind);
+    private void setSectionTitle
+            (MeetingSection meetingSection, Document meetingDoc) {
 
-        switch (sectionKind) {
+        switch (meetingSection.getSectionKind()) {
             case TREASURES:
                 sectionElement = meetingDoc.getElementById("section2");
                 break;
@@ -85,13 +84,16 @@ public class ContentParser {
         // each section's title is within the first "h2" element under the corresponding
         // div with `id` "section<sectionNumber>"
         meetingSection.setSectionTitle(sectionElement.selectFirst("h2").text());
-
-        return meetingSection;
     }
 
-    private MeetingSection getTitleAndPartsOfSection
+    private MeetingSection getMeetingSection
             (SectionKind sectionKind, Document meetingDocument) {
-        MeetingSection meetingSection = selectAppropriateSectionAndSetTitle(sectionKind, meetingDocument);
+
+        final String FILTER_TEXT = " ደቂቃ";
+        MeetingSection meetingSection = new MeetingSection(sectionKind);
+
+        setSectionTitle(meetingSection, meetingDocument);
+
         Elements presentations = new Elements();
         sectionElement.selectFirst("ul");
         presentations.addAll(sectionElement.getElementsByTag("li"));
@@ -105,9 +107,9 @@ public class ContentParser {
         String topic;
         for (Element listItem : presentations) {
             topic = listItem.selectFirst("p").text();
-            // filter for ደቂቃ
-            if (!topic.contains(" ደቂቃ")) continue;
-            topic = topic.substring(0, topic.indexOf(" ደቂቃ")) + " ደቂቃ)";
+            if (!topic.contains(FILTER_TEXT)) continue;
+
+            topic = topic.substring(0, topic.indexOf(FILTER_TEXT)) + FILTER_TEXT + ")";
             meetingSection.addPart(topic);
         }
 
