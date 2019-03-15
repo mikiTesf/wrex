@@ -99,7 +99,7 @@ public class ContentParser {
         presentations.addAll(sectionElement.getElementsByTag("li"));
 
         if (meetingSection.getSectionKind() == LIVING_AS_CHRISTIANS) {
-            presentations.remove(1); // transition song element
+            presentations.remove(0); // transition song element
             presentations.remove(presentations.size() - 1); // concluding song and prayer element
             presentations.remove(presentations.size() - 1); // next week preview element
         }
