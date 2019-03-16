@@ -66,12 +66,10 @@ public class ExcelFileGenerator {
         formattedText.setString(AdditionalStrings.CHAIRMAN);
         formattedText.applyFont(boldFont);
         row.createCell(CELL_INDEX).setCellValue(formattedText);
-        row.createCell(CELL_INDEX + 1);
-        row.createCell(CELL_INDEX + 2);
+        sheet.addMergedRegion(new CellRangeAddress
+                (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
         row.createCell(CELL_INDEX + 3);
         row.getCell(CELL_INDEX).setCellStyle(getBottomBorderedStyle());
-        row.getCell(CELL_INDEX + 1).setCellStyle(getBottomBorderedStyle());
-        row.getCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
         row.getCell(CELL_INDEX + 3).setCellStyle(getBottomBorderedStyle());
         // 7th row has the name of the brother who does the opening prayer
         row = getRowIfExists(++ROW_INDEX, sheet);
