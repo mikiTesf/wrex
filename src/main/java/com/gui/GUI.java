@@ -125,7 +125,7 @@ public class GUI extends JFrame {
                         final String FILE_NAME = "wrex.xlsx";
                         File[] files = DESTINATION.listFiles();
 
-                        if(files != null){
+                        if(files != null && files.length > 0){
                             // make sure the destination doesn't contain the same file
                             for (File file : files) {
                                 if (file.getName().contains(FILE_NAME)) {
@@ -177,7 +177,7 @@ public class GUI extends JFrame {
                                         (thisFrame, "An unknown problem has occurred",
                                                 "Problem", JOptionPane.ERROR_MESSAGE);
                         }
-                        statusLabel.setText("...");
+                        statusLabel.setText("");
                     }
                 };
 
