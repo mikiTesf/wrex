@@ -185,7 +185,7 @@ public class ExcelFileGenerator {
         resizeColumnsAndFixPageSize(sheet);
     }
 
-    public int makeExcel() {
+    public int makeExcel(String fileName) {
         File[] publicationFolders = cacheFolder.listFiles();
 
         if (publicationFolders == null) { return 1; }
@@ -195,7 +195,7 @@ public class ExcelFileGenerator {
         }
 
         try {
-            FileOutputStream out = new FileOutputStream(new File(destination.getPath() + "/wrex.xlsx"));
+            FileOutputStream out = new FileOutputStream(new File(destination.getPath() + fileName));
             workbook.write(out);
             out.close();
         } catch (IOException e) { return 2; }
@@ -266,10 +266,13 @@ public class ExcelFileGenerator {
         for (File publicationFolder : cacheFolder.listFiles()) {
             // noinspection ConstantConditions
             for (File XHTMLFile : publicationFolder.listFiles()) {
+                // noinspection ResultOfMethodCallIgnored
                 XHTMLFile.delete();
             }
+            // noinspection ResultOfMethodCallIgnored
             publicationFolder.delete();
         }
+        // noinspection ResultOfMethodCallIgnored
         cacheFolder.delete();
     }
 }
