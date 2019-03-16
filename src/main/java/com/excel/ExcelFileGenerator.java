@@ -42,7 +42,7 @@ public class ExcelFileGenerator {
 
     private void insertPageTitle(XSSFSheet sheet) {
         // data population starts from the 3rd row
-        Row row = sheet.createRow(2);
+        Row row = sheet.createRow(ROW_INDEX - 2);
 
         formattedText = new XSSFRichTextString();
         formattedText.setString(AdditionalStrings.PAGE_TITLE);
@@ -52,7 +52,7 @@ public class ExcelFileGenerator {
         row.getCell(CELL_INDEX).setCellStyle(getCellStyle
                 (false, false, false, true, false));
         sheet.addMergedRegion(new CellRangeAddress
-                (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 6));
+                (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 8));
     }
 
     private void insertHeaderSection(String weekSpan, XSSFSheet sheet) {
@@ -68,21 +68,22 @@ public class ExcelFileGenerator {
         row.createCell(CELL_INDEX).setCellValue(formattedText);
         row.createCell(CELL_INDEX + 1);
         row.createCell(CELL_INDEX + 2);
+        row.createCell(CELL_INDEX + 3);
         row.getCell(CELL_INDEX).setCellStyle(getBottomBorderedStyle());
         row.getCell(CELL_INDEX + 1).setCellStyle(getBottomBorderedStyle());
         row.getCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
+        row.getCell(CELL_INDEX + 3).setCellStyle(getBottomBorderedStyle());
         // 7th row has the name of the brother who does the opening prayer
         row = getRowIfExists(++ROW_INDEX, sheet);
         formattedText.setString(AdditionalStrings.OPENING_PRAYER);
-        row.createCell(CELL_INDEX + 1).setCellValue(formattedText);
+        row.createCell(CELL_INDEX + 2).setCellValue(formattedText);
     }
 
     private void insertTreasuresParts(MeetingSection treasures, XSSFSheet sheet) {
         // 8th row has the title of the "Treasures" section
         Row row = getRowIfExists(++ROW_INDEX, sheet);
-        sheet.addMergedRegion(new CellRangeAddress
-                (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
-        insertSectionTitle(treasures.getSectionTitle(), row);
+        insertSectionTitle
+                (sheet, treasures.getSectionTitle(), row, CELL_INDEX, CELL_INDEX + 3);
         // 10 minute talk, digging for spiritual gems and bible reading
         for (String part : treasures.getParts()) {
             if (part.contains(AdditionalStrings.BIBLE_READING)) {
@@ -92,72 +93,81 @@ public class ExcelFileGenerator {
             row = getRowIfExists(++ROW_INDEX, sheet);
             if (!part.contains(AdditionalStrings.BIBLE_READING)) {
                 sheet.addMergedRegion(new CellRangeAddress
-                        (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 1));
+                        (row.getRowNum(), row.getRowNum(), CELL_INDEX + 1, CELL_INDEX + 2));
             }
-            row.createCell(CELL_INDEX).setCellValue(part);
-            row.getCell(CELL_INDEX).setCellStyle(getBottomBorderedStyle());
-            row.createCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
+            row.createCell(CELL_INDEX + 1).setCellValue(part);
+            row.getCell(CELL_INDEX + 1).setCellStyle(getBottomBorderedStyle());
+            row.createCell(CELL_INDEX + 3).setCellStyle(getBottomBorderedStyle());
         }
     }
 
     private void insertMinistryParts(MeetingSection improveInMinistry, XSSFSheet sheet) {
         Row row = getRowIfExists(++ROW_INDEX, sheet);
-        insertSectionTitle(improveInMinistry.getSectionTitle(), row);
+        insertSectionTitle
+                (sheet, improveInMinistry.getSectionTitle(), row, CELL_INDEX, CELL_INDEX + 1);
         insertHallDivisionHeader(row);
         // the number of parts is not fixed for all months hence the for loop
         for (String part : improveInMinistry.getParts()) {
             row = getRowIfExists(++ROW_INDEX, sheet);
-            row.createCell(CELL_INDEX).setCellValue(part);
-            row.getCell(CELL_INDEX).setCellStyle(getBottomBorderedStyle());
-            row.createCell(CELL_INDEX + 1).setCellStyle(getBottomBorderedStyle());
+            row.createCell(CELL_INDEX + 1).setCellValue(part);
+            row.getCell(CELL_INDEX + 1).setCellStyle(getBottomBorderedStyle());
             row.createCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
+            row.createCell(CELL_INDEX + 3).setCellStyle(getBottomBorderedStyle());
         }
     }
 
     private void insertHallDivisionHeader(Row row) {
-        row.createCell(CELL_INDEX + 1).setCellValue(AdditionalStrings.MAIN_HALL);
-        row.getCell(CELL_INDEX + 1).setCellStyle(getCellStyle
-                (true, true, false, true, true));
-        row.createCell(CELL_INDEX + 2).setCellValue(AdditionalStrings.SECOND_HALL);
+        row.createCell(CELL_INDEX + 2).setCellValue(AdditionalStrings.MAIN_HALL);
         row.getCell(CELL_INDEX + 2).setCellStyle(getCellStyle
+                (true, true, false, true, true));
+        row.createCell(CELL_INDEX + 3).setCellValue(AdditionalStrings.SECOND_HALL);
+        row.getCell(CELL_INDEX + 3).setCellStyle(getCellStyle
                 (true, true, false, true, true));
     }
 
     private void insertChristianLifeParts(MeetingSection livingAsChristians, XSSFSheet sheet) {
         Row row = getRowIfExists(++ROW_INDEX, sheet);
-        insertSectionTitle(livingAsChristians.getSectionTitle(), row);
-        sheet.addMergedRegion(new CellRangeAddress
-                (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
+        insertSectionTitle
+                (sheet, livingAsChristians.getSectionTitle(), row, CELL_INDEX, CELL_INDEX + 3);
         // the number of parts is not fixed for all months hence the for loop
         for (String part : livingAsChristians.getParts()) {
             row = getRowIfExists(++ROW_INDEX, sheet);
-            row.createCell(CELL_INDEX).setCellValue(part);
+            row.createCell(CELL_INDEX + 1).setCellValue(part);
             sheet.addMergedRegion(new CellRangeAddress
-                    (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 1));
-            row.getCell(CELL_INDEX).setCellStyle(getBottomBorderedStyle());
+                    (row.getRowNum(), row.getRowNum(), CELL_INDEX + 1, CELL_INDEX + 2));
+            row.getCell(CELL_INDEX + 1).setCellStyle(getBottomBorderedStyle());
             row.createCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
+            row.createCell(CELL_INDEX + 3).setCellStyle(getBottomBorderedStyle());
         }
     }
 
-    private void insertSectionTitle(String sectionTitle, Row row) {
+    private void insertSectionTitle(
+            Sheet sheet,
+            String sectionTitle,
+            Row row,
+            int beginCol,
+            int endCol
+    ) {
+        sheet.addMergedRegion(new CellRangeAddress
+                (row.getRowNum(), row.getRowNum(), beginCol, endCol));
         formattedText.setString(sectionTitle);
         formattedText.applyFont(boldFont);
-        row.createCell(CELL_INDEX).setCellValue(formattedText);
-        row.getCell(CELL_INDEX).setCellStyle(getCellStyle
+        row.createCell(beginCol).setCellValue(formattedText);
+        row.getCell(beginCol).setCellStyle(getCellStyle
                 (true, true, false, false, false));
     }
 
     private void insertFooterSection(XSSFSheet sheet) {
         // Congregation Bible study reader row
         Row row = getRowIfExists(++ROW_INDEX, sheet);
-        row.createCell(CELL_INDEX + 1).setCellValue(AdditionalStrings.READER);
-        row.getCell(CELL_INDEX + 1).setCellStyle(getBottomBorderedStyle());
-        row.createCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
+        row.createCell(CELL_INDEX + 2).setCellValue(AdditionalStrings.READER);
+        row.getCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
+        row.createCell(CELL_INDEX + 3).setCellStyle(getBottomBorderedStyle());
         // closing prayer row
         row = getRowIfExists(++ROW_INDEX, sheet);
-        row.createCell(CELL_INDEX + 1).setCellValue(AdditionalStrings.CONCLUDING_PRAYER);
-        row.getCell(CELL_INDEX + 1).setCellStyle(getBottomBorderedStyle());
-        row.createCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
+        row.createCell(CELL_INDEX + 2).setCellValue(AdditionalStrings.CONCLUDING_PRAYER);
+        row.getCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
+        row.createCell(CELL_INDEX + 3).setCellStyle(getBottomBorderedStyle());
         ROW_INDEX += 3;
     }
 
@@ -172,7 +182,7 @@ public class ExcelFileGenerator {
         insertPageTitle(sheet);
         for (Meeting meeting : contentParser.getMeetings()) {
             if (meetingCount == 3) {
-                CELL_INDEX = 5;
+                CELL_INDEX = 6;
                 ROW_INDEX = 4;
             }
             insertHeaderSection(meeting.getWeekSpan(), sheet);
@@ -199,7 +209,8 @@ public class ExcelFileGenerator {
         }
 
         try {
-            FileOutputStream out = new FileOutputStream(new File(destination.getPath() + fileName));
+            FileOutputStream out = new FileOutputStream(new File
+                    (destination.getPath() + "/" + fileName));
             workbook.write(out);
             out.close();
         } catch (IOException e) { return 2; }
