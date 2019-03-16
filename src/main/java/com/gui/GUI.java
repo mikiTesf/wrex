@@ -3,22 +3,9 @@ package com.gui;
 import com.excel.ExcelFileGenerator;
 import com.extraction.EPUBContentExtractor;
 
-import javax.swing.JFrame;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JScrollPane;
-import javax.swing.JLabel;
-import javax.swing.JFileChooser;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.UIManager;
-import javax.swing.BorderFactory;
-import javax.swing.JOptionPane;
-import javax.swing.JSeparator;
-import javax.swing.JComponent;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.ImageIcon;
 
 import java.awt.Dimension;
 import java.awt.Color;
@@ -86,7 +73,7 @@ public class GUI extends JFrame {
 
         scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
-        statusLabel.setText("...");
+        statusLabel.setText(""); //TODO: or remove this
 
         FileNameExtensionFilter filter = new FileNameExtensionFilter
                 ("Meeting Workbook (EPUB)", "epub");
@@ -118,7 +105,7 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (EPUBFiles == null) return;
 
-                new Thread() {
+                Thread generateThread = new Thread() {
                     @Override
                     public void run() {
                         fileChooser.resetChoosableFileFilters();
@@ -128,7 +115,7 @@ public class GUI extends JFrame {
                         fileChooser.setMultiSelectionEnabled(false);
                         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
 
-                        switch (fileChooser.showDialog(thisFrame, "Save")) {
+                        switch (fileChooser.showOpenDialog(thisFrame)) {
                             case JFileChooser.CANCEL_OPTION:
                             case JFileChooser.ERROR_OPTION:
                                 return;
@@ -136,13 +123,17 @@ public class GUI extends JFrame {
 
                         final File DESTINATION = fileChooser.getSelectedFile();
                         final String FILE_NAME = "wrex.xlsx";
-                        // make sure the destination doesn't contain the same file
-                        for (File file : Objects.requireNonNull(DESTINATION.listFiles())) {
-                            if (file.getName().contains(FILE_NAME)) {
-                                int choice = JOptionPane.showConfirmDialog
-                                        (thisFrame, "The file already exists.\n Overwrite?", "", JOptionPane.YES_NO_OPTION);
-                                if (choice == JOptionPane.YES_OPTION) break;
-                                if (choice == JOptionPane.NO_OPTION) return;
+                        File[] files = DESTINATION.listFiles();
+
+                        if(files != null){
+                            // make sure the destination doesn't contain the same file
+                            for (File file : files) {
+                                if (file.getName().contains(FILE_NAME)) {
+                                    int choice = JOptionPane.showConfirmDialog
+                                            (thisFrame, "The file already exists.\n Overwrite?", "", JOptionPane.YES_NO_OPTION);
+                                    if (choice == JOptionPane.YES_OPTION) break;
+                                    if (choice == JOptionPane.NO_OPTION) return;
+                                }
                             }
                         }
 
@@ -188,7 +179,9 @@ public class GUI extends JFrame {
                         }
                         statusLabel.setText("...");
                     }
-                }.start();
+                };
+
+                SwingUtilities.invokeLater(generateThread);
             }
         });
 
