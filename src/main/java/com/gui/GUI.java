@@ -115,7 +115,7 @@ public class GUI extends JFrame {
                         fileChooser.setMultiSelectionEnabled(false);
                         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
 
-                        switch (fileChooser.showOpenDialog(thisFrame)) {
+                        switch (fileChooser.showDialog(thisFrame, "Save")) {
                             case JFileChooser.CANCEL_OPTION:
                             case JFileChooser.ERROR_OPTION:
                                 return;
