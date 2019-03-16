@@ -56,7 +56,6 @@ public class ExcelFileGenerator {
     }
 
     private void insertHeaderSection(String weekSpan, XSSFSheet sheet) {
-        // 4th (index -> 3) row is free
         // 5th row has "week span" in it
         Row row = getRowIfExists(ROW_INDEX, sheet);
         formattedText.setString(weekSpan);
@@ -67,6 +66,11 @@ public class ExcelFileGenerator {
         formattedText.setString(AdditionalStrings.CHAIRMAN);
         formattedText.applyFont(boldFont);
         row.createCell(CELL_INDEX).setCellValue(formattedText);
+        row.createCell(CELL_INDEX + 1);
+        row.createCell(CELL_INDEX + 2);
+        row.getCell(CELL_INDEX).setCellStyle(getBottomBorderedStyle());
+        row.getCell(CELL_INDEX + 1).setCellStyle(getBottomBorderedStyle());
+        row.getCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
         // 7th row has the name of the brother who does the opening prayer
         row = getRowIfExists(++ROW_INDEX, sheet);
         formattedText.setString(AdditionalStrings.OPENING_PRAYER);
@@ -83,7 +87,7 @@ public class ExcelFileGenerator {
         for (String part : treasures.getParts()) {
             if (part.contains(AdditionalStrings.BIBLE_READING)) {
                 row = getRowIfExists(++ROW_INDEX, sheet);
-                insertHallDivisionHeaders(row);
+                insertHallDivisionHeader(row);
             }
             row = getRowIfExists(++ROW_INDEX, sheet);
             if (!part.contains(AdditionalStrings.BIBLE_READING)) {
@@ -99,7 +103,7 @@ public class ExcelFileGenerator {
     private void insertMinistryParts(MeetingSection improveInMinistry, XSSFSheet sheet) {
         Row row = getRowIfExists(++ROW_INDEX, sheet);
         insertSectionTitle(improveInMinistry.getSectionTitle(), row);
-        insertHallDivisionHeaders(row);
+        insertHallDivisionHeader(row);
         // the number of parts is not fixed for all months hence the for loop
         for (String part : improveInMinistry.getParts()) {
             row = getRowIfExists(++ROW_INDEX, sheet);
@@ -110,7 +114,7 @@ public class ExcelFileGenerator {
         }
     }
 
-    private void insertHallDivisionHeaders(Row row) {
+    private void insertHallDivisionHeader(Row row) {
         row.createCell(CELL_INDEX + 1).setCellValue(AdditionalStrings.MAIN_HALL);
         row.getCell(CELL_INDEX + 1).setCellStyle(getCellStyle
                 (true, true, false, true, true));
