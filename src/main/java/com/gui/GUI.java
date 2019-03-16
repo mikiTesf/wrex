@@ -177,9 +177,6 @@ public class GUI extends JFrame {
                                 JOptionPane.showMessageDialog
                                         (thisFrame, "Schedule generated", "Done",
                                                 JOptionPane.INFORMATION_MESSAGE);
-                                try {
-                                    Desktop.getDesktop().open(new File(DESTINATION + "/" + FILE_NAME));
-                                } catch (IOException e1) { e1.printStackTrace(); }
                                 break;
                             default:
                                 JOptionPane.showMessageDialog
