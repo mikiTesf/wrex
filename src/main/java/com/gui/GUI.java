@@ -11,7 +11,6 @@ import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Insets;
-import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -19,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 
 import java.nio.charset.Charset;
-import java.util.Objects;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
@@ -73,7 +71,7 @@ public class GUI extends JFrame {
 
         scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
-        statusLabel.setText(""); //TODO: or remove this
+        statusLabel.setText("");
 
         FileNameExtensionFilter filter = new FileNameExtensionFilter
                 ("Meeting Workbook (EPUB)", "epub");
@@ -104,6 +102,15 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (EPUBFiles == null) return;
+
+                Thread disableButtonsThread = new Thread() {
+                    @Override
+                    public void run() {
+                        generateButton.setEnabled(false);
+                        openButton.setEnabled(false);
+                        statusLabel.setText("Generating...");
+                    }
+                };
 
                 Thread generateThread = new Thread() {
                     @Override
@@ -137,9 +144,7 @@ public class GUI extends JFrame {
                             }
                         }
 
-                        generateButton.setEnabled(false);
-                        openButton.setEnabled(false);
-                        statusLabel.setText("Generating...");
+                        SwingUtilities.invokeLater(disableButtonsThread);
 
                         try {
                             new EPUBContentExtractor().unzip(EPUBFiles, Charset.defaultCharset());
