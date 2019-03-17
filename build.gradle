@@ -14,9 +14,7 @@ dependencies {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-application {
-    mainClassName = 'App'
-}
+mainClassName = "App" //This is the format accepted by gradle ver. 3; I am not sure if this works above ver. 3
 
 jar {
     baseName = 'wrex'
