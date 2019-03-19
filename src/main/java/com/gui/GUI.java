@@ -103,15 +103,6 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (EPUBFiles == null) return;
 
-                Thread disableButtonsThread = new Thread() {
-                    @Override
-                    public void run() {
-                        generateButton.setEnabled(false);
-                        openButton.setEnabled(false);
-                        statusLabel.setText("Generating...");
-                    }
-                };
-
                 Thread generateThread = new Thread() {
                     @Override
                     public void run() {
@@ -132,7 +123,7 @@ public class GUI extends JFrame {
                         final String FILE_NAME = "wrex.xlsx";
                         File[] files = DESTINATION.listFiles();
 
-                        if(files != null && files.length > 0){
+                        if (files != null && files.length > 0) {
                             // make sure the destination doesn't contain the same file
                             for (File file : files) {
                                 if (file.getName().contains(FILE_NAME)) {
@@ -144,7 +135,14 @@ public class GUI extends JFrame {
                             }
                         }
 
-                        SwingUtilities.invokeLater(disableButtonsThread);
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                generateButton.setEnabled(false);
+                                openButton.setEnabled(false);
+                                statusLabel.setText("Generating...");
+                            }
+                        }.start();
 
                         try {
                             new EPUBContentExtractor().unzip(EPUBFiles, Charset.defaultCharset());
@@ -266,5 +264,4 @@ public class GUI extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
-
 }

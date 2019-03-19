@@ -12,7 +12,7 @@ public class Meeting {
             MeetingSection improveInMinistry,
             MeetingSection livingAsChristians
     ) {
-        this.weekSpan = weekSpan;
+        this.weekSpan = weekSpan.replaceAll("[-|–]", " – ");
         this.treasures = treasures;
         this.improveInMinistry = improveInMinistry;
         this.livingAsChristians = livingAsChristians;
