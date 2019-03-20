@@ -42,11 +42,16 @@ public class ExcelFileGenerator {
     }
 
     private void insertPageTitle(XSSFSheet sheet) {
+        String sheetName = sheet.getSheetName(), month, year, fullTitle;
         // data population starts from the 3rd row
-        Row row = getRowIfExists(ROW_INDEX - 2, sheet, false);
+        Row row = getRowIfExists(ROW_INDEX - 2, sheet, true);
+        // the last two numbers specify the month of the publication
+        month = sheetName.substring(sheetName.length() - 2);
+        year  = sheetName.substring(sheetName.length() - 6, sheetName.length() - 2);
+        fullTitle = AdditionalStrings.MEETING_NAME + " – " + AdditionalStrings.MONTHS.get(month) + " " + year;
 
         formattedText = new XSSFRichTextString();
-        formattedText.setString(AdditionalStrings.PAGE_TITLE);
+        formattedText.setString(fullTitle);
         formattedText.applyFont(boldFont);
         // set the header of the page
         row.createCell(CELL_INDEX).setCellValue(formattedText);
