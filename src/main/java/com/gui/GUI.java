@@ -103,89 +103,98 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (EPUBFiles == null) return;
 
-                Thread generateThread = new Thread() {
-                    @Override
-                    public void run() {
-                        fileChooser.resetChoosableFileFilters();
-                        fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-                        fileChooser.setDialogTitle("Save...");
-                        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                        fileChooser.setMultiSelectionEnabled(false);
-                        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+                fileChooser.resetChoosableFileFilters();
+                fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+                fileChooser.setDialogTitle("Save...");
+                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                fileChooser.setMultiSelectionEnabled(false);
+                fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
 
-                        switch (fileChooser.showDialog(thisFrame, "Save")) {
-                            case JFileChooser.CANCEL_OPTION:
-                            case JFileChooser.ERROR_OPTION:
-                                return;
+                switch (fileChooser.showDialog(thisFrame, "Save")) {
+                    case JFileChooser.CANCEL_OPTION:
+                    case JFileChooser.ERROR_OPTION:
+                        return;
+                }
+
+                final File DESTINATION = fileChooser.getSelectedFile();
+                final String FILE_NAME = "wrex.xlsx";
+                File[] files = DESTINATION.listFiles();
+
+                if (files != null && files.length > 0) {
+                    // make sure the destination doesn't contain the same file
+                    for (File file : files) {
+                        if (file.getName().contains(FILE_NAME)) {
+                            int choice = JOptionPane.showConfirmDialog
+                                    (thisFrame, "The file already exists.\n Overwrite?", "", JOptionPane.YES_NO_OPTION);
+                            if (choice == JOptionPane.YES_OPTION) break;
+                            if (choice == JOptionPane.NO_OPTION) return;
                         }
-
-                        final File DESTINATION = fileChooser.getSelectedFile();
-                        final String FILE_NAME = "wrex.xlsx";
-                        File[] files = DESTINATION.listFiles();
-
-                        if (files != null && files.length > 0) {
-                            // make sure the destination doesn't contain the same file
-                            for (File file : files) {
-                                if (file.getName().contains(FILE_NAME)) {
-                                    int choice = JOptionPane.showConfirmDialog
-                                            (thisFrame, "The file already exists.\n Overwrite?", "", JOptionPane.YES_NO_OPTION);
-                                    if (choice == JOptionPane.YES_OPTION) break;
-                                    if (choice == JOptionPane.NO_OPTION) return;
-                                }
-                            }
-                        }
-
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                generateButton.setEnabled(false);
-                                openButton.setEnabled(false);
-                                statusLabel.setText("Generating...");
-                            }
-                        }.start();
-
-                        try {
-                            new EPUBContentExtractor().unzip(EPUBFiles, Charset.defaultCharset());
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
-
-                        final int STATUS = new ExcelFileGenerator(DESTINATION).makeExcel(FILE_NAME);
-
-                        generateButton.setEnabled(true);
-                        openButton.setEnabled(true);
-
-                        switch (STATUS) {
-                            case NO_PUBLICATIONS:
-                                JOptionPane.showMessageDialog
-                                        (thisFrame, "You didn't select any publications",
-                                                "Problem", JOptionPane.ERROR_MESSAGE);
-                                break;
-                            case COULD_NOT_SAVE_FILE:
-                                JOptionPane.showMessageDialog
-                                        (thisFrame, "Could not save generated document",
-                                                "Problem", JOptionPane.ERROR_MESSAGE);
-                                break;
-                            case SUCCESS:
-                                statusLabel.setText("Done!");
-                                JOptionPane.showMessageDialog
-                                        (thisFrame, "Schedule generated", "Done",
-                                                JOptionPane.INFORMATION_MESSAGE);
-                                break;
-                            default:
-                                JOptionPane.showMessageDialog
-                                        (thisFrame, "An unknown problem has occurred",
-                                                "Problem", JOptionPane.ERROR_MESSAGE);
-                        }
-                        statusLabel.setText("");
                     }
-                };
+                }
 
-                SwingUtilities.invokeLater(generateThread);
+                new UIController(DESTINATION, FILE_NAME).execute();
             }
         });
 
         setVisible(true);
+    }
+
+    private class UIController extends SwingWorker<Void, Void> {
+
+        private final File DESTINATION;
+        private final String FILE_NAME;
+        private int STATUS;
+
+        UIController(File DESTINATION, String FILE_NAME) {
+            this.DESTINATION = DESTINATION;
+            this.FILE_NAME = FILE_NAME;
+        }
+
+        @Override
+        protected Void doInBackground() {
+            toggleButtons();
+            statusLabel.setText("Generating...");
+
+            try {
+                new EPUBContentExtractor().unzip(EPUBFiles, Charset.defaultCharset());
+            } catch (IOException e1) { e1.printStackTrace(); }
+
+            STATUS = (new ExcelFileGenerator(DESTINATION).makeExcel(FILE_NAME));
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            toggleButtons();
+
+            switch (STATUS) {
+                case NO_PUBLICATIONS:
+                    JOptionPane.showMessageDialog
+                            (thisFrame, "You didn't select any publications",
+                                    "Problem", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case COULD_NOT_SAVE_FILE:
+                    JOptionPane.showMessageDialog
+                            (thisFrame, "Could not save generated document",
+                                    "Problem", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case SUCCESS:
+                    statusLabel.setText("Done!");
+                    JOptionPane.showMessageDialog
+                            (thisFrame, "Schedule generated",
+                                    "Done", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                default:
+                    JOptionPane.showMessageDialog
+                            (thisFrame, "An unknown problem has occurred",
+                                    "Problem", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        private void toggleButtons() {
+            openButton.setEnabled(!openButton.isEnabled());
+            generateButton.setEnabled(!generateButton.isEnabled());
+        }
     }
 
     {
