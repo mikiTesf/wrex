@@ -61,7 +61,9 @@ public class ExcelFileGenerator {
         Row row = getRowIfExists(ROW_INDEX, sheet, false);
         formattedText.setString(weekSpan);
         formattedText.applyFont(boldFont);
-        row.createCell(CELL_INDEX).setCellValue(formattedText);
+        row.getCell(CELL_INDEX).setCellValue(formattedText);
+        row.getCell(CELL_INDEX).setCellStyle(getCellStyle
+                (false, false, false, false, true));
         // 6th row has the chairman's name
         row = getRowIfExists(++ROW_INDEX, sheet, false);
         formattedText.setString(AdditionalStrings.CHAIRMAN);
@@ -72,6 +74,7 @@ public class ExcelFileGenerator {
         row = getRowIfExists(++ROW_INDEX, sheet, false);
         formattedText.setString(AdditionalStrings.OPENING_PRAYER);
         row.getCell(CELL_INDEX + 2).setCellValue(formattedText);
+        setBottomBorderedCellStyle(row, CELL_INDEX + 2, CELL_INDEX + 2);
     }
 
     private void insertTreasuresParts(MeetingSection treasures, XSSFSheet sheet) {
@@ -243,11 +246,9 @@ public class ExcelFileGenerator {
 
         cellStyle.setAlignment(centeredText ? HorizontalAlignment.CENTER : HorizontalAlignment.LEFT);
 
-        if (smallerFont) {
-            XSSFFont smallFont = workbook.createFont();
-            smallFont.setFontHeight(9);
-            cellStyle.setFont(smallFont);
-        }
+        XSSFFont font = workbook.createFont();
+        font.setFontHeight(smallerFont? 12 : 14);
+        cellStyle.setFont(font);
 
         return cellStyle;
     }
@@ -255,7 +256,7 @@ public class ExcelFileGenerator {
     private void setBottomBorderedCellStyle(Row row, int firstColumn, int lastColumn) {
         for (int column = firstColumn; column <= lastColumn; ++column) {
             row.getCell(column).setCellStyle(getCellStyle
-                    (false, false, true, false, false));
+                    (false, false, true, false, true));
         }
     }
 
