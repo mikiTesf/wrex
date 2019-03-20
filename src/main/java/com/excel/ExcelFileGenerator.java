@@ -22,6 +22,7 @@ import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 public class ExcelFileGenerator {
     private XSSFWorkbook workbook;
@@ -211,7 +212,7 @@ public class ExcelFileGenerator {
             out.close();
         } catch (IOException e) { return 2; }
 
-        removeCacheAndPublicationFolders();
+        deleteFile_s(cacheFolder);
         return 0;
     }
 
@@ -282,16 +283,12 @@ public class ExcelFileGenerator {
         }
     }
 
-    private void removeCacheAndPublicationFolders() {
-        // noinspection ConstantConditions
-        for (File publicationFolder : cacheFolder.listFiles()) {
+    private void deleteFile_s(File cacheFolder) {
+        if (cacheFolder.isDirectory()) {
             // noinspection ConstantConditions
-            for (File XHTMLFile : publicationFolder.listFiles()) {
-                // noinspection ResultOfMethodCallIgnored
-                XHTMLFile.delete();
+            for (File file : cacheFolder.listFiles()) {
+                deleteFile_s(file);
             }
-            // noinspection ResultOfMethodCallIgnored
-            publicationFolder.delete();
         }
         // noinspection ResultOfMethodCallIgnored
         cacheFolder.delete();
