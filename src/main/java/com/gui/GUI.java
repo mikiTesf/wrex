@@ -33,10 +33,6 @@ public class GUI extends JFrame {
     private JLabel statusLabel;
     private final JFileChooser fileChooser = new JFileChooser();
 
-    private final int NO_PUBLICATIONS = 1;
-    private final int COULD_NOT_SAVE_FILE = 2;
-    private final int SUCCESS = 0;
-
     private File[] EPUBFiles = null;
 
     public GUI() {
@@ -167,6 +163,10 @@ public class GUI extends JFrame {
         protected void done() {
             toggleButtons();
 
+            final int NO_PUBLICATIONS     = 1;
+            final int COULD_NOT_SAVE_FILE = 2;
+            final int SUCCESS             = 0;
+
             switch (STATUS) {
                 case NO_PUBLICATIONS:
                     JOptionPane.showMessageDialog
@@ -189,6 +189,7 @@ public class GUI extends JFrame {
                             (thisFrame, "An unknown problem has occurred",
                                     "Problem", JOptionPane.ERROR_MESSAGE);
             }
+            statusLabel.setText("");
         }
 
         private void toggleButtons() {
