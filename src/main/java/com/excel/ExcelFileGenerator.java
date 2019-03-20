@@ -67,11 +67,7 @@ public class ExcelFileGenerator {
         formattedText.setString(AdditionalStrings.CHAIRMAN);
         formattedText.applyFont(boldFont);
         row.getCell(CELL_INDEX).setCellValue(formattedText);
-        row.getCell(CELL_INDEX + 3);
-        sheet.addMergedRegion(new CellRangeAddress
-                (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
-        row.getCell(CELL_INDEX).setCellStyle(getBottomBorderedStyle());
-        row.getCell(CELL_INDEX + 3).setCellStyle(getBottomBorderedStyle());
+        setBottomBorderedCellStyle(row, CELL_INDEX, CELL_INDEX + 3);
         // 7th row has the name of the brother who does the opening prayer
         row = getRowIfExists(++ROW_INDEX, sheet, false);
         formattedText.setString(AdditionalStrings.OPENING_PRAYER);
@@ -95,8 +91,7 @@ public class ExcelFileGenerator {
                         (row.getRowNum(), row.getRowNum(), CELL_INDEX + 1, CELL_INDEX + 2));
             }
             row.getCell(CELL_INDEX + 1).setCellValue(part);
-            row.getCell(CELL_INDEX + 1).setCellStyle(getBottomBorderedStyle());
-            row.getCell(CELL_INDEX + 3).setCellStyle(getBottomBorderedStyle());
+            setBottomBorderedCellStyle(row, CELL_INDEX + 1, CELL_INDEX + 3);
         }
     }
 
@@ -109,9 +104,7 @@ public class ExcelFileGenerator {
         for (String part : improveInMinistry.getParts()) {
             row = getRowIfExists(++ROW_INDEX, sheet, true);
             row.getCell(CELL_INDEX + 1).setCellValue(part);
-            row.getCell(CELL_INDEX + 1).setCellStyle(getBottomBorderedStyle());
-            row.getCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
-            row.getCell(CELL_INDEX + 3).setCellStyle(getBottomBorderedStyle());
+            setBottomBorderedCellStyle(row, CELL_INDEX + 1, CELL_INDEX + 3);
         }
     }
 
@@ -132,11 +125,9 @@ public class ExcelFileGenerator {
         for (String part : livingAsChristians.getParts()) {
             row = getRowIfExists(++ROW_INDEX, sheet, true);
             row.getCell(CELL_INDEX + 1).setCellValue(part);
+            setBottomBorderedCellStyle(row, CELL_INDEX + 1, CELL_INDEX + 3);
             sheet.addMergedRegion(new CellRangeAddress
                     (row.getRowNum(), row.getRowNum(), CELL_INDEX + 1, CELL_INDEX + 2));
-            row.getCell(CELL_INDEX + 1).setCellStyle(getBottomBorderedStyle());
-            row.getCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
-            row.getCell(CELL_INDEX + 3).setCellStyle(getBottomBorderedStyle());
         }
     }
 
@@ -160,13 +151,11 @@ public class ExcelFileGenerator {
         // Congregation Bible study reader row
         Row row = getRowIfExists(++ROW_INDEX, sheet, false);
         row.getCell(CELL_INDEX + 2).setCellValue(AdditionalStrings.READER);
-        row.getCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
-        row.getCell(CELL_INDEX + 3).setCellStyle(getBottomBorderedStyle());
+        setBottomBorderedCellStyle(row, CELL_INDEX + 2, CELL_INDEX + 3);
         // closing prayer row
         row = getRowIfExists(++ROW_INDEX, sheet, false);
         row.getCell(CELL_INDEX + 2).setCellValue(AdditionalStrings.CONCLUDING_PRAYER);
-        row.getCell(CELL_INDEX + 2).setCellStyle(getBottomBorderedStyle());
-        row.getCell(CELL_INDEX + 3).setCellStyle(getBottomBorderedStyle());
+        setBottomBorderedCellStyle(row, CELL_INDEX + 2, CELL_INDEX + 3);
         ROW_INDEX += 3;
     }
 
@@ -263,9 +252,11 @@ public class ExcelFileGenerator {
         return cellStyle;
     }
 
-    private XSSFCellStyle getBottomBorderedStyle() {
-        return getCellStyle
-                (false, false, true, false, false);
+    private void setBottomBorderedCellStyle(Row row, int firstColumn, int lastColumn) {
+        for (int column = firstColumn; column <= lastColumn; ++column) {
+            row.getCell(column).setCellStyle(getCellStyle
+                    (false, false, true, false, false));
+        }
     }
 
     private void resizeColumnsAndFixPageSize(XSSFSheet sheet) {
