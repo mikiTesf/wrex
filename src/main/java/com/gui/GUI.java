@@ -155,7 +155,11 @@ public class GUI extends JFrame {
                 new EPUBContentExtractor().unzip(EPUBFiles, Charset.defaultCharset());
             } catch (IOException e1) { e1.printStackTrace(); }
 
-            STATUS = (new ExcelFileGenerator(DESTINATION).makeExcel(FILE_NAME));
+            try {
+                STATUS = new ExcelFileGenerator(DESTINATION, "english").makeExcel(FILE_NAME);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return null;
         }
 
@@ -163,9 +167,9 @@ public class GUI extends JFrame {
         protected void done() {
             toggleButtons();
 
+            final int SUCCESS             = 0;
             final int NO_PUBLICATIONS     = 1;
             final int COULD_NOT_SAVE_FILE = 2;
-            final int SUCCESS             = 0;
 
             switch (STATUS) {
                 case NO_PUBLICATIONS:

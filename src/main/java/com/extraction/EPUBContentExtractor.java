@@ -67,8 +67,8 @@ public class EPUBContentExtractor {
         for (File XHTMLFile : Objects.requireNonNull(XHTMLFiles)) {
             Document XHTMLDocument = Jsoup.parse(XHTMLFile, "UTF-8");
             if (
-                    !XHTMLDocument.html().contains("treasures") &&
-                    !XHTMLDocument.html().contains("ministry") &&
+                    !XHTMLDocument.html().contains("treasures") ||
+                    !XHTMLDocument.html().contains("ministry") ||
                     !XHTMLDocument.html().contains("christianLiving")
             )
                 XHTMLFile.delete();
