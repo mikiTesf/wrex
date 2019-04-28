@@ -40,6 +40,7 @@ public class ExcelFileGenerator {
 
     public ExcelFileGenerator(File destination, String language) throws IOException {
         this.destination = destination;
+        language = language.toLowerCase();
         FileInputStream input = new FileInputStream("language/" + language + ".lang");
         this.languagePack.load(new InputStreamReader(input, StandardCharsets.UTF_8));
         contentParser = new ContentParser(languagePack.getProperty("filter_for_minute"));
@@ -206,7 +207,7 @@ public class ExcelFileGenerator {
     public int makeExcel(String fileName) {
         File[] publicationFolders = cacheFolder.listFiles();
 
-        if (publicationFolders == null) { return 1; }
+        if (publicationFolders == null) { return 3; }
 
         for (File publicationFolder : publicationFolders) {
             addPopulatedSheet(publicationFolder);
@@ -217,7 +218,7 @@ public class ExcelFileGenerator {
                     (destination.getPath() + "/" + fileName));
             workbook.write(out);
             out.close();
-        } catch (IOException e) { return 2; }
+        } catch (IOException e) { return 4; }
 
         deleteFile_s(cacheFolder);
         return 0;

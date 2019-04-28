@@ -18,10 +18,10 @@ import java.io.File;
 import java.io.IOException;
 
 import java.nio.charset.Charset;
+import java.util.Objects;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
 
 public class GUI extends JFrame {
     private final JFrame thisFrame = this;
@@ -31,13 +31,14 @@ public class GUI extends JFrame {
     private JTable publicationTable;
     private JScrollPane scrollPane;
     private JLabel statusLabel;
+    private JComboBox<String> languageComboBox;
     private final JFileChooser fileChooser = new JFileChooser();
 
     private File[] EPUBFiles = null;
 
     public GUI() {
         setContentPane(mainPanel);
-        setSize(new Dimension(300, 350));
+        setSize(new Dimension(345, 350));
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -52,6 +53,14 @@ public class GUI extends JFrame {
                 IllegalAccessException | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
+        // fill `languageComboBox` with the available languages
+        for (File languagePack : Objects.requireNonNull(new File("language/").listFiles())) {
+            String language = languagePack.getName();
+            language = language.toUpperCase();
+            language = language.substring(0, language.indexOf('.'));
+            languageComboBox.addItem(language);
+        }
+        languageComboBox.setSelectedIndex(0);
         // I got nothing to say about the next line of code
         fileChooser.setDragEnabled(false);
         // setup table properties;
@@ -128,7 +137,7 @@ public class GUI extends JFrame {
                     }
                 }
 
-                new UIController(DESTINATION, FILE_NAME).execute();
+                new UIController(DESTINATION, FILE_NAME, languageComboBox.getSelectedItem() + "").execute();
             }
         });
 
@@ -139,11 +148,14 @@ public class GUI extends JFrame {
 
         private final File DESTINATION;
         private final String FILE_NAME;
-        private int STATUS;
+        private int GENERATION_STATUS;
+        private int FILE_STATUS = 100;
+        private final String LANGUAGE;
 
-        UIController(File DESTINATION, String FILE_NAME) {
+        UIController(File DESTINATION, String FILE_NAME, String LANGUAGE) {
             this.DESTINATION = DESTINATION;
             this.FILE_NAME = FILE_NAME;
+            this.LANGUAGE = LANGUAGE;
         }
 
         @Override
@@ -153,12 +165,16 @@ public class GUI extends JFrame {
 
             try {
                 new EPUBContentExtractor().unzip(EPUBFiles, Charset.defaultCharset());
-            } catch (IOException e1) { e1.printStackTrace(); }
+            } catch (IOException e1) {
+                FILE_STATUS = 1;
+                return null;
+            }
 
             try {
-                STATUS = new ExcelFileGenerator(DESTINATION, "english").makeExcel(FILE_NAME);
+                GENERATION_STATUS = new ExcelFileGenerator(DESTINATION, LANGUAGE).makeExcel(FILE_NAME);
             } catch (IOException e) {
-                e.printStackTrace();
+                FILE_STATUS = 2;
+                return null;
             }
             return null;
         }
@@ -167,32 +183,52 @@ public class GUI extends JFrame {
         protected void done() {
             toggleButtons();
 
-            final int SUCCESS             = 0;
-            final int NO_PUBLICATIONS     = 1;
-            final int COULD_NOT_SAVE_FILE = 2;
+            final int SUCCESS = 0;
+            final int FILE_FORMAT_NOT_EPUB = 1;
+            final int LANGUAGE_PACK_ERROR = 2;
+            final int NO_PUBLICATIONS = 3;
+            final int COULD_NOT_SAVE_FILE = 4;
 
-            switch (STATUS) {
-                case NO_PUBLICATIONS:
-                    JOptionPane.showMessageDialog
-                            (thisFrame, "You didn't select any publications",
-                                    "Problem", JOptionPane.ERROR_MESSAGE);
+            switch (FILE_STATUS) {
+                case FILE_FORMAT_NOT_EPUB:
+                    JOptionPane.showMessageDialog(thisFrame,
+                            "Could not extract the necessary files from\nthe given" +
+                                    "publication (make sure it's an EPUB)", "Oops!", JOptionPane.ERROR_MESSAGE);
                     break;
-                case COULD_NOT_SAVE_FILE:
-                    JOptionPane.showMessageDialog
-                            (thisFrame, "Could not save generated document",
-                                    "Problem", JOptionPane.ERROR_MESSAGE);
-                    break;
-                case SUCCESS:
-                    statusLabel.setText("Done!");
-                    JOptionPane.showMessageDialog
-                            (thisFrame, "Schedule generated",
-                                    "Done", JOptionPane.INFORMATION_MESSAGE);
+                case LANGUAGE_PACK_ERROR:
+                    JOptionPane.showMessageDialog(thisFrame,
+                            "Either the pack for the specified language doesn't\n" +
+                                    "exist or there was an error reading it\n" +
+                                    "(Check if a file with the language's name exists in \"language/\")",
+                            "Oops!", JOptionPane.ERROR_MESSAGE);
                     break;
                 default:
-                    JOptionPane.showMessageDialog
-                            (thisFrame, "An unknown problem has occurred",
-                                    "Problem", JOptionPane.ERROR_MESSAGE);
+                    switch (GENERATION_STATUS) {
+                        case NO_PUBLICATIONS:
+                            JOptionPane.showMessageDialog
+                                    (thisFrame, "You didn't select any publications",
+                                            "Problem", JOptionPane.ERROR_MESSAGE);
+                            statusLabel.setText("");
+                            break;
+                        case COULD_NOT_SAVE_FILE:
+                            JOptionPane.showMessageDialog
+                                    (thisFrame, "Could not save generated document",
+                                            "Problem", JOptionPane.ERROR_MESSAGE);
+                            statusLabel.setText("");
+                            break;
+                        case SUCCESS:
+                            statusLabel.setText("Done!");
+                            JOptionPane.showMessageDialog
+                                    (thisFrame, "Schedule generated",
+                                            "Done", JOptionPane.INFORMATION_MESSAGE);
+                            break;
+                        default:
+                            JOptionPane.showMessageDialog
+                                    (thisFrame, "An unknown problem has occurred",
+                                            "Problem", JOptionPane.ERROR_MESSAGE);
+                    }
             }
+
             statusLabel.setText("");
         }
 
@@ -238,8 +274,6 @@ public class GUI extends JFrame {
         final JSeparator separator2 = new JSeparator();
         separator2.setEnabled(false);
         mainPanel.add(separator2, new GridConstraints(1, 0, 2, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        final Spacer spacer1 = new Spacer();
-        mainPanel.add(spacer1, new GridConstraints(2, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         statusLabel = new JLabel();
         Font statusLabelFont = this.$$$getFont$$$(null, -1, 11, statusLabel.getFont());
         if (statusLabelFont != null) statusLabel.setFont(statusLabelFont);
@@ -251,6 +285,8 @@ public class GUI extends JFrame {
         final JSeparator separator4 = new JSeparator();
         separator4.setEnabled(false);
         mainPanel.add(separator4, new GridConstraints(0, 0, 1, 5, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        languageComboBox = new JComboBox();
+        mainPanel.add(languageComboBox, new GridConstraints(2, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
@@ -278,4 +314,5 @@ public class GUI extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
+
 }
