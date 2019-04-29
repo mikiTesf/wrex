@@ -1,0 +1,25 @@
+meeting_name=ክርስቲያናዊ ህይወታችንና አገልግሎታችን
+chairman=ሊቀመንበር
+opening_prayer=የመክፈቻ ፀሎት
+main_hall=በዋናው አዳራሽ
+second_hall=በሁለተኛው አዳራሽ
+reader=አንባቢ
+concluding_prayer=ፀሎት
+# Test string(s)
+bible_reading=የመጽሐፍ ቅዱስ ንባብ
+# Filter string for the word "minute" (it's short form in some languages)
+# It is not optional that you put a space before the word
+filter_for_minute= ደቂቃ
+# Months
+01=ጥር
+02=የካቲት
+03=መጋቢት
+04=ሚያዝያ
+05=ግንቦት
+06=ሰኔ
+07=ሐምሌ
+08=ነሐሴ
+09=መስከረም
+10=ጥቅምት
+11=ህዳር
+12=ታህሳሥ

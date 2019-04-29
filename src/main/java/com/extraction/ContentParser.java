@@ -20,8 +20,11 @@ public class ContentParser {
     private ArrayList<Document> meetingExtracts;
     private Element sectionElement;
     private File publicationFolder;
+    private final String FILTER_FOR_MINUTE;
 
-    public ContentParser() {}
+    public ContentParser(String filterForMinute) {
+        this.FILTER_FOR_MINUTE = filterForMinute;
+    }
 
     public void readRawHTML() {
         meetingExtracts = new ArrayList<>();
@@ -89,7 +92,6 @@ public class ContentParser {
     private MeetingSection getMeetingSection
             (SectionKind sectionKind, Document meetingDocument) {
 
-        final String FILTER_TEXT = " ደቂቃ";
         MeetingSection meetingSection = new MeetingSection(sectionKind);
 
         setSectionTitle(meetingSection, meetingDocument);
@@ -107,9 +109,9 @@ public class ContentParser {
         String topic;
         for (Element listItem : presentations) {
             topic = listItem.selectFirst("p").text();
-            if (!topic.contains(FILTER_TEXT)) continue;
+            if (!topic.contains(FILTER_FOR_MINUTE)) continue;
 
-            topic = topic.substring(0, topic.indexOf(FILTER_TEXT)) + FILTER_TEXT + ")";
+            topic = topic.substring(0, topic.indexOf(FILTER_FOR_MINUTE)) + FILTER_FOR_MINUTE + ")";
             meetingSection.addPart(topic);
         }
 
