@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 
 import java.nio.charset.Charset;
-import java.util.Objects;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
@@ -53,17 +52,22 @@ public class GUI extends JFrame {
                 IllegalAccessException | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
-        // fill `languageComboBox` with the available languages
-        for (File languagePack : Objects.requireNonNull(new File("language/").listFiles())) {
+        // fill `languageComboBox` with the available language(s)
+        File languageFolder = new File("src/main/resources/language");
+        if (!languageFolder.exists()) {
+            // noinspection ResultOfMethodCallIgnored
+            languageFolder.mkdir();
+        }
+        // noinspection ConstantConditions
+        for (File languagePack : languageFolder.listFiles()) {
             String language = languagePack.getName();
             language = language.toUpperCase();
             language = language.substring(0, language.indexOf('.'));
             languageComboBox.addItem(language);
         }
-        languageComboBox.setSelectedIndex(0);
         // I got nothing to say about the next line of code
         fileChooser.setDragEnabled(false);
-        // setup table properties;
+        // setup table properties
         publicationTable.setFillsViewportHeight(true);
         DefaultTableModel tableModel = new DefaultTableModel() {
             @Override
@@ -90,7 +94,6 @@ public class GUI extends JFrame {
                 fileChooser.setMultiSelectionEnabled(true);
                 fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
                 fileChooser.setFileFilter(filter);
-
                 fileChooser.showDialog(thisFrame, "Open");
                 EPUBFiles = fileChooser.getSelectedFiles();
 
@@ -155,7 +158,7 @@ public class GUI extends JFrame {
         UIController(File DESTINATION, String FILE_NAME, String LANGUAGE) {
             this.DESTINATION = DESTINATION;
             this.FILE_NAME = FILE_NAME;
-            this.LANGUAGE = LANGUAGE;
+            this.LANGUAGE = LANGUAGE.toLowerCase();
         }
 
         @Override
@@ -176,6 +179,7 @@ public class GUI extends JFrame {
                 FILE_STATUS = 2;
                 return null;
             }
+
             return null;
         }
 
@@ -183,14 +187,14 @@ public class GUI extends JFrame {
         protected void done() {
             toggleButtons();
 
-            final int SUCCESS = 0;
-            final int FILE_FORMAT_NOT_EPUB = 1;
-            final int LANGUAGE_PACK_ERROR = 2;
-            final int NO_PUBLICATIONS = 3;
-            final int COULD_NOT_SAVE_FILE = 4;
+            final int SUCCESS              = 0;
+            final int FILE_FORMAT_ERROR    = 1;
+            final int LANGUAGE_PACK_ERROR  = 2;
+            final int NO_PUBLICATION_ERROR = 3;
+            final int COULD_NOT_SAVE_FILE  = 4;
 
             switch (FILE_STATUS) {
-                case FILE_FORMAT_NOT_EPUB:
+                case FILE_FORMAT_ERROR:
                     JOptionPane.showMessageDialog(thisFrame,
                             "Could not extract the necessary files from\nthe given" +
                                     "publication (make sure it's an EPUB)", "Oops!", JOptionPane.ERROR_MESSAGE);
@@ -198,13 +202,13 @@ public class GUI extends JFrame {
                 case LANGUAGE_PACK_ERROR:
                     JOptionPane.showMessageDialog(thisFrame,
                             "Either the pack for the specified language doesn't\n" +
-                                    "exist or there was an error reading it\n" +
+                                    "\texist or there was an error reading it\n" +
                                     "(Check if a file with the language's name exists in \"language/\")",
                             "Oops!", JOptionPane.ERROR_MESSAGE);
                     break;
                 default:
                     switch (GENERATION_STATUS) {
-                        case NO_PUBLICATIONS:
+                        case NO_PUBLICATION_ERROR:
                             JOptionPane.showMessageDialog
                                     (thisFrame, "You didn't select any publications",
                                             "Problem", JOptionPane.ERROR_MESSAGE);
@@ -265,15 +269,15 @@ public class GUI extends JFrame {
         mainPanel.add(generateButton, new GridConstraints(2, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         scrollPane = new JScrollPane();
         scrollPane.setBackground(new Color(-1));
-        mainPanel.add(scrollPane, new GridConstraints(1, 1, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        mainPanel.add(scrollPane, new GridConstraints(1, 1, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         publicationTable = new JTable();
         scrollPane.setViewportView(publicationTable);
         final JSeparator separator1 = new JSeparator();
         separator1.setEnabled(false);
-        mainPanel.add(separator1, new GridConstraints(1, 4, 2, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        mainPanel.add(separator1, new GridConstraints(1, 4, 2, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         final JSeparator separator2 = new JSeparator();
         separator2.setEnabled(false);
-        mainPanel.add(separator2, new GridConstraints(1, 0, 2, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        mainPanel.add(separator2, new GridConstraints(1, 0, 2, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         statusLabel = new JLabel();
         Font statusLabelFont = this.$$$getFont$$$(null, -1, 11, statusLabel.getFont());
         if (statusLabelFont != null) statusLabel.setFont(statusLabelFont);

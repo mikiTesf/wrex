@@ -7,7 +7,7 @@ reader=አንባቢ
 concluding_prayer=ፀሎት
 # Test string(s)
 bible_reading=የመጽሐፍ ቅዱስ ንባብ
-# Filter string for the word "minute" (for it's short form in some languages)
+# Filter string for the word "minute" (it's short form in some languages)
 # It is not optional that you put a space before the word
 filter_for_minute= ደቂቃ
 # Months

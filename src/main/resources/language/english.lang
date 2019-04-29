@@ -7,7 +7,7 @@ reader=Reader
 concluding_prayer=Concluding Prayer
 # Test string(s)
 bible_reading=Bible Reading
-# Filter string for the word "minute" (for it's short form in some languages)
+# Filter string for the word "minute" (it's short form in some languages)
 # It is not optional that you put a space before the word
 filter_for_minute= min.
 # Months
