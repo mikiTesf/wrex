@@ -53,7 +53,7 @@ public class GUI extends JFrame {
             e.printStackTrace();
         }
         // fill `languageComboBox` with the available language(s)
-        File languageFolder = new File("src/main/resources/language");
+        File languageFolder = new File("language/");
         if (!languageFolder.exists()) {
             // noinspection ResultOfMethodCallIgnored
             languageFolder.mkdir();

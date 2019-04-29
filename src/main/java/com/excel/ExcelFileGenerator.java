@@ -40,7 +40,7 @@ public class ExcelFileGenerator {
 
     public ExcelFileGenerator(File destination, String language) throws IOException {
         this.destination = destination;
-        FileInputStream input = new FileInputStream("src/main/resources/language/" + language + ".lang");
+        FileInputStream input = new FileInputStream("language/" + language + ".lang");
         this.languagePack.load(new InputStreamReader(input, StandardCharsets.UTF_8));
         contentParser = new ContentParser(languagePack.getProperty("filter_for_minute"));
         workbook = new XSSFWorkbook();
