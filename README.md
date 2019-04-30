@@ -18,8 +18,9 @@ Any kind of contribution to this project is welcome. One way is to add a languag
     concluding_prayer=Concluding Prayer  
     # Test string(s)  
     bible_reading=Bible Reading  
-    # Filter string for the word "minute" (it's short form in some languages)  
-    # It is not optional that you put a space before the word  
+    # Test string for the word "minute" (it's short form in some languages).
+    # Sometimes it is necessary to include the leading or trailing space character
+    # right before or after the word
     filter_for_minute= min.  
     # Months  
     01=January  
@@ -38,7 +39,7 @@ The image below shows the texts in the excel document that correspond to the giv
 ![An image showing which value goes into which cell(s)](docs/index.png)
 To add a language:
  1. Create a file with the name of the language you want to add (eg. `german.lang` for German)
- 2. Copy the sample provided above to the file and translate the `values` into the desired language
+ 2. Copy the sample provided above to the file and translate the `values` into the target language
  3. Put the file in `language/`
 
 The steps above are all you need to follow in order to add a language pack but it would help others if you can also add the language to the list of supported languages (above the  **Contribution**  header) and most importantly send me a PR.
