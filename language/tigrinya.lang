@@ -1,0 +1,26 @@
+meeting_name=ክርስትያናዊ ህይወትናን ኣገልግሎትናን
+chairman=ኣቦ-መንበር
+opening_prayer=መኽፈቲ ጸሎት
+main_hall=ዋና ኣዳራሽ
+second_hall=ካልኣይ ኣዳራሽ
+reader=ኣንባቢ
+concluding_prayer=መደምደሚያ ጸሎት
+# Test string(s)  
+bible_reading=ንባብ መጽሓፍ ቅዱስ
+# Test string for the word "minute" (it's short form in some languages).
+# Sometimes it is necessary to include the leading or trailing space character
+# right before or after the word
+filter_for_minute= ደቒቕ
+# Months  
+01=ጥሪ
+02=ለካቲት
+03=መጋቢት
+04=ሚያዝያ
+05=ግንቦት
+06=ሰነ
+07=ሓምለ
+08=ነሓሰ
+09=መስከረም
+10=ጥቅምቲ
+11=ሕዳር
+12=ታሕሳስ

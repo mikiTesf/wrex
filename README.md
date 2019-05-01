@@ -5,6 +5,7 @@ This project will probably be of no use to you fellow programmers out there. But
 
  - Amharic
  - English
+ - Tigrinya
 
 ## Contribution
 Any kind of contribution to this project is welcome. One way is to add a language(s). The program stores languages (language pack files) using Java's `Properties` file(s). This is the content of a typical language pack file (*English*):
