@@ -18,5 +18,5 @@ mainClassName = "App" //This is the format accepted by gradle ver. 3; I am not s
 
 jar {
     baseName = 'wrex'
-    version  = '0.1'
+    version  = '0.3'
 }

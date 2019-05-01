@@ -37,7 +37,7 @@ public class GUI extends JFrame {
 
     public GUI() {
         setContentPane(mainPanel);
-        setSize(new Dimension(345, 350));
+        setSize(new Dimension(450, 350));
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
