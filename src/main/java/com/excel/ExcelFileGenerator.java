@@ -14,7 +14,6 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
@@ -29,8 +28,6 @@ import java.util.Properties;
 
 public class ExcelFileGenerator {
     private XSSFWorkbook workbook;
-    private XSSFRichTextString formattedText;
-    private XSSFFont boldFont;
     private ContentParser contentParser;
     private int CELL_INDEX = 1;
     private int ROW_INDEX  = 4;
@@ -44,27 +41,23 @@ public class ExcelFileGenerator {
         this.languagePack.load(new InputStreamReader(input, StandardCharsets.UTF_8));
         contentParser = new ContentParser(languagePack.getProperty("filter_for_minute"));
         workbook = new XSSFWorkbook();
-        boldFont = new XSSFFont();
-        boldFont.setBold(true);
     }
 
     private void insertPageTitle(XSSFSheet sheet) {
         String sheetName = sheet.getSheetName(), month, year, fullTitle;
         // data population starts from the 3rd row
-        Row row = getRowIfExists(ROW_INDEX - 2, sheet, true);
+        Row row = getRowIfExists(ROW_INDEX - 2, sheet, false);
         // the last two numbers specify the month of the publication
         month = sheetName.substring(sheetName.length() - 2);
         year  = sheetName.substring(sheetName.length() - 6, sheetName.length() - 2);
         fullTitle = languagePack.getProperty("meeting_name") + " – " +
                 languagePack.getProperty(month) + " " + year;
 
-        formattedText = new XSSFRichTextString();
-        formattedText.setString(fullTitle);
-        formattedText.applyFont(boldFont);
         // set the header of the page
-        row.createCell(CELL_INDEX).setCellValue(formattedText);
+        row.createCell(CELL_INDEX).setCellValue(fullTitle);
         row.getCell(CELL_INDEX).setCellStyle(getCellStyle
-                (false, false, false, true, false));
+                (false, false, false,
+                        true, false, true));
         sheet.addMergedRegion(new CellRangeAddress
                 (row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 8));
     }
@@ -72,22 +65,21 @@ public class ExcelFileGenerator {
     private void insertHeaderSection(String weekSpan, XSSFSheet sheet) {
         // 5th row has "week span" in it
         Row row = getRowIfExists(ROW_INDEX, sheet, false);
-        formattedText.setString(weekSpan);
-        formattedText.applyFont(boldFont);
-        row.getCell(CELL_INDEX).setCellValue(formattedText);
+        row.getCell(CELL_INDEX).setCellValue(weekSpan);
         row.getCell(CELL_INDEX).setCellStyle(getCellStyle
-                (false, false, false, false, true));
+                (false, false, false,
+                        false, true, true));
+        sheet.setColumnWidth(CELL_INDEX, 1000);
+        sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
         // 6th row has the chairman's name
         row = getRowIfExists(++ROW_INDEX, sheet, false);
-        formattedText.setString(languagePack.getProperty("chairman"));
-        formattedText.applyFont(boldFont);
-        row.getCell(CELL_INDEX).setCellValue(formattedText);
-        setBottomBorderedCellStyle(row, CELL_INDEX, CELL_INDEX + 3);
+        row.getCell(CELL_INDEX).setCellValue(languagePack.getProperty("chairman"));
+        setBottomBorderedCellStyle(row, CELL_INDEX, CELL_INDEX + 3, true, true);
+        sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
         // 7th row has the name of the brother who does the opening prayer
         row = getRowIfExists(++ROW_INDEX, sheet, false);
-        formattedText.setString(languagePack.getProperty("opening_prayer"));
-        row.getCell(CELL_INDEX + 2).setCellValue(formattedText);
-        setBottomBorderedCellStyle(row, CELL_INDEX + 2, CELL_INDEX + 2);
+        row.getCell(CELL_INDEX + 2).setCellValue(languagePack.getProperty("opening_prayer"));
+        setBottomBorderedCellStyle(row, CELL_INDEX + 2, CELL_INDEX + 2, false, true);
     }
 
     private void insertTreasuresParts(MeetingSection treasures, XSSFSheet sheet) {
@@ -107,7 +99,7 @@ public class ExcelFileGenerator {
                         (row.getRowNum(), row.getRowNum(), CELL_INDEX + 1, CELL_INDEX + 2));
             }
             row.getCell(CELL_INDEX + 1).setCellValue(part);
-            setBottomBorderedCellStyle(row, CELL_INDEX + 1, CELL_INDEX + 3);
+            setBottomBorderedCellStyle(row, CELL_INDEX + 1, CELL_INDEX + 3, false, false);
         }
     }
 
@@ -120,17 +112,19 @@ public class ExcelFileGenerator {
         for (String part : improveInMinistry.getParts()) {
             row = getRowIfExists(++ROW_INDEX, sheet, true);
             row.getCell(CELL_INDEX + 1).setCellValue(part);
-            setBottomBorderedCellStyle(row, CELL_INDEX + 1, CELL_INDEX + 3);
+            setBottomBorderedCellStyle(row, CELL_INDEX + 1, CELL_INDEX + 3, false, false);
         }
     }
 
     private void insertHallDivisionHeader(Row row) {
         row.getCell(CELL_INDEX + 2).setCellValue(languagePack.getProperty("main_hall"));
         row.getCell(CELL_INDEX + 2).setCellStyle(getCellStyle
-                (true, true, false, true, true));
+                (true, true, false,
+                        true, true, false));
         row.getCell(CELL_INDEX + 3).setCellValue(languagePack.getProperty("second_hall"));
         row.getCell(CELL_INDEX + 3).setCellStyle(getCellStyle
-                (true, true, false, true, true));
+                (true, true, false,
+                        true, true, false));
     }
 
     private void insertChristianLifeParts(MeetingSection livingAsChristians, XSSFSheet sheet) {
@@ -141,7 +135,7 @@ public class ExcelFileGenerator {
         for (String part : livingAsChristians.getParts()) {
             row = getRowIfExists(++ROW_INDEX, sheet, true);
             row.getCell(CELL_INDEX + 1).setCellValue(part);
-            setBottomBorderedCellStyle(row, CELL_INDEX + 1, CELL_INDEX + 3);
+            setBottomBorderedCellStyle(row, CELL_INDEX + 1, CELL_INDEX + 3, false, false);
             sheet.addMergedRegion(new CellRangeAddress
                     (row.getRowNum(), row.getRowNum(), CELL_INDEX + 1, CELL_INDEX + 2));
         }
@@ -156,22 +150,21 @@ public class ExcelFileGenerator {
     ) {
         sheet.addMergedRegion(new CellRangeAddress
                 (row.getRowNum(), row.getRowNum(), beginCol, endCol));
-        formattedText.setString(sectionTitle);
-        formattedText.applyFont(boldFont);
-        row.getCell(beginCol).setCellValue(formattedText);
+        row.getCell(beginCol).setCellValue(sectionTitle);
         row.getCell(beginCol).setCellStyle(getCellStyle
-                (true, true, false, false, false));
+                (true, true, false,
+                        false, true, true));
     }
 
     private void insertFooterSection(XSSFSheet sheet) {
         // Congregation Bible study reader row
         Row row = getRowIfExists(++ROW_INDEX, sheet, false);
         row.getCell(CELL_INDEX + 2).setCellValue(languagePack.getProperty("reader"));
-        setBottomBorderedCellStyle(row, CELL_INDEX + 2, CELL_INDEX + 3);
+        setBottomBorderedCellStyle(row, CELL_INDEX + 2, CELL_INDEX + 3, false, true);
         // closing prayer row
         row = getRowIfExists(++ROW_INDEX, sheet, false);
         row.getCell(CELL_INDEX + 2).setCellValue(languagePack.getProperty("concluding_prayer"));
-        setBottomBorderedCellStyle(row, CELL_INDEX + 2, CELL_INDEX + 3);
+        setBottomBorderedCellStyle(row, CELL_INDEX + 2, CELL_INDEX + 3, false, true);
         ROW_INDEX += 3;
     }
 
@@ -231,7 +224,7 @@ public class ExcelFileGenerator {
             row.createCell(column);
         }
 
-        if (increaseRowHeight) row.setHeight((short) 400);
+        if (increaseRowHeight) row.setHeight((short) 500);
 
         return row;
     }
@@ -241,8 +234,8 @@ public class ExcelFileGenerator {
             boolean topBordered,
             boolean bottomBordered,
             boolean centeredText,
-            boolean smallerFont
-    ) {
+            boolean smallerFont,
+            boolean boldFont) {
         XSSFCellStyle cellStyle = workbook.createCellStyle();
 
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -260,16 +253,24 @@ public class ExcelFileGenerator {
         cellStyle.setAlignment(centeredText ? HorizontalAlignment.CENTER : HorizontalAlignment.LEFT);
 
         XSSFFont font = workbook.createFont();
-        font.setFontHeight(smallerFont? 12 : 14);
+        font.setBold(boldFont);
+        font.setFontHeight(smallerFont? 14 : 16);
         cellStyle.setFont(font);
 
         return cellStyle;
     }
 
-    private void setBottomBorderedCellStyle(Row row, int firstColumn, int lastColumn) {
+    private void setBottomBorderedCellStyle(
+            Row row,
+            int firstColumn,
+            int lastColumn,
+            boolean boldFont,
+            boolean smallerFont)
+    {
         for (int column = firstColumn; column <= lastColumn; ++column) {
             row.getCell(column).setCellStyle(getCellStyle
-                    (false, false, true, false, true));
+                    (false, false, true,
+                            false, smallerFont, boldFont));
         }
     }
 
