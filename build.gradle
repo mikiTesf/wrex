@@ -18,7 +18,7 @@ mainClassName = "App" // This is the format accepted by Gradle ver. 3 (also work
 
 jar {
     manifest {
-        ttributes "Main-Class" : "App"
+        attributes "Main-Class" : "App"
     }
     
     from {
