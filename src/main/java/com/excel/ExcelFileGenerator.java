@@ -74,12 +74,14 @@ public class ExcelFileGenerator {
         // 6th row has the chairman's name
         row = getRowIfExists(++ROW_INDEX, sheet);
         row.getCell(CELL_INDEX).setCellValue(languagePack.getProperty("chairman"));
-        setBottomBorderedCellStyle(row, CELL_INDEX, CELL_INDEX + 3, true, true);
+        setBottomBorderedCellStyle
+                (row, CELL_INDEX, CELL_INDEX + 3, true, true, 1);
         sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
         // 7th row has the name of the brother who does the opening prayer
         row = getRowIfExists(++ROW_INDEX, sheet);
         row.getCell(CELL_INDEX + 2).setCellValue(languagePack.getProperty("opening_prayer"));
-        setBottomBorderedCellStyle(row, CELL_INDEX, CELL_INDEX + 2, false, true);
+        setBottomBorderedCellStyle
+	            (row, CELL_INDEX, CELL_INDEX + 3, false, true, 1);
     }
 
     private void insertTreasuresParts(MeetingSection treasures, XSSFSheet sheet) {
@@ -99,7 +101,8 @@ public class ExcelFileGenerator {
                         (row.getRowNum(), row.getRowNum(), CELL_INDEX + 1, CELL_INDEX + 2));
             }
             row.getCell(CELL_INDEX + 1).setCellValue(part);
-            setBottomBorderedCellStyle(row, CELL_INDEX + 1, CELL_INDEX + 3, false, false);
+            setBottomBorderedCellStyle
+                    (row, CELL_INDEX + 1, CELL_INDEX + 3, false, false, 2);
         }
     }
 
@@ -112,7 +115,8 @@ public class ExcelFileGenerator {
         for (String part : improveInMinistry.getParts()) {
             row = getRowIfExists(++ROW_INDEX, sheet);
             row.getCell(CELL_INDEX + 1).setCellValue(part);
-            setBottomBorderedCellStyle(row, CELL_INDEX + 1, CELL_INDEX + 3, false, false);
+            setBottomBorderedCellStyle
+                    (row, CELL_INDEX + 1, CELL_INDEX + 3, false, false, 2);
         }
     }
 
@@ -135,7 +139,8 @@ public class ExcelFileGenerator {
         for (String part : livingAsChristians.getParts()) {
             row = getRowIfExists(++ROW_INDEX, sheet);
             row.getCell(CELL_INDEX + 1).setCellValue(part);
-            setBottomBorderedCellStyle(row, CELL_INDEX + 1, CELL_INDEX + 3, false, false);
+            setBottomBorderedCellStyle
+                    (row, CELL_INDEX + 1, CELL_INDEX + 3, false, false, 1);
             sheet.addMergedRegion(new CellRangeAddress
                     (row.getRowNum(), row.getRowNum(), CELL_INDEX + 1, CELL_INDEX + 2));
         }
@@ -160,11 +165,13 @@ public class ExcelFileGenerator {
         // Congregation Bible study reader row
         Row row = getRowIfExists(++ROW_INDEX, sheet);
         row.getCell(CELL_INDEX + 2).setCellValue(languagePack.getProperty("reader"));
-        setBottomBorderedCellStyle(row, CELL_INDEX + 2, CELL_INDEX + 3, false, true);
+        setBottomBorderedCellStyle
+                (row, CELL_INDEX + 2, CELL_INDEX + 3, false, true, 1);
         // closing prayer row
         row = getRowIfExists(++ROW_INDEX, sheet);
         row.getCell(CELL_INDEX + 2).setCellValue(languagePack.getProperty("concluding_prayer"));
-        setBottomBorderedCellStyle(row, CELL_INDEX + 2, CELL_INDEX + 3, false, true);
+        setBottomBorderedCellStyle
+                (row, CELL_INDEX + 2, CELL_INDEX + 3, false, true, 1);
         ROW_INDEX += 3;
     }
 
@@ -235,7 +242,8 @@ public class ExcelFileGenerator {
             boolean bottomBordered,
             boolean centeredText,
             boolean smallerFont,
-            boolean boldFont) {
+            boolean boldFont
+    ) {
         XSSFCellStyle cellStyle = workbook.createCellStyle();
 
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -260,17 +268,23 @@ public class ExcelFileGenerator {
         return cellStyle;
     }
 
-    private void setBottomBorderedCellStyle(
+    private void setBottomBorderedCellStyle (
             Row row,
             int firstColumn,
             int lastColumn,
             boolean boldFont,
-            boolean smallerFont)
-    {
+            boolean smallerFont,
+            int lastCellsToCenterHorizontally
+    ) {
         for (int column = firstColumn; column <= lastColumn; ++column) {
             row.getCell(column).setCellStyle(getCellStyle
                     (false, false, true,
                             false, smallerFont, boldFont));
+        }
+
+        for (int column = row.getLastCellNum() - 1; lastCellsToCenterHorizontally > 0; --column) {
+            row.getCell(column).getCellStyle().setAlignment(HorizontalAlignment.CENTER);
+            --lastCellsToCenterHorizontally;
         }
     }
 
