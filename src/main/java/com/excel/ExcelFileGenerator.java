@@ -289,9 +289,9 @@ public class ExcelFileGenerator {
     }
 
     private void resizeColumnsAndFixPageSize(XSSFSheet sheet) {
-        final double MARGIN_LENGTH = 0.1; // 0.393701 in = 1 cm
+        final double MARGIN_LENGTH = 0.393701; // 0.393701 inch = 1 cm
         final int FIRST_COLUMN = 1;
-        final int LAST_COLUMN = 7;
+        final int LAST_COLUMN = 9;
 
         sheet.getPrintSetup().setPaperSize(PrintSetup.A4_PAPERSIZE);
         sheet.setMargin(Sheet.LeftMargin, MARGIN_LENGTH);
