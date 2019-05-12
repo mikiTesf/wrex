@@ -14,9 +14,17 @@ dependencies {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-mainClassName = "App" //This is the format accepted by gradle ver. 3; I am not sure if this works above ver. 3
+mainClassName = "App" // This is the format accepted by Gradle ver. 3 (also works for Gradle 5)
 
 jar {
+    manifest {
+        attributes "Main-Class" : "App"
+    }
+    
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    
     baseName = 'wrex'
     version  = '0.3'
 }

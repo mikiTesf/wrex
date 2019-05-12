@@ -223,7 +223,7 @@ public class GUI extends JFrame {
                         case SUCCESS:
                             statusLabel.setText("Done!");
                             JOptionPane.showMessageDialog
-                                    (thisFrame, "Schedule generated",
+                                    (thisFrame, "Construct generated",
                                             "Done", JOptionPane.INFORMATION_MESSAGE);
                             break;
                         default:
