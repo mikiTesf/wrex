@@ -155,7 +155,7 @@ public class GUI extends JFrame {
         private int FILE_STATUS = 100;
         private final String LANGUAGE;
 
-        UIController(File DESTINATION, String FILE_NAME, String LANGUAGE) {
+        private UIController(File DESTINATION, String FILE_NAME, String LANGUAGE) {
             this.DESTINATION = DESTINATION;
             this.FILE_NAME = FILE_NAME;
             this.LANGUAGE = LANGUAGE.toLowerCase();
@@ -187,11 +187,11 @@ public class GUI extends JFrame {
         protected void done() {
             toggleButtons();
 
-            final int SUCCESS              = 0;
-            final int FILE_FORMAT_ERROR    = 1;
-            final int LANGUAGE_PACK_ERROR  = 2;
-            final int NO_PUBLICATION_ERROR = 3;
-            final int COULD_NOT_SAVE_FILE  = 4;
+            final int SUCCESS                   = 0;
+            final int FILE_FORMAT_ERROR         = 1;
+            final int LANGUAGE_PACK_ERROR       = 2;
+            final int NO_PUBLICATION_ERROR      = 3;
+            final int COULD_NOT_SAVE_FILE_ERROR = 4;
 
             switch (FILE_STATUS) {
                 case FILE_FORMAT_ERROR:
@@ -214,7 +214,7 @@ public class GUI extends JFrame {
                                             "Problem", JOptionPane.ERROR_MESSAGE);
                             statusLabel.setText("");
                             break;
-                        case COULD_NOT_SAVE_FILE:
+                        case COULD_NOT_SAVE_FILE_ERROR:
                             JOptionPane.showMessageDialog
                                     (thisFrame, "Could not save generated document",
                                             "Problem", JOptionPane.ERROR_MESSAGE);
@@ -223,7 +223,7 @@ public class GUI extends JFrame {
                         case SUCCESS:
                             statusLabel.setText("Done!");
                             JOptionPane.showMessageDialog
-                                    (thisFrame, "Construct generated",
+                                    (thisFrame, "Template generated!",
                                             "Done", JOptionPane.INFORMATION_MESSAGE);
                             break;
                         default:

@@ -68,20 +68,25 @@ public class ExcelFileGenerator {
         row.getCell(CELL_INDEX).setCellValue(weekSpan);
         row.getCell(CELL_INDEX).setCellStyle(getCellStyle
                 (false, false, false,
-                        false, true, true));
+                        false, false, true));
         sheet.setColumnWidth(CELL_INDEX, 1250);
         sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
         // 6th row has the chairman's name
         row = getRowIfExists(++ROW_INDEX, sheet);
         row.getCell(CELL_INDEX).setCellValue(languagePack.getProperty("chairman"));
         setBottomBorderedCellStyle
-                (row, CELL_INDEX, CELL_INDEX + 3, true, true, 1);
+                (row, CELL_INDEX, CELL_INDEX + 3, true, false, 1);
+        row.getCell(CELL_INDEX + 3).setCellStyle(getCellStyle(
+                false, false, true, true, false, false
+        ));
         sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), CELL_INDEX, CELL_INDEX + 2));
         // 7th row has the name of the brother who does the opening prayer
         row = getRowIfExists(++ROW_INDEX, sheet);
         row.getCell(CELL_INDEX + 2).setCellValue(languagePack.getProperty("opening_prayer"));
         setBottomBorderedCellStyle
 	            (row, CELL_INDEX, CELL_INDEX + 3, false, true, 1);
+        row.getCell(CELL_INDEX + 3).setCellStyle(getCellStyle
+                (false, false, true, true, false, false));
     }
 
     private void insertTreasuresParts(MeetingSection treasures, XSSFSheet sheet) {
@@ -158,7 +163,7 @@ public class ExcelFileGenerator {
         row.getCell(beginCol).setCellValue(sectionTitle);
         row.getCell(beginCol).setCellStyle(getCellStyle
                 (true, true, false,
-                        false, true, true));
+                        false, false, true));
     }
 
     private void insertFooterSection(XSSFSheet sheet) {
@@ -167,11 +172,15 @@ public class ExcelFileGenerator {
         row.getCell(CELL_INDEX + 2).setCellValue(languagePack.getProperty("reader"));
         setBottomBorderedCellStyle
                 (row, CELL_INDEX + 2, CELL_INDEX + 3, false, true, 1);
+        row.getCell(CELL_INDEX + 3).setCellStyle(getCellStyle
+                (false, false, true, true, false, false));
         // closing prayer row
         row = getRowIfExists(++ROW_INDEX, sheet);
         row.getCell(CELL_INDEX + 2).setCellValue(languagePack.getProperty("concluding_prayer"));
         setBottomBorderedCellStyle
                 (row, CELL_INDEX + 2, CELL_INDEX + 3, false, true, 1);
+        row.getCell(CELL_INDEX + 3).setCellStyle(getCellStyle
+                (false, false, true, true, false, false));
         ROW_INDEX += 3;
     }
 
