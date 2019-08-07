@@ -150,7 +150,8 @@ public class GUI extends JFrame {
 
                 final Properties languagePack = new Properties();
                 try {
-                    FileInputStream input = new FileInputStream("languages/" + languagePack + ".lang");
+                    FileInputStream input = new FileInputStream
+                            ("languages/" + languageComboBox.getSelectedItem().toString().toLowerCase() + ".lang");
                     languagePack.load(new InputStreamReader(input, StandardCharsets.UTF_8));
                 } catch (IOException e1) { e1.printStackTrace(); }
 
