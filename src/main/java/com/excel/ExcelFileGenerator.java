@@ -19,11 +19,8 @@ import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 public class ExcelFileGenerator {
@@ -33,13 +30,12 @@ public class ExcelFileGenerator {
     private int ROW_INDEX  = 4;
     private final File cacheFolder = new File(".content/");
     private final File destination;
-    private final Properties languagePack = new Properties();
+    private final Properties languagePack;
 
-    public ExcelFileGenerator(File destination, String language) throws IOException {
+    public ExcelFileGenerator(File destination, Properties languagePack) {
+        this.languagePack = languagePack;
         this.destination = destination;
-        FileInputStream input = new FileInputStream("language/" + language + ".lang");
-        this.languagePack.load(new InputStreamReader(input, StandardCharsets.UTF_8));
-        contentParser = new ContentParser(languagePack.getProperty("filter_for_minute"));
+        contentParser = new ContentParser(this.languagePack.getProperty("filter_for_minute"));
         workbook = new XSSFWorkbook();
     }
 
