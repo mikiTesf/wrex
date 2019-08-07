@@ -15,9 +15,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Properties;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
@@ -53,16 +58,19 @@ public class GUI extends JFrame {
             e.printStackTrace();
         }
         // fill `languageComboBox` with the available language(s)
-        File languageFolder = new File("language/");
+        File languageFolder = new File("languages/");
         if (!languageFolder.exists()) {
             // noinspection ResultOfMethodCallIgnored
             languageFolder.mkdir();
         }
+        File[] availableLanguages = languageFolder.listFiles();
         // noinspection ConstantConditions
-        for (File languagePack : languageFolder.listFiles()) {
-            String language = languagePack.getName();
-            language = language.toUpperCase();
-            language = language.substring(0, language.indexOf('.'));
+        Arrays.sort(availableLanguages);
+        for (File languagePack : availableLanguages) {
+            String language = languagePack.getName().toLowerCase();
+            language = language.replaceFirst
+                    (language.charAt(0) + "", Character.toUpperCase(language.charAt(0)) + "");
+            language = language.substring(0, language.indexOf(".lang"));
             languageComboBox.addItem(language);
         }
         // I got nothing to say about the next line of code
@@ -140,7 +148,13 @@ public class GUI extends JFrame {
                     }
                 }
 
-                new UIController(DESTINATION, FILE_NAME, languageComboBox.getSelectedItem() + "").execute();
+                final Properties languagePack = new Properties();
+                try {
+                    FileInputStream input = new FileInputStream("languages/" + languagePack + ".lang");
+                    languagePack.load(new InputStreamReader(input, StandardCharsets.UTF_8));
+                } catch (IOException e1) { e1.printStackTrace(); }
+
+                new UIController(DESTINATION, FILE_NAME, languagePack).execute();
             }
         });
 
@@ -153,12 +167,12 @@ public class GUI extends JFrame {
         private final String FILE_NAME;
         private int GENERATION_STATUS;
         private int FILE_STATUS = 100;
-        private final String LANGUAGE;
+        private final Properties LANGUAGE_PACK;
 
-        private UIController(File DESTINATION, String FILE_NAME, String LANGUAGE) {
+        private UIController(File DESTINATION, String FILE_NAME, Properties LANGUAGE_PACK) {
             this.DESTINATION = DESTINATION;
             this.FILE_NAME = FILE_NAME;
-            this.LANGUAGE = LANGUAGE.toLowerCase();
+            this.LANGUAGE_PACK = LANGUAGE_PACK;
         }
 
         @Override
@@ -173,12 +187,7 @@ public class GUI extends JFrame {
                 return null;
             }
 
-            try {
-                GENERATION_STATUS = new ExcelFileGenerator(DESTINATION, LANGUAGE).makeExcel(FILE_NAME);
-            } catch (IOException e) {
-                FILE_STATUS = 2;
-                return null;
-            }
+            GENERATION_STATUS = new ExcelFileGenerator(DESTINATION, LANGUAGE_PACK).makeExcel(FILE_NAME);
 
             return null;
         }
@@ -203,7 +212,7 @@ public class GUI extends JFrame {
                     JOptionPane.showMessageDialog(thisFrame,
                             "Either the pack for the specified language doesn't\n" +
                                     "\texist or there was an error reading it\n" +
-                                    "(Check if a file with the language's name exists in \"language/\")",
+                                    "(Check if a file with the language's name exists in \"languages/\")",
                             "Oops!", JOptionPane.ERROR_MESSAGE);
                     break;
                 default:

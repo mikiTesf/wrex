@@ -16,7 +16,7 @@ import java.util.zip.ZipInputStream;
 public class EPUBContentExtractor {
 
     public void unzip(File[] EPUBFiles, Charset charset) throws IOException {
-        final File destination = new File(".content/");
+        final File destination = new File(".content" + File.separator);
         String OEBPSFolderPath = "";
 
         for (File EPUBFile : EPUBFiles) {
@@ -28,7 +28,7 @@ public class EPUBContentExtractor {
                 ZipEntry entry = zipIn.getNextEntry();
                 // create a hidden directory for the extracted files
                 File publicationFolder = new File
-                        (destination + "/" + EPUBFile.getName().replaceAll(".epub", ""));
+                        (destination + File.separator + EPUBFile.getName().replaceAll(".epub", ""));
                 publicationFolder.mkdirs();
 
                 while (entry != null) {

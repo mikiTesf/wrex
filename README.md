@@ -41,9 +41,9 @@ The image below shows the texts in the excel document that correspond to the giv
 To add a language:
  1. Create a file with the name of the language you want to add (eg. `german.lang` for German)
  2. Copy the sample provided above to the file and translate the `values` into the target language
- 3. Put the file in `language/`
+ 3. Put the file in `languages/`
 
-The steps above are all you need to follow in order to add a language pack but it would help others if you can also add the language to the list of supported languages (above the  **Contribution**  header) and most importantly send me a PR.
+The steps above are all you need to follow in order to add a language pack. It would help others if you can send me a PR with the newly added language appended to the list of supported languages listed in this README (above the  **Contribution**  header).
 
 Note that a language pack has a `.lang` extension. Also, be sure that you don't translate the keys (the texts to the left of the `=` sign) into the new language. You're supposed to translate the values (the texts to the right of the `=` sign) only.
 
