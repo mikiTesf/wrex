@@ -77,7 +77,7 @@ public class EPUBContentExtractor {
 
     private void moveContentFilesToPublicationFolder (File OEBPSFolder) {
         for (File XHTMLFile : Objects.requireNonNull(OEBPSFolder.listFiles())) {
-            XHTMLFile.renameTo(new File(OEBPSFolder.getParent() + '/' + XHTMLFile.getName()));
+            XHTMLFile.renameTo(new File(OEBPSFolder.getParent() + File.separator + XHTMLFile.getName()));
         }
         // remove the "OEBPS/" folder when done
         OEBPSFolder.delete();

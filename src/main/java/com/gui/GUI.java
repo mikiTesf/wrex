@@ -103,21 +103,24 @@ public class GUI extends JFrame {
                 fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
                 fileChooser.setFileFilter(filter);
                 fileChooser.showDialog(thisFrame, "Open");
-                EPUBFiles = fileChooser.getSelectedFiles();
+                final File[] SELECTED_FILES_TEST = fileChooser.getSelectedFiles();
 
-                tableModel.setRowCount(0);
-                for (File EPUBFile : EPUBFiles) {
-                    tableModel.addRow(new Object[]{EPUBFile.getName()});
+                if (SELECTED_FILES_TEST.length != 0) {
+                    EPUBFiles = SELECTED_FILES_TEST;
+                    generateButton.setEnabled(true);
+                    tableModel.setRowCount(0);
+
+                    for (File EPUBFile : EPUBFiles) {
+                        tableModel.addRow(new Object[]{EPUBFile.getName()});
+                    }
                 }
-
-                generateButton.setEnabled(EPUBFiles.length != 0);
             }
         });
 
         generateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (EPUBFiles == null) return;
+                if (EPUBFiles.length == 0) return;
 
                 fileChooser.resetChoosableFileFilters();
                 fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
