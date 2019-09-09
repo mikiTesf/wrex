@@ -5,6 +5,7 @@ import com.extraction.EPUBContentExtractor;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.FileChooserUI;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.Dimension;
@@ -17,10 +18,13 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import java.io.InputStreamReader;
+
+import java.lang.reflect.Field;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -36,7 +40,7 @@ public class GUI extends JFrame {
     private JScrollPane scrollPane;
     private JLabel statusLabel;
     private JComboBox<String> languageComboBox;
-    private final JFileChooser fileChooser = new JFileChooser();
+    private final JFileChooser fileChooser;
 
     private File[] EPUBFiles = null;
 
@@ -46,17 +50,32 @@ public class GUI extends JFrame {
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("WREX");
         // other initial setups
         generateButton.setEnabled(false);
-    }
-
-    public void setupAndDrawUI() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.put("FileChooser.readOnly", Boolean.TRUE);
         } catch (ClassNotFoundException | InstantiationException |
                 IllegalAccessException | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
+
+        fileChooser = new JFileChooser();
+
+        try {
+            FileChooserUI fileChooserUI = fileChooser.getUI();
+            Field field = fileChooserUI.getClass().getDeclaredField("fileNameTextField");
+            field.setAccessible(true);
+            JTextField textField = (JTextField) field.get(fileChooserUI);
+            textField.setEditable(false);
+            textField.setEnabled(false);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void setupAndDrawUI() {
         // fill `languageComboBox` with the available language(s)
         File languageFolder = new File("languages/");
         if (!languageFolder.exists()) {
@@ -96,13 +115,11 @@ public class GUI extends JFrame {
         openButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-                fileChooser.setDialogTitle("Open...");
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 fileChooser.setMultiSelectionEnabled(true);
                 fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
                 fileChooser.setFileFilter(filter);
-                fileChooser.showDialog(thisFrame, "Open");
+                fileChooser.showOpenDialog(thisFrame);
                 final File[] SELECTED_FILES_TEST = fileChooser.getSelectedFiles();
 
                 if (SELECTED_FILES_TEST.length != 0) {
@@ -123,13 +140,11 @@ public class GUI extends JFrame {
                 if (EPUBFiles.length == 0) return;
 
                 fileChooser.resetChoosableFileFilters();
-                fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-                fileChooser.setDialogTitle("Save...");
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                fileChooser.setMultiSelectionEnabled(false);
                 fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+                fileChooser.setMultiSelectionEnabled(false);
 
-                switch (fileChooser.showDialog(thisFrame, "Save")) {
+                switch (fileChooser.showSaveDialog(thisFrame)) {
                     case JFileChooser.CANCEL_OPTION:
                     case JFileChooser.ERROR_OPTION:
                         return;
