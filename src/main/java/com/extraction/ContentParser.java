@@ -73,7 +73,7 @@ public class ContentParser {
     private void setSectionTitle
             (MeetingSection meetingSection, Document meetingDoc) {
 
-        switch (meetingSection.getSectionKind()) {
+        switch (meetingSection.getSECTION_KIND()) {
             case TREASURES:
                 sectionElement = meetingDoc.getElementById("section2");
                 break;
@@ -100,7 +100,7 @@ public class ContentParser {
         sectionElement.selectFirst("ul");
         presentations.addAll(sectionElement.getElementsByTag("li"));
 
-        if (meetingSection.getSectionKind() == LIVING_AS_CHRISTIANS) {
+        if (meetingSection.getSECTION_KIND() == LIVING_AS_CHRISTIANS) {
             presentations.remove(0); // transition song element
             presentations.remove(presentations.size() - 1); // concluding song and prayer element
             presentations.remove(presentations.size() - 1); // next week preview element

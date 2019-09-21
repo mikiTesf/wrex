@@ -9,26 +9,31 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.BufferedOutputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class EPUBContentExtractor {
 
+    private final File CACHE_FOLDER = new File(".content" + File.separator);
+
     public void unzip(File[] EPUBFiles, Charset charset) throws IOException {
-        final File destination = new File(".content" + File.separator);
         String OEBPSFolderPath = "";
 
         for (File EPUBFile : EPUBFiles) {
             try (ZipInputStream zipIn = new ZipInputStream
                     (new FileInputStream(EPUBFile), charset)) {
                 // Make sure destination exists
-                if (!destination.exists()) { destination.mkdir(); }
+                if (!CACHE_FOLDER.exists()) { CACHE_FOLDER.mkdir(); }
 
                 ZipEntry entry = zipIn.getNextEntry();
                 // create a hidden directory for the extracted files
                 File publicationFolder = new File
-                        (destination + File.separator + EPUBFile.getName().replaceAll(".epub", ""));
+                        (CACHE_FOLDER + File.separator + EPUBFile.getName().replaceAll(".epub", ""));
                 publicationFolder.mkdirs();
 
                 while (entry != null) {
@@ -107,6 +112,23 @@ public class EPUBContentExtractor {
             while ((location = zipIn.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, location);
             }
+        }
+    }
+
+    public File getCacheFolder() {
+        return this.CACHE_FOLDER;
+    }
+
+    public void deleteCacheFolder() {
+        Path pathToCacheFolder = Paths.get(CACHE_FOLDER.toURI());
+
+        try {
+            Files.walk(pathToCacheFolder)
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

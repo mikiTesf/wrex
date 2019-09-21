@@ -3,18 +3,18 @@ package com.meeting;
 import java.util.ArrayList;
 
 public class MeetingSection {
-    private SectionKind sectionKind;
+    private final SectionKind SECTION_KIND;
     private String title;
     // demonstrations, talks, etc...
-    private ArrayList<String> parts;
+    private final ArrayList<String> PARTS;
 
-    public MeetingSection(SectionKind sectionKind) {
-        this.sectionKind = sectionKind;
-        parts = new ArrayList<>();
+    public MeetingSection(SectionKind SECTION_KIND) {
+        this.SECTION_KIND = SECTION_KIND;
+        PARTS = new ArrayList<>();
     }
 
-    public SectionKind getSectionKind() {
-        return this.sectionKind;
+    public SectionKind getSECTION_KIND() {
+        return this.SECTION_KIND;
     }
 
     public void setSectionTitle(String title) {
@@ -26,10 +26,10 @@ public class MeetingSection {
     }
 
     public ArrayList<String> getParts () {
-        return this.parts;
+        return this.PARTS;
     }
 
     public void addPart (String part) {
-        parts.add(part);
+        PARTS.add(part);
     }
 }
