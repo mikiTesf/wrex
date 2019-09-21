@@ -25,14 +25,16 @@ import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Properties;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 
 public class GUI extends JFrame {
-    private final JFrame thisFrame = this;
+    private final JFrame THIS_FRAME = this;
     private JButton openButton;
     private JButton generateButton;
     private JPanel mainPanel;
@@ -40,7 +42,7 @@ public class GUI extends JFrame {
     private JScrollPane scrollPane;
     private JLabel statusLabel;
     private JComboBox<String> languageComboBox;
-    private final JFileChooser fileChooser;
+    private final JFileChooser FILE_CHOOSER;
 
     private File[] EPUBFiles = null;
 
@@ -51,6 +53,7 @@ public class GUI extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("WREX");
+        setIconImage(new ImageIcon(getClass().getResource("/icons/frameIcon.png")).getImage());
         // other initial setups
         generateButton.setEnabled(false);
         try {
@@ -61,10 +64,10 @@ public class GUI extends JFrame {
             e.printStackTrace();
         }
 
-        fileChooser = new JFileChooser();
+        FILE_CHOOSER = new JFileChooser();
 
         try {
-            FileChooserUI fileChooserUI = fileChooser.getUI();
+            FileChooserUI fileChooserUI = FILE_CHOOSER.getUI();
             Field field = fileChooserUI.getClass().getDeclaredField("fileNameTextField");
             field.setAccessible(true);
             JTextField textField = (JTextField) field.get(fileChooserUI);
@@ -77,7 +80,7 @@ public class GUI extends JFrame {
 
     public void setupAndDrawUI() {
         // fill `languageComboBox` with the available language(s)
-        File languageFolder = new File("languages/");
+        File languageFolder = new File("languages" + File.separator);
         if (!languageFolder.exists()) {
             // noinspection ResultOfMethodCallIgnored
             languageFolder.mkdir();
@@ -93,7 +96,7 @@ public class GUI extends JFrame {
             languageComboBox.addItem(language);
         }
         // I got nothing to say about the next line of code
-        fileChooser.setDragEnabled(false);
+        FILE_CHOOSER.setDragEnabled(false);
         // setup table properties
         publicationTable.setFillsViewportHeight(true);
         DefaultTableModel tableModel = new DefaultTableModel() {
@@ -115,12 +118,12 @@ public class GUI extends JFrame {
         openButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fileChooser.setMultiSelectionEnabled(true);
-                fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-                fileChooser.setFileFilter(filter);
-                fileChooser.showOpenDialog(thisFrame);
-                final File[] SELECTED_FILES_TEST = fileChooser.getSelectedFiles();
+                FILE_CHOOSER.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                FILE_CHOOSER.setMultiSelectionEnabled(true);
+                FILE_CHOOSER.setCurrentDirectory(new File(System.getProperty("user.home")));
+                FILE_CHOOSER.setFileFilter(filter);
+                FILE_CHOOSER.showOpenDialog(THIS_FRAME);
+                final File[] SELECTED_FILES_TEST = FILE_CHOOSER.getSelectedFiles();
 
                 if (SELECTED_FILES_TEST.length != 0) {
                     EPUBFiles = SELECTED_FILES_TEST;
@@ -139,41 +142,43 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (EPUBFiles.length == 0) return;
 
-                fileChooser.resetChoosableFileFilters();
-                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-                fileChooser.setMultiSelectionEnabled(false);
+                FILE_CHOOSER.resetChoosableFileFilters();
+                FILE_CHOOSER.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                FILE_CHOOSER.setCurrentDirectory(new File(System.getProperty("user.home")));
+                FILE_CHOOSER.setMultiSelectionEnabled(false);
 
-                switch (fileChooser.showSaveDialog(thisFrame)) {
+                switch (FILE_CHOOSER.showSaveDialog(THIS_FRAME)) {
                     case JFileChooser.CANCEL_OPTION:
                     case JFileChooser.ERROR_OPTION:
                         return;
                 }
 
-                final File DESTINATION = fileChooser.getSelectedFile();
-                final String FILE_NAME = "wrex.xlsx";
-                File[] files = DESTINATION.listFiles();
+                final File DESTINATION      = FILE_CHOOSER.getSelectedFile();
+                File[] files                = DESTINATION.listFiles();
+                final String GENERATED_DATE = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+                final String SAVE_NAME      = "WREX_" + GENERATED_DATE + ".xlsx";
 
                 if (files != null && files.length > 0) {
                     // make sure the destination doesn't contain the same file
                     for (File file : files) {
-                        if (file.getName().contains(FILE_NAME)) {
+                        if (file.getName().contains(SAVE_NAME)) {
                             int choice = JOptionPane.showConfirmDialog
-                                    (thisFrame, "The file already exists.\n Overwrite?", "", JOptionPane.YES_NO_OPTION);
+                                    (THIS_FRAME, "The file already exists.\n Overwrite?", "", JOptionPane.YES_NO_OPTION);
                             if (choice == JOptionPane.YES_OPTION) break;
                             if (choice == JOptionPane.NO_OPTION) return;
                         }
                     }
                 }
 
-                final Properties languagePack = new Properties();
+                final Properties LANGUAGE_PACK = new Properties();
                 try {
+                    @SuppressWarnings("ConstantConditions")
                     FileInputStream input = new FileInputStream
-                            ("languages/" + languageComboBox.getSelectedItem().toString().toLowerCase() + ".lang");
-                    languagePack.load(new InputStreamReader(input, StandardCharsets.UTF_8));
+                            ("languages" + File.separator + languageComboBox.getSelectedItem().toString().toLowerCase() + ".lang");
+                    LANGUAGE_PACK.load(new InputStreamReader(input, StandardCharsets.UTF_8));
                 } catch (IOException e1) { e1.printStackTrace(); }
 
-                new UIController(DESTINATION, FILE_NAME, languagePack).execute();
+                new UIController(DESTINATION, SAVE_NAME, LANGUAGE_PACK).execute();
             }
         });
 
@@ -183,14 +188,15 @@ public class GUI extends JFrame {
     private class UIController extends SwingWorker<Void, Void> {
 
         private final File DESTINATION;
-        private final String FILE_NAME;
+        private final String SAVE_NAME;
         private int GENERATION_STATUS;
         private int FILE_STATUS = 100;
         private final Properties LANGUAGE_PACK;
+        private final EPUBContentExtractor EPUB_CONTENT_EXTRACTOR = new EPUBContentExtractor();
 
-        private UIController(File DESTINATION, String FILE_NAME, Properties LANGUAGE_PACK) {
-            this.DESTINATION = DESTINATION;
-            this.FILE_NAME = FILE_NAME;
+        private UIController(File DESTINATION, String SAVE_NAME, Properties LANGUAGE_PACK) {
+            this.DESTINATION   = DESTINATION;
+            this.SAVE_NAME     = SAVE_NAME;
             this.LANGUAGE_PACK = LANGUAGE_PACK;
         }
 
@@ -200,13 +206,15 @@ public class GUI extends JFrame {
             statusLabel.setText("Generating...");
 
             try {
-                new EPUBContentExtractor().unzip(EPUBFiles, Charset.defaultCharset());
+                EPUB_CONTENT_EXTRACTOR.unzip(EPUBFiles, Charset.defaultCharset());
             } catch (IOException e1) {
                 FILE_STATUS = 1;
                 return null;
             }
 
-            GENERATION_STATUS = new ExcelFileGenerator(DESTINATION, LANGUAGE_PACK).makeExcel(FILE_NAME);
+            GENERATION_STATUS = new ExcelFileGenerator
+                    (DESTINATION, LANGUAGE_PACK, EPUB_CONTENT_EXTRACTOR.getCacheFolder().listFiles())
+                    .makeExcel(SAVE_NAME);
 
             return null;
         }
@@ -214,6 +222,7 @@ public class GUI extends JFrame {
         @Override
         protected void done() {
             toggleButtons();
+            EPUB_CONTENT_EXTRACTOR.deleteCacheFolder();
 
             final int SUCCESS                   = 0;
             final int FILE_FORMAT_ERROR         = 1;
@@ -223,12 +232,12 @@ public class GUI extends JFrame {
 
             switch (FILE_STATUS) {
                 case FILE_FORMAT_ERROR:
-                    JOptionPane.showMessageDialog(thisFrame,
+                    JOptionPane.showMessageDialog(THIS_FRAME,
                             "Could not extract the necessary files from\nthe given" +
                                     "publication (make sure it's an EPUB)", "Oops!", JOptionPane.ERROR_MESSAGE);
                     break;
                 case LANGUAGE_PACK_ERROR:
-                    JOptionPane.showMessageDialog(thisFrame,
+                    JOptionPane.showMessageDialog(THIS_FRAME,
                             "Either the pack for the specified language doesn't\n" +
                                     "\texist or there was an error reading it\n" +
                                     "(Check if a file with the language's name exists in \"languages/\")",
@@ -238,25 +247,25 @@ public class GUI extends JFrame {
                     switch (GENERATION_STATUS) {
                         case NO_PUBLICATION_ERROR:
                             JOptionPane.showMessageDialog
-                                    (thisFrame, "You didn't select any publications",
+                                    (THIS_FRAME, "You didn't select any publications",
                                             "Problem", JOptionPane.ERROR_MESSAGE);
                             statusLabel.setText("");
                             break;
                         case COULD_NOT_SAVE_FILE_ERROR:
                             JOptionPane.showMessageDialog
-                                    (thisFrame, "Could not save generated document",
+                                    (THIS_FRAME, "Could not save generated document",
                                             "Problem", JOptionPane.ERROR_MESSAGE);
                             statusLabel.setText("");
                             break;
                         case SUCCESS:
                             statusLabel.setText("Done!");
                             JOptionPane.showMessageDialog
-                                    (thisFrame, "Template generated!",
+                                    (THIS_FRAME, "Template generated!",
                                             "Done", JOptionPane.INFORMATION_MESSAGE);
                             break;
                         default:
                             JOptionPane.showMessageDialog
-                                    (thisFrame, "An unknown problem has occurred",
+                                    (THIS_FRAME, "An unknown problem has occurred",
                                             "Problem", JOptionPane.ERROR_MESSAGE);
                     }
             }
