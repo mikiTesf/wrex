@@ -21,6 +21,7 @@ import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Properties;
 
 public class ExcelFileGenerator {
@@ -30,14 +31,18 @@ public class ExcelFileGenerator {
     private int ROW_INDEX  = 4;
     private final File DESTINATION;
     private final Properties LANGUAGE_PACK;
-    private final File[] PUBLICATION_FOLDERS;
+    private final ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS;
 
-    public ExcelFileGenerator(File DESTINATION, Properties LANGUAGE_PACK, File[] PUBLICATION_FOLDERS) {
-        this.LANGUAGE_PACK = LANGUAGE_PACK;
-        this.DESTINATION = DESTINATION;
-        CONTENT_PARSER = new ContentParser(this.LANGUAGE_PACK.getProperty("filter_for_minute"));
-        WORKBOOK = new XSSFWorkbook();
-        this.PUBLICATION_FOLDERS = PUBLICATION_FOLDERS;
+    public ExcelFileGenerator(
+            File DESTINATION,
+            Properties LANGUAGE_PACK,
+            ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS)
+    {
+        this.LANGUAGE_PACK         = LANGUAGE_PACK;
+        this.DESTINATION           = DESTINATION;
+        this.ALL_MEETINGS_CONTENTS = ALL_MEETINGS_CONTENTS;
+        CONTENT_PARSER             = new ContentParser(this.LANGUAGE_PACK.getProperty("filter_for_minute"));
+        WORKBOOK                   = new XSSFWorkbook();
     }
 
     private void insertPageTitle(XSSFSheet sheet) {
@@ -181,11 +186,12 @@ public class ExcelFileGenerator {
         ROW_INDEX += 3;
     }
 
-    private void addPopulatedSheet(File publicationFolder) {
-        CONTENT_PARSER.setPublicationFolder(publicationFolder);
-        CONTENT_PARSER.readRawHTML();
+    private void addPopulatedSheet(ArrayList<String> meetingFilesContents) {
+        CONTENT_PARSER.setMeetingContents(meetingFilesContents);
+        CONTENT_PARSER.parseXHTML();
 
-        XSSFSheet sheet = WORKBOOK.createSheet(publicationFolder.getName());
+        // TODO: find a way to the name the following sheet after the publication's name
+        XSSFSheet sheet = WORKBOOK.createSheet();
 
         int meetingCount = 0;
 
@@ -211,10 +217,10 @@ public class ExcelFileGenerator {
 
     public int makeExcel(String fileName) {
 
-        if (PUBLICATION_FOLDERS == null) { return 3; }
+        if (ALL_MEETINGS_CONTENTS.size() == 0) { return 3; }
 
-        for (File publicationFolder : PUBLICATION_FOLDERS) {
-            addPopulatedSheet(publicationFolder);
+        for (ArrayList<String> meetingContents : ALL_MEETINGS_CONTENTS) {
+            addPopulatedSheet(meetingContents);
         }
 
         try {
