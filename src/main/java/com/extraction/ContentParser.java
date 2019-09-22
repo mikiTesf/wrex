@@ -1,9 +1,6 @@
 package com.extraction;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import com.meeting.MeetingSection;
 import com.meeting.Meeting;
@@ -19,29 +16,19 @@ import static com.meeting.SectionKind.*;
 public class ContentParser {
     private ArrayList<Document> meetingExtracts;
     private Element sectionElement;
-    private File publicationFolder;
+    private ArrayList<String> meetingContents;
     private final String FILTER_FOR_MINUTE;
 
     public ContentParser(String filterForMinute) {
         this.FILTER_FOR_MINUTE = filterForMinute;
     }
 
-    public void readRawHTML() {
+    public void parseXHTML() {
         meetingExtracts = new ArrayList<>();
-        try {
-            File[] XHTMLFiles = publicationFolder.listFiles();
-            /*
-            * Sorting the 'XHTMLFiles' array is important because `listFiles()` does not guarantee
-            * order through neither path nor name (both would have worked in this case). This in
-            * turn affects the order of the schedule in the Excel file that gets generated next
-            * */
-            // noinspection ConstantConditions
-            Arrays.sort(XHTMLFiles);
-            for (File XHTMLFile : XHTMLFiles) {
-                meetingExtracts.add(Jsoup.parse(XHTMLFile, "UTF-8"));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        Object[] meetingContents = this.meetingContents.toArray();
+
+        for (Object meetingContent : meetingContents) {
+            meetingExtracts.add(Jsoup.parse(meetingContent.toString()));
         }
     }
 
@@ -118,7 +105,7 @@ public class ContentParser {
         return meetingSection;
     }
 
-    public void setPublicationFolder(File publicationFolder) {
-        this.publicationFolder = publicationFolder;
+    public void setMeetingContents(ArrayList<String> meetingContents) {
+        this.meetingContents = meetingContents;
     }
 }

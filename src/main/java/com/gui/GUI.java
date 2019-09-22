@@ -22,10 +22,10 @@ import java.io.InputStreamReader;
 
 import java.lang.reflect.Field;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
@@ -44,7 +44,7 @@ public class GUI extends JFrame {
     private JComboBox<String> languageComboBox;
     private final JFileChooser FILE_CHOOSER;
 
-    private File[] EPUBFiles = null;
+    private File[] EPUBFiles;
 
     public GUI() {
         setContentPane(mainPanel);
@@ -192,7 +192,6 @@ public class GUI extends JFrame {
         private int GENERATION_STATUS;
         private int FILE_STATUS = 100;
         private final Properties LANGUAGE_PACK;
-        private final EPUBContentExtractor EPUB_CONTENT_EXTRACTOR = new EPUBContentExtractor();
 
         private UIController(File DESTINATION, String SAVE_NAME, Properties LANGUAGE_PACK) {
             this.DESTINATION   = DESTINATION;
@@ -201,19 +200,14 @@ public class GUI extends JFrame {
         }
 
         @Override
-        protected Void doInBackground() {
+        protected Void doInBackground() throws IOException {
             toggleButtons();
             statusLabel.setText("Generating...");
 
-            try {
-                EPUB_CONTENT_EXTRACTOR.unzip(EPUBFiles, Charset.defaultCharset());
-            } catch (IOException e1) {
-                FILE_STATUS = 1;
-                return null;
-            }
+            final ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS = new EPUBContentExtractor()
+                    .getContentsOfRelevantEntriesAsStrings(EPUBFiles);
 
-            GENERATION_STATUS = new ExcelFileGenerator
-                    (DESTINATION, LANGUAGE_PACK, EPUB_CONTENT_EXTRACTOR.getCacheFolder().listFiles())
+            GENERATION_STATUS = new ExcelFileGenerator(DESTINATION, LANGUAGE_PACK, ALL_MEETINGS_CONTENTS)
                     .makeExcel(SAVE_NAME);
 
             return null;
@@ -222,7 +216,6 @@ public class GUI extends JFrame {
         @Override
         protected void done() {
             toggleButtons();
-            EPUB_CONTENT_EXTRACTOR.deleteCacheFolder();
 
             final int SUCCESS                   = 0;
             final int FILE_FORMAT_ERROR         = 1;
