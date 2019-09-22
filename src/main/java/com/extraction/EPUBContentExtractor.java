@@ -1,134 +1,71 @@
 package com.extraction;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.BufferedOutputStream;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
-import java.util.Objects;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
 public class EPUBContentExtractor {
 
-    private final File CACHE_FOLDER = new File(".content" + File.separator);
+    public ArrayList<ArrayList<String>> getContentsOfRelevantEntriesAsStrings
+            (File[] epubPublications) throws IOException {
 
-    public void unzip(File[] EPUBFiles, Charset charset) throws IOException {
-        String OEBPSFolderPath = "";
+        final ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS = new ArrayList<>();
 
-        for (File EPUBFile : EPUBFiles) {
-            try (ZipInputStream zipIn = new ZipInputStream
-                    (new FileInputStream(EPUBFile), charset)) {
-                // Make sure destination exists
-                if (!CACHE_FOLDER.exists()) { CACHE_FOLDER.mkdir(); }
+        for (File publication : epubPublications) {
+            ArrayList<String> publicationExtracts = new ArrayList<>();
+            ZipFile epubArchive = new ZipFile(publication);
 
-                ZipEntry entry = zipIn.getNextEntry();
-                // create a hidden directory for the extracted files
-                File publicationFolder = new File
-                        (CACHE_FOLDER + File.separator + EPUBFile.getName().replaceAll(".epub", ""));
-                publicationFolder.mkdirs();
+            for (Enumeration e = epubArchive.entries(); e.hasMoreElements(); ) {
+                ZipEntry entry = (ZipEntry) e.nextElement();
 
-                while (entry != null) {
-                    if (unnecessaryFile(entry.getName())) {
-                        entry = zipIn.getNextEntry();
-                        continue;
-                    }
-                    String filePath = publicationFolder + File.separator + entry.getName();
-                    File entryFile = new File(filePath);
+                if (unnecessaryFile(entry.getName())) continue;
 
-                    if (entry.isDirectory()) { entryFile.mkdir(); }
-                    else {
-                        /*
-                        * because all other folders and files are categorized as unnecessary, the
-                         * only parent file (which is a directory) that passes the filter is "OEBPS/"
-                        */
-                        File OEBPSFolder = entryFile.getParentFile();
-                        if (!OEBPSFolder.exists()) {
-                            OEBPSFolder.mkdirs();
-                            OEBPSFolderPath = OEBPSFolder.getPath();
-                        }
-                        extractFile(zipIn, entryFile);
-                    }
-                    zipIn.closeEntry();
-                    entry = zipIn.getNextEntry();
-                }
+                String entryContent = getEntryAsString(epubArchive.getInputStream(entry));
+
+                if (!entryContent.contains("treasures") ||
+                    !entryContent.contains("ministry")  ||
+                    !entryContent.contains("christianLiving")) continue;
+
+                publicationExtracts.add(entryContent);
             }
-            removeNonMeetingFiles(new File(OEBPSFolderPath));
-            moveContentFilesToPublicationFolder(new File(OEBPSFolderPath));
-        }
-    }
 
-    private void removeNonMeetingFiles(File OEBPSFolder) throws IOException {
-        File[] XHTMLFiles = OEBPSFolder.listFiles();
-
-        for (File XHTMLFile : Objects.requireNonNull(XHTMLFiles)) {
-            Document XHTMLDocument = Jsoup.parse(XHTMLFile, "UTF-8");
-            if (
-                    !XHTMLDocument.html().contains("treasures") ||
-                    !XHTMLDocument.html().contains("ministry") ||
-                    !XHTMLDocument.html().contains("christianLiving")
-            )
-                XHTMLFile.delete();
+            ALL_MEETINGS_CONTENTS.add(publicationExtracts);
         }
-    }
 
-    private void moveContentFilesToPublicationFolder (File OEBPSFolder) {
-        for (File XHTMLFile : Objects.requireNonNull(OEBPSFolder.listFiles())) {
-            XHTMLFile.renameTo(new File(OEBPSFolder.getParent() + File.separator + XHTMLFile.getName()));
-        }
-        // remove the "OEBPS/" folder when done
-        OEBPSFolder.delete();
+        return ALL_MEETINGS_CONTENTS;
     }
 
     private boolean unnecessaryFile(String fileName) {
         return
-                fileName.contains("mimetype")    ||
-                fileName.contains("META-INF")    ||
-                fileName.contains("css")         ||
-                fileName.contains("images")      ||
-                fileName.contains("extracted")   ||
-                // different numbers appear after "pagenav"
-                fileName.contains("pagenav")     ||
-                fileName.contains("content.opf") ||
-                fileName.contains("cover.xhtml") ||
-                // both "toc.ncx" and "toc.xhtml"
-                fileName.contains("toc.");
+               fileName.contains("mimetype")    ||
+               fileName.contains("META-INF")    ||
+               fileName.contains("css")         ||
+               fileName.contains("images")      ||
+               fileName.contains("extracted")   ||
+               // different numbers appear after "pagenav"
+               fileName.contains("pagenav")     ||
+               fileName.contains("content.opf") ||
+               fileName.contains("cover.xhtml") ||
+               // both "toc.ncx" and "toc.xhtml"
+               fileName.contains("toc.");
     }
 
-    private void extractFile(ZipInputStream zipIn, File file)
-            throws IOException {
-        try (BufferedOutputStream outputStream = new BufferedOutputStream
-                (new FileOutputStream(file))) {
-            byte[] buffer = new byte[50];
-            int location;
-            while ((location = zipIn.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, location);
-            }
+    private String getEntryAsString(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        int nRead;
+        byte[] data = new byte[16384];
+
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
         }
-    }
 
-    public File getCacheFolder() {
-        return this.CACHE_FOLDER;
-    }
-
-    public void deleteCacheFolder() {
-        Path pathToCacheFolder = Paths.get(CACHE_FOLDER.toURI());
-
-        try {
-            Files.walk(pathToCacheFolder)
-                    .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return new String(buffer.toByteArray(), StandardCharsets.UTF_8);
     }
 }
