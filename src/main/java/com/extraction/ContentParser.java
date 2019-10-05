@@ -1,6 +1,8 @@
 package com.extraction;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import com.meeting.MeetingSection;
 import com.meeting.Meeting;
@@ -18,9 +20,13 @@ public class ContentParser {
     private Element sectionElement;
     private ArrayList<String> meetingContents;
     private final String FILTER_FOR_MINUTE;
+    private final Properties ELEMENT_SELECTORS = new Properties();
 
     public ContentParser(String filterForMinute) {
         this.FILTER_FOR_MINUTE = filterForMinute;
+        try {
+            this.ELEMENT_SELECTORS.load(getClass().getResourceAsStream("/elementSelectors.properties"));
+        } catch (IOException e) { e.printStackTrace(); }
     }
 
     public void parseXHTML() {
@@ -53,7 +59,7 @@ public class ContentParser {
     }
 
     private String getWeekSpan(Document meetingDoc) {
-        sectionElement = meetingDoc.selectFirst("title");
+        sectionElement = meetingDoc.selectFirst(ELEMENT_SELECTORS.getProperty("week.span.selector.element"));
         return sectionElement.text();
     }
 
@@ -62,18 +68,22 @@ public class ContentParser {
 
         switch (meetingSection.getSECTION_KIND()) {
             case TREASURES:
-                sectionElement = meetingDoc.getElementById("section2");
+                sectionElement = meetingDoc.getElementById
+                        (ELEMENT_SELECTORS.getProperty("treasures.section.element.id"));
                 break;
             case IMPROVE_IN_MINISTRY:
-                sectionElement = meetingDoc.getElementById("section3");
+                sectionElement = meetingDoc.getElementById
+                        (ELEMENT_SELECTORS.getProperty("improve.in.ministry.section.element.id"));
                 break;
             case LIVING_AS_CHRISTIANS:
-                sectionElement = meetingDoc.getElementById("section4");
+                sectionElement = meetingDoc.getElementById
+                        (ELEMENT_SELECTORS.getProperty("christian.life.section.element.id"));
                 break;
         }
         // each section's title is within the first "h2" element under the corresponding
         // div with `id` "section<sectionNumber>"
-        meetingSection.setSectionTitle(sectionElement.selectFirst("h2").text());
+        meetingSection.setSectionTitle(sectionElement.selectFirst
+                (ELEMENT_SELECTORS.getProperty("meeting.section.title.selector.element")).text());
     }
 
     private MeetingSection getMeetingSection
@@ -84,8 +94,8 @@ public class ContentParser {
         setSectionTitle(meetingSection, meetingDocument);
 
         Elements presentations = new Elements();
-        sectionElement.selectFirst("ul");
-        presentations.addAll(sectionElement.getElementsByTag("li"));
+        sectionElement.selectFirst(ELEMENT_SELECTORS.getProperty("presentations.group.selector.element"));
+        presentations.addAll(sectionElement.getElementsByTag(ELEMENT_SELECTORS.getProperty("presentation.selector.element")));
 
         if (meetingSection.getSECTION_KIND() == LIVING_AS_CHRISTIANS) {
             presentations.remove(0); // transition song element
@@ -95,7 +105,8 @@ public class ContentParser {
 
         String topic;
         for (Element listItem : presentations) {
-            topic = listItem.selectFirst("p").text();
+            topic = listItem.selectFirst
+                    (ELEMENT_SELECTORS.getProperty("presentation.titles.selector.element")).text();
             if (!topic.contains(FILTER_FOR_MINUTE)) continue;
 
             topic = topic.substring(0, topic.indexOf(FILTER_FOR_MINUTE)) + FILTER_FOR_MINUTE + ")";
