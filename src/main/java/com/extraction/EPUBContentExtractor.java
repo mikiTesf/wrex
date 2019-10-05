@@ -21,6 +21,7 @@ public class EPUBContentExtractor {
             ArrayList<String> publicationExtracts = new ArrayList<>();
             ZipFile epubArchive = new ZipFile(publication);
 
+            publicationExtracts.add(publication.getName());
             for (Enumeration e = epubArchive.entries(); e.hasMoreElements(); ) {
                 ZipEntry entry = (ZipEntry) e.nextElement();
 
