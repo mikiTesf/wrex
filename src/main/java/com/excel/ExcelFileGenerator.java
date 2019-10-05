@@ -34,13 +34,13 @@ public class ExcelFileGenerator {
     private final ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS;
 
     public ExcelFileGenerator(
-            File DESTINATION,
+            ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS,
             Properties LANGUAGE_PACK,
-            ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS)
+            File DESTINATION)
     {
+        this.ALL_MEETINGS_CONTENTS = ALL_MEETINGS_CONTENTS;
         this.LANGUAGE_PACK         = LANGUAGE_PACK;
         this.DESTINATION           = DESTINATION;
-        this.ALL_MEETINGS_CONTENTS = ALL_MEETINGS_CONTENTS;
         CONTENT_PARSER             = new ContentParser(this.LANGUAGE_PACK.getProperty("filter_for_minute"));
         WORKBOOK                   = new XSSFWorkbook();
     }
@@ -187,11 +187,14 @@ public class ExcelFileGenerator {
     }
 
     private void addPopulatedSheet(ArrayList<String> meetingFilesContents) {
+        /* The first element in `meetingFilesContents` is the name of the publication.
+           The publication name is important to name the excel sheets. This first element
+           must be removed after it is used */
+        XSSFSheet sheet = WORKBOOK.createSheet
+                (meetingFilesContents.remove(0).replaceAll("\\.[e|E][p|P][u|U][b|B]", ""));
+
         CONTENT_PARSER.setMeetingContents(meetingFilesContents);
         CONTENT_PARSER.parseXHTML();
-
-        // TODO: find a way to the name the following sheet after the publication's name
-        XSSFSheet sheet = WORKBOOK.createSheet();
 
         int meetingCount = 0;
 
@@ -201,11 +204,13 @@ public class ExcelFileGenerator {
                 CELL_INDEX = 6;
                 ROW_INDEX = 4;
             }
+
             insertHeaderSection(meeting.getWEEK_SPAN(), sheet);
             insertTreasuresParts(meeting.getTREASURES(), sheet);
             insertMinistryParts(meeting.getIMPROVE_IN_MINISTRY(), sheet);
             insertChristianLifeParts(meeting.getLIVING_AS_CHRISTIANS(), sheet);
             insertFooterSection(sheet);
+
             ++meetingCount;
         }
         // reset indexes
@@ -217,7 +222,7 @@ public class ExcelFileGenerator {
 
     public int makeExcel(String fileName) {
 
-        if (ALL_MEETINGS_CONTENTS.size() == 0) { return 3; }
+        if (ALL_MEETINGS_CONTENTS.size() == 0) return 3;
 
         for (ArrayList<String> meetingContents : ALL_MEETINGS_CONTENTS) {
             addPopulatedSheet(meetingContents);

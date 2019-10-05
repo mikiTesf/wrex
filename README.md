@@ -8,7 +8,9 @@ This project will probably be of no use to you fellow programmers out there. But
  - Tigrinya
 
 ## Contribution
-Any kind of contribution to this project is welcome. One way is to add a language(s). The program stores languages (language pack files) using Java's `Properties` file(s). This is the content of a typical language pack file (*English*):
+Any kind of contribution to this project is welcome. Some are listed next.
+### Adding Language Packs
+One way to contribute is to add a language(s). These language packs are needed to replace the texts you see indicated by the arrows on the image below. The program stores languages (language pack files) using Java's `Properties` file(s). This is the content of a typical language pack file (*English*):
 
     meeting_name=CHRISTIAN LIFE AND MINISTRY  
     chairman=Chairman  
@@ -19,7 +21,7 @@ Any kind of contribution to this project is welcome. One way is to add a languag
     concluding_prayer=Concluding Prayer  
     # Test string(s)  
     bible_reading=Bible Reading  
-    # Test string for the word "minute" (it's short form in some languages).
+    # Test string for the word "minute" (it's abbreviation in some languages).
     # Sometimes it is necessary to include the leading or trailing space character
     # right before or after the word
     filter_for_minute= min.  
@@ -43,8 +45,18 @@ To add a language:
  2. Copy the sample provided above to the file and translate the `values` into the target language
  3. Put the file in `languages/`
 
-The steps above are all you need to follow in order to add a language pack. It would help others if you can send me a PR with the newly added language appended to the list of supported languages listed in this README (above the  **Contribution**  header).
+The steps above are all you need to follow in order to add a language pack. It would help others if you can send me a PR with the newly added language appended to the list of supported languages listed in this README (above the  [**Contribution**](#contribution)  header).
 
 Note that a language pack has a `.lang` extension. Also, be sure that you don't translate the keys (the texts to the left of the `=` sign) into the new language. You're supposed to translate the values (the texts to the right of the `=` sign) only.
+
+### Internationalization
+Effort was made to internationalize (i18n) <b>WREX</b> and it was successful. Head over to the `UITexts.properties` file in the program's
+resources folder and do the same thing instructed with the language pack files and you can make <b>WREX</b> local to your own language.
+
+## Attribution
+I would like to thank the following authors for providing free icons that I've used in **WREX**. You can find more about them and their work using the links provided.
+- Laura Reen from [iconfinder](iconfinder.com) for the `Schedule` icon on the JFrame's window ![JFrame Icon](src/main/resources/icons/frameIcon.png).
+- Jozef Krajčovič from [iconfinder](iconfinder.com) for the `Excel Document` icon on the `Generate` button ![Excel Document Icon](src/main/resources/icons/generateExcel.png).
+- [Freepik](freepik.com/home) from [flaticon](flaticon.com)  for the `Open Folder` icon on the `Open` button ![Open Folder Icon](src/main/resources/icons/openFile.png).
 
 Thank you and Enjoy!

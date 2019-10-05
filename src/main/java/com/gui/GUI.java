@@ -153,9 +153,9 @@ public class GUI extends JFrame {
                         // with parenthesis (this also gets rid of the underscores)
                         nameToDisplayInTable = nameToDisplayInTable
                                 .replaceFirst("_", " (")
-                                // the following `replaceAll(...)` only replaces the last underscore
+                                // the following `replaceFirst(...)` only replaces the last underscore
                                 // as there will only be one left after the above replacement is done
-                                .replaceAll("_", ") ");
+                                .replaceFirst("_", ") ");
                         tableModel.addRow(new Object[]{nameToDisplayInTable});
                     }
                 }
@@ -202,9 +202,7 @@ public class GUI extends JFrame {
                     FileInputStream input = new FileInputStream
                             ("languages" + File.separator + languageComboBox.getSelectedItem().toString().toLowerCase() + ".lang");
                     LANGUAGE_PACK.load(new InputStreamReader(input, StandardCharsets.UTF_8));
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+                } catch (IOException e1) { e1.printStackTrace(); }
 
                 new UIController(DESTINATION, SAVE_NAME, LANGUAGE_PACK).execute();
             }
@@ -222,8 +220,8 @@ public class GUI extends JFrame {
         private final Properties LANGUAGE_PACK;
 
         private UIController(File DESTINATION, String SAVE_NAME, Properties LANGUAGE_PACK) {
-            this.DESTINATION = DESTINATION;
-            this.SAVE_NAME = SAVE_NAME;
+            this.DESTINATION   = DESTINATION;
+            this.SAVE_NAME     = SAVE_NAME;
             this.LANGUAGE_PACK = LANGUAGE_PACK;
         }
 
@@ -235,7 +233,7 @@ public class GUI extends JFrame {
             final ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS = new EPUBContentExtractor()
                     .getContentsOfRelevantEntriesAsStrings(EPUBFiles);
 
-            GENERATION_STATUS = new ExcelFileGenerator(DESTINATION, LANGUAGE_PACK, ALL_MEETINGS_CONTENTS)
+            GENERATION_STATUS = new ExcelFileGenerator(ALL_MEETINGS_CONTENTS, LANGUAGE_PACK, DESTINATION)
                     .makeExcel(SAVE_NAME);
 
             return null;
