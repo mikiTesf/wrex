@@ -51,12 +51,12 @@ Note that a language pack has a `.lang` extension. Also, be sure that you don't 
 
 ### Internationalization
 Effort was made to internationalize (i18n) <b>WREX</b> and it was successful. Head over to the `UITexts.properties` file in the program's
-resources folder and do the same thing instructed with the language pack files and you can make <b>WREX</b> local to your own language.
+resources folder and do the same thing instructed with the language pack files and you can make <b>WREX</b> local to your own language. Right now, there is no option to change the program's interface language besides editing the specified file, but I plan to add it with the next few commits.
 
 ## Attribution
 I would like to thank the following authors for providing free icons that I've used in **WREX**. You can find more about them and their work using the links provided.
-- Laura Reen from [iconfinder](iconfinder.com) for the `Schedule` icon on the JFrame's window ![JFrame Icon](src/main/resources/icons/frameIcon.png).
-- Jozef Krajčovič from [iconfinder](iconfinder.com) for the `Excel Document` icon on the `Generate` button ![Excel Document Icon](src/main/resources/icons/generateExcel.png).
-- [Freepik](freepik.com/home) from [flaticon](flaticon.com)  for the `Open Folder` icon on the `Open` button ![Open Folder Icon](src/main/resources/icons/openFile.png).
+- [Laura Reen](https://www.iconfinder.com/laurareen) from [iconfinder](https://www.iconfinder.com) for the `Schedule` icon on the JFrame's window ![JFrame Icon](src/main/resources/icons/frameIcon.png).
+- [Jozef Krajčovič](https://www.iconfinder.com/Jozef89) from [iconfinder](https://www.iconfinder.com) for the `Excel Document` icon on the `Generate` button ![Excel Document Icon](src/main/resources/icons/generateExcel.png).
+- [Freepik](https://www.freepik.com/home) from [flaticon](https://www.flaticon.com)  for the `Open Folder` icon on the `Open` button ![Open Folder Icon](src/main/resources/icons/openFile.png).
 
 Thank you and Enjoy!
