@@ -62,7 +62,9 @@ public class GUI extends JFrame {
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle(UI_TEXTS.getProperty("jframe.title.text") + " (v" + UI_TEXTS.getProperty("version") + ")");
+        setTitle(
+            UI_TEXTS.getProperty("program.name")   + " (" + UI_TEXTS.getProperty("program.version") + ")"
+        );
         setIconImage(new ImageIcon(getClass().getResource("/icons/frameIcon.png")).getImage());
         // other initial setups
         generateButton.setEnabled(false);
