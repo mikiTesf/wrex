@@ -42,16 +42,17 @@ The image below shows the texts in the excel document that correspond to the giv
 ![An image showing which value goes into which cell(s)](docs/index.png)
 To add a language:
  1. Create a file with the name of the language you want to add (eg. `german.lang` for German)
- 2. Copy the sample provided above to the file and translate the `values` into the target language
- 3. Put the file in `languages/`
+ 2. Copy the sample provided above to the file
+ 3. Translate the `values` into the target language
+ 4. Put the file in `languages/`
 
 The steps above are all you need to follow in order to add a language pack. It would help others if you can send me a PR with the newly added language appended to the list of supported languages listed in this README (above the  [**Contribution**](#contribution)  header).
 
 Note that a language pack has a `.lang` extension. Also, be sure that you don't translate the keys (the texts to the left of the `=` sign) into the new language. You're supposed to translate the values (the texts to the right of the `=` sign) only.
 
 ### Internationalization
-Effort was made to internationalize (i18n) <b>WREX</b> and it was successful. Head over to the `UITexts.properties` file in the program's
-resources folder and do the same thing instructed with the language pack files and you can make <b>WREX</b> local to your own language. Right now, there is no option to change the program's interface language besides editing the specified file, but I plan to add it with the next few commits.
+Effort was made to internationalize (i18n) <b>WREX</b> and it was successful. To make **WREX** local to your language head over to `UITexts.properties` in the program's
+`resources` folder and do step 3 above. Right now, there is no option to change the program's interface language during runtime, but I plan to add it with the next few commits.
 
 ## Attribution
 I would like to thank the following authors for providing free icons that I've used in **WREX**. You can find more about them and their work using the links provided.
