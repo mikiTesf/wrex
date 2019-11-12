@@ -39,7 +39,10 @@ One way to contribute is to add a language(s). These language packs are needed t
     11=November  
     12=December
 The image below shows the texts in the excel document that correspond to the given `values`:
-![An image showing which value goes into which cell(s)](docs/index.png)
+<kbd>
+![An image showing which value goes into which cell(s)](docs/screenshot.png)
+</kbd>
+
 To add a language:
  1. Create a file with the name of the language you want to add (eg. `german.lang` for German)
  2. Copy the sample provided above to the file
