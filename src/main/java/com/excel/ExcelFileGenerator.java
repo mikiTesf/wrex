@@ -194,7 +194,6 @@ public class ExcelFileGenerator {
                 (meetingFilesContents.remove(0).replaceAll("\\.[e|E][p|P][u|U][b|B]", ""));
 
         CONTENT_PARSER.setMeetingContents(meetingFilesContents);
-        CONTENT_PARSER.parseXHTML();
 
         int meetingCount = 0;
 
@@ -220,22 +219,17 @@ public class ExcelFileGenerator {
         resizeColumnsAndFixPageSize(sheet);
     }
 
-    public int makeExcel(String fileName) {
-
-        if (ALL_MEETINGS_CONTENTS.size() == 0) return 3;
-
+    public boolean makeExcel(String fileName) throws IOException {
         for (ArrayList<String> meetingContents : ALL_MEETINGS_CONTENTS) {
             addPopulatedSheet(meetingContents);
         }
 
-        try {
-            FileOutputStream out = new FileOutputStream(new File
-                    (DESTINATION.getPath() + File.separator + fileName));
-            WORKBOOK.write(out);
-            out.close();
-        } catch (IOException e) { return 4; }
+        FileOutputStream out = new FileOutputStream(new File
+                (DESTINATION.getPath() + File.separator + fileName));
+        WORKBOOK.write(out);
+        out.close();
 
-        return 0;
+        return true;
     }
 
     private Row getRowIfExists(int rowIndex, XSSFSheet sheet) {
