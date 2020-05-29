@@ -35,6 +35,7 @@ import java.util.zip.ZipException;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
 
 import static com.gui.GenerationStatus.*;
 
@@ -55,21 +56,23 @@ public class GUI extends JFrame {
     private File[] EPUBFiles;
 
     public GUI() {
+        Properties PROGRAM_META = new Properties();
         try {
             UI_TEXTS.load(getClass().getResourceAsStream("/UITexts.properties"));
+            PROGRAM_META.load(getClass().getResourceAsStream("/wrexMeta.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         setContentPane(mainPanel);
         setSize(new Dimension(450, 350));
-        setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle(
-                UI_TEXTS.getProperty("program.name") + " (" + UI_TEXTS.getProperty("program.version") + ")"
+                PROGRAM_META.getProperty("program.name") + " (" + PROGRAM_META.getProperty("program.version") + ")"
         );
         setIconImage(new ImageIcon(getClass().getResource("/icons/frameIcon.png")).getImage());
+        insertMenuBarAndItems();
         // other initial setups
         generateButton.setEnabled(false);
 
@@ -93,6 +96,48 @@ public class GUI extends JFrame {
         } catch (IllegalAccessException | NoSuchFieldException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private void insertMenuBarAndItems() {
+        JMenuBar menuBar = new JMenuBar();
+
+        JMenu fileMenu = new JMenu(UI_TEXTS.getProperty("file.menu.text"));
+
+        JMenuItem exitItem = new JMenuItem(UI_TEXTS.getProperty("exit.menu.item.text"));
+        exitItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        fileMenu.add(exitItem);
+
+        JMenu helpMenu = new JMenu(UI_TEXTS.getProperty("help.menu.text"));
+
+        JMenuItem aboutItem = new JMenuItem(UI_TEXTS.getProperty("about.menu.item.text"));
+        aboutItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new AboutDialog(THIS_FRAME).setVisible(true);
+            }
+        });
+
+        JMenuItem howToItem = new JMenuItem(UI_TEXTS.getProperty("howto.menu.item.text"));
+        howToItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new HowToDialog(THIS_FRAME).setVisible(true);
+            }
+        });
+
+        helpMenu.add(aboutItem);
+        helpMenu.add(howToItem);
+
+        menuBar.add(fileMenu);
+        menuBar.add(helpMenu);
+
+        setJMenuBar(menuBar);
     }
 
     public void setupAndDrawUI() {
@@ -337,6 +382,8 @@ public class GUI extends JFrame {
         scrollPane.setBackground(new Color(-1));
         mainPanel.add(scrollPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         publicationTable = new JTable();
+        publicationTable.setAutoCreateRowSorter(false);
+        publicationTable.setAutoResizeMode(4);
         publicationTable.setEnabled(true);
         publicationTable.setFillsViewportHeight(true);
         Font publicationTableFont = this.$$$getFont$$$(null, -1, 14, publicationTable.getFont());
@@ -346,16 +393,16 @@ public class GUI extends JFrame {
         publicationTable.setToolTipText("");
         scrollPane.setViewportView(publicationTable);
         controlsPanel = new JPanel();
-        controlsPanel.setLayout(new GridLayoutManager(2, 3, new Insets(0, 0, 0, 0), -1, -1));
+        controlsPanel.setLayout(new GridLayoutManager(2, 5, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.add(controlsPanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         openButton = new JButton();
         openButton.setIcon(new ImageIcon(getClass().getResource("/icons/openFile.png")));
         this.$$$loadButtonText$$$(openButton, ResourceBundle.getBundle("UITexts").getString("open.button.text"));
-        controlsPanel.add(openButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        controlsPanel.add(openButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         generateButton = new JButton();
         generateButton.setIcon(new ImageIcon(getClass().getResource("/icons/generateExcel.png")));
         this.$$$loadButtonText$$$(generateButton, ResourceBundle.getBundle("UITexts").getString("generate.button.text"));
-        controlsPanel.add(generateButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        controlsPanel.add(generateButton, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         statusLabel = new JLabel();
         statusLabel.setEnabled(false);
         Font statusLabelFont = this.$$$getFont$$$(null, -1, 11, statusLabel.getFont());
@@ -363,9 +410,13 @@ public class GUI extends JFrame {
         statusLabel.setHorizontalAlignment(0);
         statusLabel.setHorizontalTextPosition(0);
         statusLabel.setText("Label");
-        controlsPanel.add(statusLabel, new GridConstraints(1, 0, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        controlsPanel.add(statusLabel, new GridConstraints(1, 0, 1, 5, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         languageComboBox = new JComboBox();
-        controlsPanel.add(languageComboBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        controlsPanel.add(languageComboBox, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final Spacer spacer1 = new Spacer();
+        controlsPanel.add(spacer1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        final Spacer spacer2 = new Spacer();
+        controlsPanel.add(spacer2, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
     }
 
     /**
