@@ -17,6 +17,7 @@ import java.awt.event.ActionListener;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -30,9 +31,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.zip.ZipException;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+
+import static com.gui.GenerationStatus.*;
 
 public class GUI extends JFrame {
     private final JFrame THIS_FRAME = this;
@@ -63,7 +67,7 @@ public class GUI extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle(
-            UI_TEXTS.getProperty("program.name")   + " (" + UI_TEXTS.getProperty("program.version") + ")"
+                UI_TEXTS.getProperty("program.name") + " (" + UI_TEXTS.getProperty("program.version") + ")"
         );
         setIconImage(new ImageIcon(getClass().getResource("/icons/frameIcon.png")).getImage());
         // other initial setups
@@ -158,7 +162,7 @@ public class GUI extends JFrame {
                                 // the following `replaceFirst(...)` only replaces the last underscore
                                 // as there will only be one left after the above replacement is done
                                 .replaceFirst("_", ") ");
-                        tableModel.addRow(new Object[]{nameToDisplayInTable});
+                        tableModel.addRow(new String[]{nameToDisplayInTable});
                     }
                 }
             }
@@ -199,12 +203,27 @@ public class GUI extends JFrame {
                 }
 
                 final Properties LANGUAGE_PACK = new Properties();
+
                 try {
                     @SuppressWarnings("ConstantConditions")
                     FileInputStream input = new FileInputStream
                             ("languages" + File.separator + languageComboBox.getSelectedItem().toString().toLowerCase() + ".lang");
                     LANGUAGE_PACK.load(new InputStreamReader(input, StandardCharsets.UTF_8));
-                } catch (IOException e1) { e1.printStackTrace(); }
+                } catch (FileNotFoundException e1) {
+                    JOptionPane.showMessageDialog(
+                            THIS_FRAME,
+                            UI_TEXTS.getProperty("language.pack.renamed.or.deleted.message"),
+                            UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                } catch (IOException e2) {
+                    JOptionPane.showMessageDialog(
+                            THIS_FRAME,
+                            UI_TEXTS.getProperty("language.pack.unreadable.message"),
+                            UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
                 new UIController(DESTINATION, SAVE_NAME, LANGUAGE_PACK).execute();
             }
@@ -217,26 +236,44 @@ public class GUI extends JFrame {
 
         private final File DESTINATION;
         private final String SAVE_NAME;
-        private int GENERATION_STATUS;
-        private int FILE_STATUS = 100;
+        // `GENERATION_STATUS` is only useful to choose the message to be shown to the user in case
+        // of an error. The actual error/exception is properly handled using try/catch blocks. In fact,
+        // the value for `GENERATION_STATUS` is set in the `catch` blocks of the corresponding error(s)
+        private GenerationStatus GENERATION_STATUS;
         private final Properties LANGUAGE_PACK;
 
         private UIController(File DESTINATION, String SAVE_NAME, Properties LANGUAGE_PACK) {
-            this.DESTINATION   = DESTINATION;
-            this.SAVE_NAME     = SAVE_NAME;
+            this.DESTINATION = DESTINATION;
+            this.SAVE_NAME = SAVE_NAME;
             this.LANGUAGE_PACK = LANGUAGE_PACK;
         }
 
         @Override
-        protected Void doInBackground() throws IOException {
+        protected Void doInBackground() {
             toggleButtons();
             statusLabel.setText(UI_TEXTS.getProperty("status.label.generating.text"));
 
-            final ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS = new EPUBContentExtractor()
-                    .getContentsOfRelevantEntriesAsStrings(EPUBFiles);
+            ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS = null;
 
-            GENERATION_STATUS = new ExcelFileGenerator(ALL_MEETINGS_CONTENTS, LANGUAGE_PACK, DESTINATION)
-                    .makeExcel(SAVE_NAME);
+            try {
+                ALL_MEETINGS_CONTENTS = new EPUBContentExtractor()
+                        .getContentsOfRelevantEntriesAsStrings(EPUBFiles);
+            } catch (ZipException e) {
+                GENERATION_STATUS = ZIP_FORMAT_ERROR;
+                return null;
+            } catch (IOException e1) {
+                GENERATION_STATUS = COULD_NOT_READ_FILE_ERROR;
+                return null;
+            }
+
+            try {
+                if (new ExcelFileGenerator(ALL_MEETINGS_CONTENTS, LANGUAGE_PACK, DESTINATION).makeExcel(SAVE_NAME)) {
+                    GENERATION_STATUS = SUCCESS;
+                }
+            } catch (IOException e1) {
+                GENERATION_STATUS = COULD_NOT_SAVE_FILE_ERROR;
+                return null;
+            }
 
             return null;
         }
@@ -245,43 +282,29 @@ public class GUI extends JFrame {
         protected void done() {
             toggleButtons();
 
-            final int SUCCESS = 0;
-            final int FILE_FORMAT_ERROR = 1;
-            final int LANGUAGE_PACK_ERROR = 2;
-            final int NO_PUBLICATION_ERROR = 3;
-            final int COULD_NOT_SAVE_FILE_ERROR = 4;
-
-            switch (FILE_STATUS) {
-                case FILE_FORMAT_ERROR:
-                    JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("could.not.extract.file.message"),
+            switch (GENERATION_STATUS) {
+                case ZIP_FORMAT_ERROR:
+                    JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("file.format.error.message"),
                             UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
                     break;
-                case LANGUAGE_PACK_ERROR:
-                    JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("language.pack.error.message"),
+                case COULD_NOT_READ_FILE_ERROR:
+                    JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("could.not.read.epub.file.message"),
                             UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
+                    break;
+                case COULD_NOT_SAVE_FILE_ERROR:
+                    JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("could.not.save.document.message"),
+                            UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
+                    statusLabel.setText("");
+                    break;
+                case SUCCESS:
+                    statusLabel.setText(UI_TEXTS.getProperty("status.label.generation.finished.text"));
+                    JOptionPane.showMessageDialog
+                            (THIS_FRAME, UI_TEXTS.getProperty("template.generated.message"),
+                                    UI_TEXTS.getProperty("done.message.dialogue.title"), JOptionPane.INFORMATION_MESSAGE);
                     break;
                 default:
-                    switch (GENERATION_STATUS) {
-                        case NO_PUBLICATION_ERROR:
-                            JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("no.publication.selected.message"),
-                                    UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
-                            statusLabel.setText("");
-                            break;
-                        case COULD_NOT_SAVE_FILE_ERROR:
-                            JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("could.not.save.document.message"),
-                                    UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
-                            statusLabel.setText("");
-                            break;
-                        case SUCCESS:
-                            statusLabel.setText(UI_TEXTS.getProperty("status.label.generation.finished.text"));
-                            JOptionPane.showMessageDialog
-                                    (THIS_FRAME, UI_TEXTS.getProperty("template.generated.message"),
-                                            UI_TEXTS.getProperty("done.message.dialogue.title"), JOptionPane.INFORMATION_MESSAGE);
-                            break;
-                        default:
-                            JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
-                                    UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
-                    }
+                    JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
+                            UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
             }
 
             statusLabel.setText("");
@@ -334,10 +357,13 @@ public class GUI extends JFrame {
         this.$$$loadButtonText$$$(generateButton, ResourceBundle.getBundle("UITexts").getString("generate.button.text"));
         controlsPanel.add(generateButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         statusLabel = new JLabel();
+        statusLabel.setEnabled(false);
         Font statusLabelFont = this.$$$getFont$$$(null, -1, 11, statusLabel.getFont());
         if (statusLabelFont != null) statusLabel.setFont(statusLabelFont);
+        statusLabel.setHorizontalAlignment(0);
+        statusLabel.setHorizontalTextPosition(0);
         statusLabel.setText("Label");
-        controlsPanel.add(statusLabel, new GridConstraints(1, 0, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        controlsPanel.add(statusLabel, new GridConstraints(1, 0, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         languageComboBox = new JComboBox();
         controlsPanel.add(languageComboBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }

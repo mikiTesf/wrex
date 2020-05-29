@@ -29,7 +29,7 @@ public class ContentParser {
         } catch (IOException e) { e.printStackTrace(); }
     }
 
-    public void parseXHTML() {
+    private void parseXHTML() {
         meetingExtracts = new ArrayList<>();
         Object[] meetingContents = this.meetingContents.toArray();
 
@@ -118,5 +118,6 @@ public class ContentParser {
 
     public void setMeetingContents(ArrayList<String> meetingContents) {
         this.meetingContents = meetingContents;
+        this.parseXHTML();
     }
 }
