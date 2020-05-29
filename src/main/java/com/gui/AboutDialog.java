@@ -18,13 +18,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 
-public class AboutForm extends JDialog {
+public class AboutDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JLabel versionLabel;
     private JLabel buildDateLabel;
 
-    AboutForm(JFrame parentFrame) {
+    AboutDialog(JFrame parentFrame) {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -37,7 +37,6 @@ public class AboutForm extends JDialog {
 
         setMinimumSize(new Dimension(300, 250));
         pack();
-        setResizable(false);
         setLocationRelativeTo(parentFrame);
     }
 
