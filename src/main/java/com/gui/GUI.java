@@ -119,7 +119,7 @@ public class GUI extends JFrame {
         aboutItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new AboutForm(THIS_FRAME).setVisible(true);
+                new AboutDialog(THIS_FRAME).setVisible(true);
             }
         });
 
@@ -127,11 +127,12 @@ public class GUI extends JFrame {
         howToItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                return;
+                new HowToDialog(THIS_FRAME).setVisible(true);
             }
         });
 
         helpMenu.add(aboutItem);
+        helpMenu.add(howToItem);
 
         menuBar.add(fileMenu);
         menuBar.add(helpMenu);
