@@ -1,9 +1,9 @@
-import com.gui.GUI;
+import com.gui.MainWindow;
 
 class App {
 
     public static void main(String[] args) {
-        GUI gui = new GUI();
-        gui.setupAndDrawUI();
+        MainWindow mainWindow = new MainWindow();
+        mainWindow.setupAndDrawUI();
     }
 }

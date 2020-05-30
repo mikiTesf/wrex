@@ -39,7 +39,7 @@ import com.intellij.uiDesigner.core.Spacer;
 
 import static com.gui.GenerationStatus.*;
 
-public class GUI extends JFrame {
+public class MainWindow extends JFrame {
     private final JFrame THIS_FRAME = this;
     private JButton openButton;
     private JButton generateButton;
@@ -55,7 +55,7 @@ public class GUI extends JFrame {
 
     private File[] EPUBFiles;
 
-    public GUI() {
+    public MainWindow() {
         Properties PROGRAM_META = new Properties();
         try {
             UI_TEXTS.load(getClass().getResourceAsStream("/UITexts.properties"));
