@@ -111,6 +111,15 @@ public class MainWindow extends JFrame {
             }
         });
 
+        JMenuItem presentersItem = new JMenuItem(UI_TEXTS.getProperty("presenters.menu.item.text"));
+        presentersItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new PresenterDialog(THIS_FRAME).setVisible(true);
+            }
+        });
+
+        fileMenu.add(presentersItem);
         fileMenu.add(exitItem);
 
         JMenu helpMenu = new JMenu(UI_TEXTS.getProperty("help.menu.text"));

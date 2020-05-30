@@ -21,7 +21,7 @@ public class Presenter {
     @DatabaseField(columnName = "last_name", defaultValue = "")
     private String lastName;
 
-    static Dao<Presenter, Integer> presenterDao;
+    public static Dao<Presenter, Integer> presenterDao;
 
     static {
         try {
@@ -42,6 +42,8 @@ public class Presenter {
     public int getId() {
         return id;
     }
+
+    public void setId(int id) { this.id = id; }
 
     public String getFirstName() {
         return firstName;
@@ -65,5 +67,9 @@ public class Presenter {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public static void save(Presenter presenter) throws SQLException {
+        presenterDao.createIfNotExists(presenter);
     }
 }
