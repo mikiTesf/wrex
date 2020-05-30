@@ -188,7 +188,7 @@ public class PresenterDialog extends JFrame {
         } catch (SQLException ignore) {
         }
 
-        refreshPresentersTable();
+        presentersTableModel.removeRow(selectedRow);
     }
 
     // on `updateNamesButton` clicked
