@@ -1,10 +1,12 @@
 package com.gui;
 
 import com.domain.Presenter;
+import com.domain.Privilege;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.AbstractButton;
@@ -23,6 +25,8 @@ import java.awt.Insets;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -45,6 +49,8 @@ public class PresenterDialog extends JFrame {
     private JButton updateNamesButton;
     private JPanel mainPanel;
     private JPanel namesPanel;
+    private JComboBox<Privilege> privilegeComboBox;
+    private JLabel privilegeLabel;
 
     private final Properties UI_TEXTS = new Properties();
     private final HashMap<Integer, Integer> rowToIdMap = new HashMap<>();
@@ -66,9 +72,12 @@ public class PresenterDialog extends JFrame {
         };
         presentersTable.setModel(presentersTableModel);
 
-        presentersTableModel.addColumn("First Name");
-        presentersTableModel.addColumn("Middle Name");
-        presentersTableModel.addColumn("Last Name");
+        presentersTableModel.addColumn(UI_TEXTS.getProperty("full.name.column.header"));
+        presentersTableModel.addColumn(UI_TEXTS.getProperty("privilege.column.header"));
+
+        for (Privilege privilege : Privilege.values()) {
+            privilegeComboBox.addItem(privilege);
+        }
 
         this.addPresenterButton.addActionListener(new ActionListener() {
             @Override
@@ -98,13 +107,21 @@ public class PresenterDialog extends JFrame {
             }
         });
 
-        refreshPresentersTable();
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                parentFrame.setEnabled(true);
+            }
+        });
+
         this.updateNamesButton.setVisible(false);
 
         setPreferredSize(new Dimension(400, 400));
         pack();
         setLocationRelativeTo(parentFrame);
         setAlwaysOnTop(true);
+
+        refreshPresentersTable();
     }
 
     // on `addPresenterButtonClicked`
@@ -123,7 +140,11 @@ public class PresenterDialog extends JFrame {
         }
 
         try {
-            Presenter presenter = new Presenter(insertedFirstName, insertedMiddleName, insertedLastName);
+            Presenter presenter = new Presenter(
+                    insertedFirstName,
+                    insertedMiddleName,
+                    insertedLastName,
+                    (Privilege) privilegeComboBox.getSelectedItem());
 
             if (isUpdate) {
                 presenter.setId(this.rowToIdMap.get(presentersTable.getSelectedRow()));
@@ -161,10 +182,17 @@ public class PresenterDialog extends JFrame {
         this.deletePresenterButton.setEnabled(false);
         this.editPresenterButton.setEnabled(false);
 
+        Presenter presenter = null;
+        try {
+            presenter = Presenter.presenterDao.queryForId(rowToIdMap.get(selectedRow));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-        this.firstNameTextField.setText((String) presentersTableModel.getValueAt(selectedRow, 0));
-        this.middleNameTextField.setText((String) presentersTableModel.getValueAt(selectedRow, 1));
-        this.lastNameTextField.setText((String) presentersTableModel.getValueAt(selectedRow, 2));
+        this.firstNameTextField.setText(presenter.getFirstName());
+        this.middleNameTextField.setText(presenter.getMiddleName());
+        this.lastNameTextField.setText(presenter.getLastName());
+        this.privilegeComboBox.setSelectedItem(presenter.getPrivilege());
     }
 
     // on `removePresenterButton` clicked
@@ -179,9 +207,7 @@ public class PresenterDialog extends JFrame {
                 UI_TEXTS.getProperty("are.you.sure"),
                 JOptionPane.YES_NO_OPTION);
 
-        if (choice == JOptionPane.NO_OPTION) {
-            return;
-        }
+        if (choice == JOptionPane.NO_OPTION) { return; }
 
         try {
             Presenter.presenterDao.deleteById(rowToIdMap.get(selectedRow));
@@ -228,10 +254,9 @@ public class PresenterDialog extends JFrame {
 
         try {
             for (Presenter presenter : Presenter.presenterDao.queryForAll()) {
-                this.presentersTableModel.addRow(new String[]{
-                        presenter.getFirstName(),
-                        presenter.getMiddleName(),
-                        presenter.getLastName()
+                this.presentersTableModel.addRow(new Object[]{
+                        presenter.getFirstName() + " " + presenter.getMiddleName() + " " + presenter.getLastName(),
+                        presenter.getPrivilege()
                 });
                 rowToIdMap.put(presentersTableModel.getRowCount() - 1, presenter.getId());
             }
@@ -263,7 +288,7 @@ public class PresenterDialog extends JFrame {
         mainPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.setEnabled(true);
         namesPanel = new JPanel();
-        namesPanel.setLayout(new GridLayoutManager(3, 2, new Insets(0, 0, 0, 0), -1, -1));
+        namesPanel.setLayout(new GridLayoutManager(4, 2, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.add(namesPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         namesPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), ResourceBundle.getBundle("UITexts").getString("name.fields.border.title"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
         firstNameLabel = new JLabel();
@@ -281,6 +306,11 @@ public class PresenterDialog extends JFrame {
         namesPanel.add(lastNameLabel, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         lastNameTextField = new JTextField();
         namesPanel.add(lastNameTextField, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        privilegeLabel = new JLabel();
+        this.$$$loadLabelText$$$(privilegeLabel, ResourceBundle.getBundle("UITexts").getString("privilege.label.text"));
+        namesPanel.add(privilegeLabel, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        privilegeComboBox = new JComboBox();
+        namesPanel.add(privilegeComboBox, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.add(panel1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));

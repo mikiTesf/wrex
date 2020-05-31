@@ -5,7 +5,7 @@ import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
 
-public class DBConnection {
+class DBConnection {
 
     static JdbcConnectionSource connectionSource = null;
 

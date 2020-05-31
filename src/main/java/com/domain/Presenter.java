@@ -21,6 +21,9 @@ public class Presenter {
     @DatabaseField(columnName = "last_name", defaultValue = "")
     private String lastName;
 
+    @DatabaseField(columnName = "privilege", canBeNull = false)
+    private Privilege privilege;
+
     public static Dao<Presenter, Integer> presenterDao;
 
     static {
@@ -33,10 +36,11 @@ public class Presenter {
 
     public Presenter() {}
 
-    public Presenter(String firstName, String middleName, String lastName) {
+    public Presenter(String firstName, String middleName, String lastName, Privilege privilege) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
+        this.privilege = privilege;
     }
 
     public int getId() {
@@ -67,6 +71,14 @@ public class Presenter {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public Privilege getPrivilege() {
+        return privilege;
+    }
+
+    public void setPrivilege(Privilege privilege) {
+        this.privilege = privilege;
     }
 
     public static void save(Presenter presenter) throws SQLException {

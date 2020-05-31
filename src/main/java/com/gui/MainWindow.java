@@ -115,6 +115,7 @@ public class MainWindow extends JFrame {
         presentersItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                THIS_FRAME.setEnabled(false);
                 new PresenterDialog(THIS_FRAME).setVisible(true);
             }
         });

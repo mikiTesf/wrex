@@ -34,7 +34,7 @@ public class HowToDialog extends JDialog {
             }
         });
 
-        setMinimumSize(new Dimension(280, 310));
+        setPreferredSize(new Dimension(500, 320));
         pack();
         setLocationRelativeTo(parentFrame);
     }
@@ -72,9 +72,11 @@ public class HowToDialog extends JDialog {
         contentPane.add(panel3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         panel3.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null));
         final JLabel label1 = new JLabel();
+        label1.setHorizontalAlignment(2);
+        label1.setHorizontalTextPosition(2);
         this.$$$loadLabelText$$$(label1, ResourceBundle.getBundle("UITexts").getString("howto.text"));
         label1.setToolTipText("");
-        panel3.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        panel3.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
 
     /**
