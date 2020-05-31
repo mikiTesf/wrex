@@ -7,6 +7,7 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.AbstractButton;
@@ -25,16 +26,13 @@ import java.awt.Insets;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
-public class PresenterDialog extends JFrame {
-    private final JFrame THIS_FRAME = this;
+public class PresenterDialog extends JDialog {
     private JTextField firstNameTextField;
     private JTextField middleNameTextField;
     private JTextField lastNameTextField;
@@ -63,6 +61,7 @@ public class PresenterDialog extends JFrame {
         }
 
         setContentPane(mainPanel);
+        setModal(true);
 
         presentersTableModel = new DefaultTableModel() {
             @Override
@@ -71,6 +70,7 @@ public class PresenterDialog extends JFrame {
             }
         };
         presentersTable.setModel(presentersTableModel);
+        presentersTable.setRowHeight(20);
 
         presentersTableModel.addColumn(UI_TEXTS.getProperty("full.name.column.header"));
         presentersTableModel.addColumn(UI_TEXTS.getProperty("privilege.column.header"));
@@ -107,19 +107,11 @@ public class PresenterDialog extends JFrame {
             }
         });
 
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                parentFrame.setEnabled(true);
-            }
-        });
-
         this.updateNamesButton.setVisible(false);
 
         setPreferredSize(new Dimension(400, 400));
         pack();
         setLocationRelativeTo(parentFrame);
-        setAlwaysOnTop(true);
 
         refreshPresentersTable();
     }
@@ -132,7 +124,7 @@ public class PresenterDialog extends JFrame {
 
         if (!inputIsValid(insertedFirstName, insertedMiddleName, insertedLastName)) {
             JOptionPane.showMessageDialog(
-                    THIS_FRAME,
+                    this,
                     UI_TEXTS.getProperty("name.contains.special.characters"),
                     UI_TEXTS.getProperty("problem.message.dialogue.title"),
                     JOptionPane.ERROR_MESSAGE);
@@ -154,7 +146,7 @@ public class PresenterDialog extends JFrame {
             }
         } catch (SQLException e1) {
             JOptionPane.showMessageDialog(
-                    THIS_FRAME,
+                    this,
                     UI_TEXTS.getProperty("could.not.save.new.presenter"),
                     UI_TEXTS.getProperty("problem.message.dialogue.title"),
                     JOptionPane.ERROR_MESSAGE);
@@ -164,7 +156,7 @@ public class PresenterDialog extends JFrame {
         refreshPresentersTable();
         clearInputFields();
         JOptionPane.showMessageDialog(
-                THIS_FRAME,
+                this,
                 UI_TEXTS.getProperty("new.presenter.details.saved"),
                 UI_TEXTS.getProperty("done.message.dialogue.title"),
                 JOptionPane.INFORMATION_MESSAGE);
@@ -174,7 +166,9 @@ public class PresenterDialog extends JFrame {
     private void onEdit() {
         int selectedRow = this.presentersTable.getSelectedRow();
 
-        if (selectedRow == -1) { return; }
+        if (selectedRow == -1) {
+            return;
+        }
 
         this.presentersTable.setEnabled(false);
         this.updateNamesButton.setVisible(true);
@@ -182,32 +176,34 @@ public class PresenterDialog extends JFrame {
         this.deletePresenterButton.setEnabled(false);
         this.editPresenterButton.setEnabled(false);
 
-        Presenter presenter = null;
         try {
-            presenter = Presenter.presenterDao.queryForId(rowToIdMap.get(selectedRow));
+            Presenter presenter = Presenter.presenterDao.queryForId(rowToIdMap.get(selectedRow));
+            this.firstNameTextField.setText(presenter.getFirstName());
+            this.middleNameTextField.setText(presenter.getMiddleName());
+            this.lastNameTextField.setText(presenter.getLastName());
+            this.privilegeComboBox.setSelectedItem(presenter.getPrivilege());
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        this.firstNameTextField.setText(presenter.getFirstName());
-        this.middleNameTextField.setText(presenter.getMiddleName());
-        this.lastNameTextField.setText(presenter.getLastName());
-        this.privilegeComboBox.setSelectedItem(presenter.getPrivilege());
     }
 
     // on `removePresenterButton` clicked
     private void onRemove() {
         int selectedRow = this.presentersTable.getSelectedRow();
 
-        if (selectedRow == -1) { return; }
+        if (selectedRow == -1) {
+            return;
+        }
 
         int choice = JOptionPane.showConfirmDialog(
-                THIS_FRAME,
+                this,
                 UI_TEXTS.getProperty("are.you.sure"),
                 UI_TEXTS.getProperty("are.you.sure"),
                 JOptionPane.YES_NO_OPTION);
 
-        if (choice == JOptionPane.NO_OPTION) { return; }
+        if (choice == JOptionPane.NO_OPTION) {
+            return;
+        }
 
         try {
             Presenter.presenterDao.deleteById(rowToIdMap.get(selectedRow));
@@ -262,7 +258,7 @@ public class PresenterDialog extends JFrame {
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(
-                    THIS_FRAME,
+                    this,
                     UI_TEXTS.getProperty("could.not.fetch.presenter.details"),
                     UI_TEXTS.getProperty("problem.message.dialogue.title"),
                     JOptionPane.ERROR_MESSAGE);

@@ -35,7 +35,7 @@ public class AboutDialog extends JDialog {
             }
         });
 
-        setMinimumSize(new Dimension(300, 250));
+        setPreferredSize(new Dimension(300, 250));
         pack();
         setLocationRelativeTo(parentFrame);
     }
@@ -144,5 +144,4 @@ public class AboutDialog extends JDialog {
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }
-
 }
