@@ -16,6 +16,7 @@ class DBConnection {
         try {
             connectionSource = new JdbcConnectionSource(PATH_TO_DB);
             TableUtils.createTableIfNotExists(connectionSource, Presenter.class);
+            TableUtils.createTableIfNotExists(connectionSource, Settings.class);
         } catch (SQLException e) {
             e.printStackTrace();
         }
