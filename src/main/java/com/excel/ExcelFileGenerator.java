@@ -1,8 +1,8 @@
 package com.excel;
 
 import com.domain.Settings;
-import com.extraction.ContentParser;
 
+import com.extraction.PubExtract;
 import com.meeting.Meeting;
 import com.meeting.MeetingSection;
 
@@ -32,12 +32,11 @@ import java.util.Properties;
 
 public class ExcelFileGenerator {
     private final XSSFWorkbook WORKBOOK;
-    private final ContentParser CONTENT_PARSER;
     private int COL_INDEX = 1;
     private int ROW_INDEX = 4;
     private final File DESTINATION;
     private final Properties LANGUAGE_PACK;
-    private final ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS;
+    private final ArrayList<PubExtract> ALL_PUB_EXTRACTS;
     private Settings settings;
     private final XSSFCellStyle PART_STYLE;
     private final XSSFCellStyle LABEL_STYLE;
@@ -46,15 +45,14 @@ public class ExcelFileGenerator {
     private final XSSFCellStyle HALL_DIVIDERS_STYLE;
 
     public ExcelFileGenerator(
-            ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS,
+            ArrayList<PubExtract> ALL_PUB_EXTRACTS,
             Properties LANGUAGE_PACK,
             File DESTINATION)
     {
-        this.ALL_MEETINGS_CONTENTS = ALL_MEETINGS_CONTENTS;
-        this.LANGUAGE_PACK         = LANGUAGE_PACK;
-        this.DESTINATION           = DESTINATION;
-        CONTENT_PARSER             = new ContentParser(this.LANGUAGE_PACK.getProperty("filter_for_minute"));
-        WORKBOOK                   = new XSSFWorkbook();
+        this.ALL_PUB_EXTRACTS = ALL_PUB_EXTRACTS;
+        this.LANGUAGE_PACK = LANGUAGE_PACK;
+        this.DESTINATION   = DESTINATION;
+        WORKBOOK           = new XSSFWorkbook();
 
         try {
             settings = Settings.getLastSavedSettings();
@@ -209,19 +207,13 @@ public class ExcelFileGenerator {
         ROW_INDEX += 3;
     }
 
-    private void addPopulatedSheet(ArrayList<String> meetingFilesContents) {
-        /* The first element in `meetingFilesContents` is the name of the publication.
-           The publication name is important to name the excel sheets. This first element
-           must be removed after it is used */
-        XSSFSheet sheet = WORKBOOK.createSheet
-                (meetingFilesContents.remove(0).replaceAll("\\.[e|E][p|P][u|U][b|B]", ""));
-
-        CONTENT_PARSER.setMeetingContents(meetingFilesContents);
+    private void addPopulatedSheet(ArrayList<Meeting> meetings, String publicationName) {
+        XSSFSheet sheet = WORKBOOK.createSheet(publicationName);
 
         int meetingCount = 0;
 
         insertPageTitle(sheet);
-        for (Meeting meeting : CONTENT_PARSER.getMeetings()) {
+        for (Meeting meeting : meetings) {
             if (meetingCount == 3) {
                 COL_INDEX = 6;
                 ROW_INDEX = 4;
@@ -242,17 +234,15 @@ public class ExcelFileGenerator {
         resizeColumnsAndFixPageSize(sheet);
     }
 
-    public boolean makeExcel(String fileName) throws IOException {
-        for (ArrayList<String> meetingContents : ALL_MEETINGS_CONTENTS) {
-            addPopulatedSheet(meetingContents);
+    public void makeExcel(String fileName) throws IOException {
+        for (PubExtract pubExtract : ALL_PUB_EXTRACTS) {
+            addPopulatedSheet(pubExtract.getMeetings(), pubExtract.getPublicationName());
         }
 
         FileOutputStream out = new FileOutputStream(new File
                 (DESTINATION.getPath() + File.separator + fileName));
         WORKBOOK.write(out);
         out.close();
-
-        return true;
     }
 
     private Row getRowIfExists(int rowIndex, XSSFSheet sheet) {

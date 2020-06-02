@@ -10,18 +10,15 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class EPUBContentExtractor {
+class ContentReader {
 
-    public ArrayList<ArrayList<String>> getContentsOfRelevantEntriesAsStrings
-            (File[] epubPublications) throws IOException {
+    ArrayList<String> getContentsOfRelevantEntriesAsStrings(File epubPublication)
+            throws IOException
+    {
+        final ArrayList<String> MEETINGS_CONTENTS = new ArrayList<>();
 
-        final ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS = new ArrayList<>();
+            ZipFile epubArchive = new ZipFile(epubPublication);
 
-        for (File publication : epubPublications) {
-            ArrayList<String> publicationExtracts = new ArrayList<>();
-            ZipFile epubArchive = new ZipFile(publication);
-
-            publicationExtracts.add(publication.getName());
             for (Enumeration e = epubArchive.entries(); e.hasMoreElements(); ) {
                 ZipEntry entry = (ZipEntry) e.nextElement();
 
@@ -33,13 +30,10 @@ public class EPUBContentExtractor {
                     !entryContent.contains("ministry")  ||
                     !entryContent.contains("christianLiving")) continue;
 
-                publicationExtracts.add(entryContent);
+                MEETINGS_CONTENTS.add(entryContent);
             }
 
-            ALL_MEETINGS_CONTENTS.add(publicationExtracts);
-        }
-
-        return ALL_MEETINGS_CONTENTS;
+        return MEETINGS_CONTENTS;
     }
 
     private boolean unnecessaryFile(String fileName) {

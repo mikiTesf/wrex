@@ -1,9 +1,27 @@
 package com.gui;
 
 import com.excel.ExcelFileGenerator;
-import com.extraction.EPUBContentExtractor;
 
-import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingWorker;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.FileChooserUI;
 import javax.swing.table.DefaultTableModel;
@@ -33,6 +51,8 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.zip.ZipException;
 
+import com.extraction.Extractor;
+import com.extraction.PubExtract;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
@@ -304,11 +324,13 @@ public class MainWindow extends JFrame {
         // the value for `GENERATION_STATUS` is set in the `catch` blocks of the corresponding error(s)
         private GenerationStatus GENERATION_STATUS;
         private final Properties LANGUAGE_PACK;
+        private final Extractor EXTRACTOR;
 
         private UIController(File DESTINATION, String SAVE_NAME, Properties LANGUAGE_PACK) {
             this.DESTINATION = DESTINATION;
             this.SAVE_NAME = SAVE_NAME;
             this.LANGUAGE_PACK = LANGUAGE_PACK;
+            EXTRACTOR = new Extractor(LANGUAGE_PACK.getProperty("filter_for_minute"));
         }
 
         @Override
@@ -316,11 +338,10 @@ public class MainWindow extends JFrame {
             toggleButtons();
             statusLabel.setText(UI_TEXTS.getProperty("status.label.generating.text"));
 
-            ArrayList<ArrayList<String>> ALL_MEETINGS_CONTENTS = null;
+            final ArrayList<PubExtract> ALL_PUB_EXTRACTS;
 
             try {
-                ALL_MEETINGS_CONTENTS = new EPUBContentExtractor()
-                        .getContentsOfRelevantEntriesAsStrings(EPUBFiles);
+                ALL_PUB_EXTRACTS = EXTRACTOR.getPublicationExtracts(EPUBFiles);
             } catch (ZipException e) {
                 GENERATION_STATUS = ZIP_FORMAT_ERROR;
                 return null;
@@ -330,9 +351,13 @@ public class MainWindow extends JFrame {
             }
 
             try {
-                if (new ExcelFileGenerator(ALL_MEETINGS_CONTENTS, LANGUAGE_PACK, DESTINATION).makeExcel(SAVE_NAME)) {
-                    GENERATION_STATUS = SUCCESS;
-                }
+                new ExcelFileGenerator(ALL_PUB_EXTRACTS, LANGUAGE_PACK, DESTINATION)
+                        .makeExcel(SAVE_NAME);
+                // If the above operation does not throw any Exceptions, then it can be confidently
+                // concluded that the generation process went smoothly without any problems. Hence
+                // the assignment of `SUCCESS` to `GENERATION_STATUS`.
+                GENERATION_STATUS = SUCCESS;
+
             } catch (IOException e1) {
                 GENERATION_STATUS = COULD_NOT_SAVE_FILE_ERROR;
                 return null;
@@ -362,7 +387,7 @@ public class MainWindow extends JFrame {
                 case SUCCESS:
                     statusLabel.setText(UI_TEXTS.getProperty("status.label.generation.finished.text"));
                     JOptionPane.showMessageDialog
-                            (THIS_FRAME, UI_TEXTS.getProperty("template.generated.message"),
+                            (THIS_FRAME, UI_TEXTS.getProperty("generation.successful.message"),
                                     UI_TEXTS.getProperty("done.message.dialogue.title"), JOptionPane.INFORMATION_MESSAGE);
                     break;
                 default:

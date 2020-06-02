@@ -15,14 +15,14 @@ import org.jsoup.select.Elements;
 
 import static com.meeting.SectionKind.*;
 
-public class ContentParser {
+class ContentParser {
     private ArrayList<Document> meetingExtracts;
     private Element sectionElement;
     private ArrayList<String> meetingContents;
     private final String FILTER_FOR_MINUTE;
     private final Properties ELEMENT_SELECTORS = new Properties();
 
-    public ContentParser(String filterForMinute) {
+    ContentParser(String filterForMinute) {
         this.FILTER_FOR_MINUTE = filterForMinute;
         try {
             this.ELEMENT_SELECTORS.load(getClass().getResourceAsStream("/elementSelectors.properties"));
@@ -38,7 +38,7 @@ public class ContentParser {
         }
     }
 
-    public ArrayList<Meeting> getMeetings() {
+    ArrayList<Meeting> getMeetings() {
         ArrayList<Meeting> meetings = new ArrayList<>();
 
         for (Document meetingDocument : meetingExtracts) {
@@ -116,7 +116,7 @@ public class ContentParser {
         return meetingSection;
     }
 
-    public void setMeetingContents(ArrayList<String> meetingContents) {
+    void setMeetingContents(ArrayList<String> meetingContents) {
         this.meetingContents = meetingContents;
         this.parseXHTML();
     }
