@@ -4,7 +4,6 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
-import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JDialog;
 import javax.swing.JPanel;

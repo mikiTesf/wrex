@@ -5,7 +5,7 @@ public enum Privilege {
     MINISTERIAL_SERVANT("Ministerial Servant"),
     PUBLISHER("Publisher");
 
-    String text;
+    private final String text;
 
     Privilege(String privilegeName) {
         text = privilegeName;

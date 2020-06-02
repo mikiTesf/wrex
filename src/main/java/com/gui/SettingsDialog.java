@@ -51,7 +51,7 @@ public class SettingsDialog extends JDialog {
     private JButton defaultSettingsButton;
     private JLabel rowHeightLabel;
     private JLabel addHallDivisionRowLabel;
-    private JCheckBox addHallDivsionRowCheckbox;
+    private JCheckBox addHallDivisionRowCheckbox;
 
     SettingsDialog(JFrame parentFrame) {
         setContentPane(contentPane);
@@ -82,7 +82,7 @@ public class SettingsDialog extends JDialog {
         };
 
         askToAssignPresentersCheckBox.addMouseListener(mouseAdapter);
-        addHallDivsionRowCheckbox.addMouseListener(mouseAdapter);
+        addHallDivisionRowCheckbox.addMouseListener(mouseAdapter);
 
 
         buttonOK.addActionListener(new ActionListener() {
@@ -142,7 +142,7 @@ public class SettingsDialog extends JDialog {
         settings.setLabelsFontSize((int) this.labelsFontSizeSpinner.getValue());
         settings.setRowHeight((int) this.rowHeightSpinner.getValue() * 100);
         settings.setAskToAssignPresenters(this.askToAssignPresentersCheckBox.isSelected());
-        settings.setHasHallDividers(this.addHallDivsionRowCheckbox.isSelected());
+        settings.setHasHallDividers(this.addHallDivisionRowCheckbox.isSelected());
 
         try {
             Settings.settingsDao.update(settings);
@@ -168,7 +168,7 @@ public class SettingsDialog extends JDialog {
         // understand, I decided to divide the values by 100.
         this.rowHeightSpinner.setValue(settings.getRowHeight() / 100);
         this.askToAssignPresentersCheckBox.setSelected(settings.askToAssignPresenters());
-        this.addHallDivsionRowCheckbox.setSelected(settings.hasHallDividers());
+        this.addHallDivisionRowCheckbox.setSelected(settings.hasHallDividers());
     }
 
     {
@@ -269,10 +269,10 @@ public class SettingsDialog extends JDialog {
         this.$$$loadLabelText$$$(addHallDivisionRowLabel, ResourceBundle.getBundle("UITexts").getString("add.hall.division.row.label"));
         addHallDivisionRowLabel.setToolTipText("");
         panel4.add(addHallDivisionRowLabel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        addHallDivsionRowCheckbox = new JCheckBox();
-        addHallDivsionRowCheckbox.setText("");
-        addHallDivsionRowCheckbox.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.hall.division.row.field"));
-        panel4.add(addHallDivsionRowCheckbox, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        addHallDivisionRowCheckbox = new JCheckBox();
+        addHallDivisionRowCheckbox.setText("");
+        addHallDivisionRowCheckbox.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.hall.division.row.field"));
+        panel4.add(addHallDivisionRowCheckbox, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

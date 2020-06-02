@@ -212,7 +212,7 @@
               <toolTipText value=""/>
             </properties>
           </component>
-          <component id="27002" class="javax.swing.JCheckBox" binding="addHallDivsionRowCheckbox">
+          <component id="27002" class="javax.swing.JCheckBox" binding="addHallDivisionRowCheckbox">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
