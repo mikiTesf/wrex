@@ -37,19 +37,21 @@ public class SettingsDialog extends JDialog {
     private JButton buttonCancel;
     private JSpinner sheetTitleFontSizeSpinner;
     private JSpinner meetingSectionTitleFontSizeSpinner;
-    private JSpinner presentationFontSizeSpinner;
+    private JSpinner partFontSizeSpinner;
     private JSpinner presenterNameFontSizeSpinner;
     private JSpinner labelsFontSizeSpinner;
     private JSpinner rowHeightSpinner;
     private JCheckBox askToAssignPresentersCheckBox;
     private JLabel sheetTitleFontSizeLabel;
     private JLabel meetingSectionTitleFontSizeLabel;
-    private JLabel presentationFontSizeLabel;
+    private JLabel partFontSizeLabel;
     private JLabel presenterNameFontSizeLabel;
     private JLabel askToAssignPresentersLabel;
     private JLabel labelsFontSizeLabel;
-    private JLabel rowHeightLabel;
     private JButton defaultSettingsButton;
+    private JLabel rowHeightLabel;
+    private JLabel addHallDivisionRowLabel;
+    private JCheckBox addHallDivsionRowCheckbox;
 
     SettingsDialog(JFrame parentFrame) {
         setContentPane(contentPane);
@@ -60,7 +62,7 @@ public class SettingsDialog extends JDialog {
                 new SpinnerNumberModel(1, 1, 100, 1));
         this.meetingSectionTitleFontSizeSpinner.setModel(
                 new SpinnerNumberModel(1, 1, 100, 1));
-        this.presentationFontSizeSpinner.setModel(
+        this.partFontSizeSpinner.setModel(
                 new SpinnerNumberModel(1, 1, 100, 1));
         this.presenterNameFontSizeSpinner.setModel(
                 new SpinnerNumberModel(1, 1, 100, 1));
@@ -69,7 +71,7 @@ public class SettingsDialog extends JDialog {
         this.rowHeightSpinner.setModel(
                 new SpinnerNumberModel(1, 1, 999999, 1));
 
-        askToAssignPresentersCheckBox.addMouseListener(new MouseAdapter() {
+        final MouseAdapter mouseAdapter = new MouseAdapter() {
             public void mouseEntered(MouseEvent me) {
                 ToolTipManager.sharedInstance().setDismissDelay(60000);
             }
@@ -77,7 +79,10 @@ public class SettingsDialog extends JDialog {
             public void mouseExited(MouseEvent me) {
                 ToolTipManager.sharedInstance().setDismissDelay(ToolTipManager.sharedInstance().getDismissDelay());
             }
-        });
+        };
+
+        askToAssignPresentersCheckBox.addMouseListener(mouseAdapter);
+        addHallDivsionRowCheckbox.addMouseListener(mouseAdapter);
 
 
         buttonOK.addActionListener(new ActionListener() {
@@ -120,7 +125,9 @@ public class SettingsDialog extends JDialog {
             this.setFieldsToSettingsDetails(Settings.getDefaultSettings());
         }
 
-        setPreferredSize(new Dimension(350, 300));
+        final Dimension minimumSize = new Dimension(300, 350);
+        setMinimumSize(minimumSize);
+        setPreferredSize(minimumSize);
         pack();
         setLocationRelativeTo(parentFrame);
     }
@@ -130,11 +137,12 @@ public class SettingsDialog extends JDialog {
         settings.setId(1);
         settings.setSheetTitleFontSize((int) this.sheetTitleFontSizeSpinner.getValue());
         settings.setMeetingSectionTitleFontSize((int) this.meetingSectionTitleFontSizeSpinner.getValue());
-        settings.setPresentationFontSize((int) this.presentationFontSizeSpinner.getValue());
+        settings.setPartFontSize((int) this.partFontSizeSpinner.getValue());
         settings.setPresenterNameFontSize((int) this.presenterNameFontSizeSpinner.getValue());
         settings.setLabelsFontSize((int) this.labelsFontSizeSpinner.getValue());
         settings.setRowHeight((int) this.rowHeightSpinner.getValue() * 100);
         settings.setAskToAssignPresenters(this.askToAssignPresentersCheckBox.isSelected());
+        settings.setHasHallDividers(this.addHallDivsionRowCheckbox.isSelected());
 
         try {
             Settings.settingsDao.update(settings);
@@ -152,14 +160,15 @@ public class SettingsDialog extends JDialog {
     private void setFieldsToSettingsDetails(Settings settings) {
         this.sheetTitleFontSizeSpinner.setValue(settings.getSheetTitleFontSize());
         this.meetingSectionTitleFontSizeSpinner.setValue(settings.getMeetingSectionTitleFontSize());
-        this.presentationFontSizeSpinner.setValue(settings.getPresentationFontSize());
+        this.partFontSizeSpinner.setValue(settings.getPartFontSize());
         this.presenterNameFontSizeSpinner.setValue(settings.getPresenterNameFontSize());
         this.labelsFontSizeSpinner.setValue(settings.getLabelsFontSize());
         // The actual values for the row height that change the row height noticeably
         // are big numbers. Like, multiples of 100. So to make it easy for the user to
         // understand, I decided to divide the values by 100.
         this.rowHeightSpinner.setValue(settings.getRowHeight() / 100);
-        this.askToAssignPresentersCheckBox.setSelected(settings.isAskToAssignPresenters());
+        this.askToAssignPresentersCheckBox.setSelected(settings.askToAssignPresenters());
+        this.addHallDivsionRowCheckbox.setSelected(settings.hasHallDividers());
     }
 
     {
@@ -197,14 +206,14 @@ public class SettingsDialog extends JDialog {
         this.$$$loadButtonText$$$(defaultSettingsButton, ResourceBundle.getBundle("UITexts").getString("default.settings.button.text"));
         panel1.add(defaultSettingsButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel3 = new JPanel();
-        panel3.setLayout(new GridLayoutManager(5, 3, new Insets(0, 0, 0, 0), -1, -1));
+        panel3.setLayout(new GridLayoutManager(6, 3, new Insets(0, 0, 0, 0), -1, -1));
         contentPane.add(panel3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         panel3.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), ResourceBundle.getBundle("UITexts").getString("font.settings.fields.border.title"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
         sheetTitleFontSizeLabel = new JLabel();
         this.$$$loadLabelText$$$(sheetTitleFontSizeLabel, ResourceBundle.getBundle("UITexts").getString("sheet.title.font.size.label"));
         panel3.add(sheetTitleFontSizeLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer2 = new Spacer();
-        panel3.add(spacer2, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        panel3.add(spacer2, new GridConstraints(0, 2, 6, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         sheetTitleFontSizeSpinner = new JSpinner();
         sheetTitleFontSizeSpinner.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.sheet.title.font.size.field"));
         panel3.add(sheetTitleFontSizeSpinner, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -214,13 +223,13 @@ public class SettingsDialog extends JDialog {
         meetingSectionTitleFontSizeSpinner = new JSpinner();
         meetingSectionTitleFontSizeSpinner.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.meeting.section.title.font.size.field"));
         panel3.add(meetingSectionTitleFontSizeSpinner, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        presentationFontSizeLabel = new JLabel();
-        this.$$$loadLabelText$$$(presentationFontSizeLabel, ResourceBundle.getBundle("UITexts").getString("presentation.font.size.label"));
-        presentationFontSizeLabel.setToolTipText("");
-        panel3.add(presentationFontSizeLabel, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        presentationFontSizeSpinner = new JSpinner();
-        presentationFontSizeSpinner.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.presentation.font.size.field"));
-        panel3.add(presentationFontSizeSpinner, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        partFontSizeLabel = new JLabel();
+        this.$$$loadLabelText$$$(partFontSizeLabel, ResourceBundle.getBundle("UITexts").getString("part.font.size.label"));
+        partFontSizeLabel.setToolTipText("");
+        panel3.add(partFontSizeLabel, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        partFontSizeSpinner = new JSpinner();
+        partFontSizeSpinner.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.part.font.size.field"));
+        panel3.add(partFontSizeSpinner, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         presenterNameFontSizeLabel = new JLabel();
         this.$$$loadLabelText$$$(presenterNameFontSizeLabel, ResourceBundle.getBundle("UITexts").getString("presenter.name.font.size.label"));
         presenterNameFontSizeLabel.setToolTipText("");
@@ -235,27 +244,35 @@ public class SettingsDialog extends JDialog {
         labelsFontSizeSpinner = new JSpinner();
         labelsFontSizeSpinner.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.labels.font.size.field"));
         panel3.add(labelsFontSizeSpinner, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        rowHeightLabel = new JLabel();
+        this.$$$loadLabelText$$$(rowHeightLabel, ResourceBundle.getBundle("UITexts").getString("row.height.label"));
+        rowHeightLabel.setToolTipText("");
+        panel3.add(rowHeightLabel, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        rowHeightSpinner = new JSpinner();
+        rowHeightSpinner.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.row.height.label.field"));
+        panel3.add(rowHeightSpinner, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new GridLayoutManager(2, 3, new Insets(0, 0, 0, 0), -1, -1));
         contentPane.add(panel4, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         panel4.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), ResourceBundle.getBundle("UITexts").getString("other.settings.fields.border.title"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+        final Spacer spacer3 = new Spacer();
+        panel4.add(spacer3, new GridConstraints(0, 2, 2, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         askToAssignPresentersLabel = new JLabel();
         this.$$$loadLabelText$$$(askToAssignPresentersLabel, ResourceBundle.getBundle("UITexts").getString("ask.to.assign.presenter.label"));
         askToAssignPresentersLabel.setToolTipText("");
-        panel4.add(askToAssignPresentersLabel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel4.add(askToAssignPresentersLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         askToAssignPresentersCheckBox = new JCheckBox();
         askToAssignPresentersCheckBox.setText("");
         askToAssignPresentersCheckBox.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.ask.to.assign.presenter.field"));
-        panel4.add(askToAssignPresentersCheckBox, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final Spacer spacer3 = new Spacer();
-        panel4.add(spacer3, new GridConstraints(0, 2, 2, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
-        rowHeightLabel = new JLabel();
-        this.$$$loadLabelText$$$(rowHeightLabel, ResourceBundle.getBundle("UITexts").getString("row.height.label"));
-        rowHeightLabel.setToolTipText("");
-        panel4.add(rowHeightLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        rowHeightSpinner = new JSpinner();
-        rowHeightSpinner.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.row.height.label.field"));
-        panel4.add(rowHeightSpinner, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel4.add(askToAssignPresentersCheckBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        addHallDivisionRowLabel = new JLabel();
+        this.$$$loadLabelText$$$(addHallDivisionRowLabel, ResourceBundle.getBundle("UITexts").getString("add.hall.division.row.label"));
+        addHallDivisionRowLabel.setToolTipText("");
+        panel4.add(addHallDivisionRowLabel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        addHallDivsionRowCheckbox = new JCheckBox();
+        addHallDivsionRowCheckbox.setText("");
+        addHallDivsionRowCheckbox.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.hall.division.row.field"));
+        panel4.add(addHallDivsionRowCheckbox, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

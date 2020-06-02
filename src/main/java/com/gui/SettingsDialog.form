@@ -3,7 +3,7 @@
   <grid id="cbd77" binding="contentPane" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="48" y="54" width="436" height="355"/>
+      <xy x="48" y="54" width="436" height="392"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -57,7 +57,7 @@
           </component>
         </children>
       </grid>
-      <grid id="e3588" layout-manager="GridLayoutManager" row-count="5" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="e3588" layout-manager="GridLayoutManager" row-count="6" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -75,7 +75,7 @@
           </component>
           <hspacer id="dc9c7">
             <constraints>
-              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="2" row-span="6" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
           </hspacer>
           <component id="d3b29" class="javax.swing.JSpinner" binding="sheetTitleFontSizeSpinner">
@@ -102,21 +102,21 @@
               <toolTipText resource-bundle="UITexts" key="tooltip.meeting.section.title.font.size.field"/>
             </properties>
           </component>
-          <component id="376be" class="javax.swing.JLabel" binding="presentationFontSizeLabel">
+          <component id="376be" class="javax.swing.JLabel" binding="partFontSizeLabel">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="UITexts" key="presentation.font.size.label"/>
+              <text resource-bundle="UITexts" key="part.font.size.label"/>
               <toolTipText value=""/>
             </properties>
           </component>
-          <component id="7d7ed" class="javax.swing.JSpinner" binding="presentationFontSizeSpinner">
+          <component id="7d7ed" class="javax.swing.JSpinner" binding="partFontSizeSpinner">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <toolTipText resource-bundle="UITexts" key="tooltip.presentation.font.size.field"/>
+              <toolTipText resource-bundle="UITexts" key="tooltip.part.font.size.field"/>
             </properties>
           </component>
           <component id="cdba0" class="javax.swing.JLabel" binding="presenterNameFontSizeLabel">
@@ -153,6 +153,23 @@
               <toolTipText resource-bundle="UITexts" key="tooltip.labels.font.size.field"/>
             </properties>
           </component>
+          <component id="5a57e" class="javax.swing.JLabel" binding="rowHeightLabel">
+            <constraints>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text resource-bundle="UITexts" key="row.height.label"/>
+              <toolTipText value=""/>
+            </properties>
+          </component>
+          <component id="355aa" class="javax.swing.JSpinner" binding="rowHeightSpinner">
+            <constraints>
+              <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <toolTipText resource-bundle="UITexts" key="tooltip.row.height.label.field"/>
+            </properties>
+          </component>
         </children>
       </grid>
       <grid id="43ee3" layout-manager="GridLayoutManager" row-count="2" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -163,9 +180,14 @@
         <properties/>
         <border type="etched" title-resource-bundle="UITexts" title-key="other.settings.fields.border.title" title-justification="2"/>
         <children>
+          <hspacer id="b8b33">
+            <constraints>
+              <grid row="0" column="2" row-span="2" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </hspacer>
           <component id="75453" class="javax.swing.JLabel" binding="askToAssignPresentersLabel">
             <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text resource-bundle="UITexts" key="ask.to.assign.presenter.label"/>
@@ -174,33 +196,29 @@
           </component>
           <component id="4a380" class="javax.swing.JCheckBox" binding="askToAssignPresentersCheckBox">
             <constraints>
-              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value=""/>
               <toolTipText resource-bundle="UITexts" key="tooltip.ask.to.assign.presenter.field"/>
             </properties>
           </component>
-          <hspacer id="b8b33">
+          <component id="d794d" class="javax.swing.JLabel" binding="addHallDivisionRowLabel">
             <constraints>
-              <grid row="0" column="2" row-span="2" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-          </hspacer>
-          <component id="510a0" class="javax.swing.JLabel" binding="rowHeightLabel">
-            <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="UITexts" key="row.height.label"/>
+              <text resource-bundle="UITexts" key="add.hall.division.row.label"/>
               <toolTipText value=""/>
             </properties>
           </component>
-          <component id="d65a2" class="javax.swing.JSpinner" binding="rowHeightSpinner">
+          <component id="27002" class="javax.swing.JCheckBox" binding="addHallDivsionRowCheckbox">
             <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <toolTipText resource-bundle="UITexts" key="tooltip.row.height.label.field"/>
+              <text value=""/>
+              <toolTipText resource-bundle="UITexts" key="tooltip.hall.division.row.field"/>
             </properties>
           </component>
         </children>

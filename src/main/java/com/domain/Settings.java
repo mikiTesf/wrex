@@ -23,13 +23,16 @@ public class Settings {
     private int meetingSectionTitleFontSize;
 
     @DatabaseField(defaultValue = "16")
-    private int presentationFontSize;
+    private int partFontSize;
 
     @DatabaseField(defaultValue = "16")
     private int presenterNameFontSize;
 
     @DatabaseField(defaultValue = "600")
     private int rowHeight;
+
+    @DatabaseField(defaultValue = "false")
+    private boolean addHallDividers;
 
     @DatabaseField(defaultValue = "false")
     private boolean askToAssignPresenters;
@@ -47,24 +50,25 @@ public class Settings {
         }
     }
 
-    public Settings() {
-    }
+    public Settings() {}
 
     public Settings(
             int sheetTitleFontSize,
             int labelsFontSize,
             int meetingSectionTitleFontSize,
-            int presentationFontSize,
+            int partFontSize,
             int presenterNameFontSize,
             int rowHeight,
+            boolean addHallDividers,
             boolean askToAssignPresenters)
     {
         this.sheetTitleFontSize = sheetTitleFontSize;
         this.labelsFontSize = labelsFontSize;
         this.meetingSectionTitleFontSize = meetingSectionTitleFontSize;
-        this.presentationFontSize = presentationFontSize;
+        this.partFontSize = partFontSize;
         this.presenterNameFontSize = presenterNameFontSize;
         this.rowHeight = rowHeight;
+        this.addHallDividers = addHallDividers;
         this.askToAssignPresenters = askToAssignPresenters;
     }
 
@@ -100,12 +104,12 @@ public class Settings {
         this.meetingSectionTitleFontSize = meetingSectionTitleFontSize;
     }
 
-    public int getPresentationFontSize() {
-        return presentationFontSize;
+    public int getPartFontSize() {
+        return partFontSize;
     }
 
-    public void setPresentationFontSize(int presentationFontSize) {
-        this.presentationFontSize = presentationFontSize;
+    public void setPartFontSize(int partFontSize) {
+        this.partFontSize = partFontSize;
     }
 
     public int getPresenterNameFontSize() {
@@ -124,7 +128,15 @@ public class Settings {
         this.rowHeight = rowHeight;
     }
 
-    public boolean isAskToAssignPresenters() {
+    public boolean hasHallDividers() {
+        return addHallDividers;
+    }
+
+    public void setHasHallDividers(boolean addHallDividers) {
+        this.addHallDividers = addHallDividers;
+    }
+
+    public boolean askToAssignPresenters() {
         return askToAssignPresenters;
     }
 
@@ -133,7 +145,7 @@ public class Settings {
     }
 
     public static Settings getDefaultSettings() {
-        return new Settings(16, 15, 16, 16, 16, 600, false);
+        return new Settings(16, 15, 16, 16, 16, 600, false, false);
     }
 
     public static Settings getLastSavedSettings() throws SQLException {

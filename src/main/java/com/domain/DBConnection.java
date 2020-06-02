@@ -5,15 +5,13 @@ import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
 
-class DBConnection {
+public class DBConnection {
 
     static JdbcConnectionSource connectionSource = null;
 
-    static  {
-        // `wdb` - A fancy acronym for "WREX Database"
-        String PATH_TO_DB = "jdbc:sqlite:wrex.wdb";
-
+    public static void initializeDBTables() {
         try {
+            String PATH_TO_DB = "jdbc:sqlite:wrex.wdb";
             connectionSource = new JdbcConnectionSource(PATH_TO_DB);
             TableUtils.createTableIfNotExists(connectionSource, Presenter.class);
             TableUtils.createTableIfNotExists(connectionSource, Settings.class);
