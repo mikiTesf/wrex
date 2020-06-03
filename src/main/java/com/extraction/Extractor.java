@@ -25,7 +25,7 @@ public class Extractor {
 
             pubExtract.setPublicationName(
                     epubFile.getName().replaceAll("\\.[e|E][p|P][u|U][b|B]", ""));
-            pubExtract.setPublicationImage(null);
+            pubExtract.setPublicationImage(CONTENT_READER.getCoverImage());
             pubExtract.setMeetings(CONTENT_PARSER.getMeetings());
             publicationsExtracts.add(pubExtract);
         }

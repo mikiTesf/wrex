@@ -6,6 +6,7 @@ import com.extraction.PubExtract;
 import com.meeting.Meeting;
 import com.meeting.MeetingSection;
 
+import com.meeting.Part;
 import com.meeting.SectionKind;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -110,16 +111,20 @@ public class ExcelFileGenerator {
         // 8th row has the title of the "Treasures" section
         Row row = getRowIfExists(++ROW_INDEX, sheet);
         insertSectionTitle(sheet, treasures, row);
+        String partTitle;
         // 10 minute talk, digging for spiritual gems and bible reading
-        for (String part : treasures.getParts()) {
+        for (Part part : treasures.getParts()) {
             row = getRowIfExists(++ROW_INDEX, sheet);
+            partTitle = part.getPartTitle();
 
-            if (part.contains(LANGUAGE_PACK.getProperty("bible_reading")) && settings.hasHallDividers()) {
+            if (partTitle.contains(LANGUAGE_PACK.getProperty("bible_reading")) &&
+                    settings.hasHallDividers())
+            {
                 insertHallDivisionHeaders(row);
                 row = getRowIfExists(++ROW_INDEX, sheet);
-                insertPart(sheet, part, true, row);
+                insertPart(sheet, partTitle, true, row);
             } else {
-                insertPart(sheet, part, false, row);
+                insertPart(sheet, partTitle, false, row);
             }
 
             addThinBordersToCellsInRow(row, COL_INDEX + 1, true);
@@ -134,9 +139,9 @@ public class ExcelFileGenerator {
             insertHallDivisionHeaders(row);
         }
         // the number of parts is not fixed for all months hence the for loop
-        for (String part : improveInMinistry.getParts()) {
+        for (Part part : improveInMinistry.getParts()) {
             row = getRowIfExists(++ROW_INDEX, sheet);
-            insertPart(sheet, part, settings.hasHallDividers(), row);
+            insertPart(sheet, part.getPartTitle(), settings.hasHallDividers(), row);
             addThinBordersToCellsInRow(row, COL_INDEX + 1, true);
         }
     }
@@ -170,9 +175,9 @@ public class ExcelFileGenerator {
         Row row = getRowIfExists(++ROW_INDEX, sheet);
         insertSectionTitle(sheet, livingAsChristians, row);
         // the number of parts is not fixed for all months hence the for loop
-        for (String part : livingAsChristians.getParts()) {
+        for (Part part : livingAsChristians.getParts()) {
             row = getRowIfExists(++ROW_INDEX, sheet);
-            insertPart(sheet, part, false, row);
+            insertPart(sheet, part.getPartTitle(), false, row);
             addThinBordersToCellsInRow(row, COL_INDEX + 1, true);
         }
     }

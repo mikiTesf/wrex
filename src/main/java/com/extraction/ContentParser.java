@@ -7,6 +7,7 @@ import java.util.Properties;
 import com.meeting.MeetingSection;
 import com.meeting.Meeting;
 
+import com.meeting.Part;
 import com.meeting.SectionKind;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -110,7 +111,7 @@ class ContentParser {
             if (!topic.contains(FILTER_FOR_MINUTE)) continue;
 
             topic = topic.substring(0, topic.indexOf(FILTER_FOR_MINUTE)) + FILTER_FOR_MINUTE + ")";
-            meetingSection.addPart(topic);
+            meetingSection.addPart(new Part(topic, ""));
         }
 
         return meetingSection;

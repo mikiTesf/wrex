@@ -6,7 +6,7 @@ public class MeetingSection {
     private final SectionKind SECTION_KIND;
     private String title;
     // demonstrations, talks, etc...
-    private final ArrayList<String> PARTS;
+    private final ArrayList<Part> PARTS;
 
     public MeetingSection(SectionKind SECTION_KIND) {
         this.SECTION_KIND = SECTION_KIND;
@@ -25,11 +25,11 @@ public class MeetingSection {
         return this.title;
     }
 
-    public ArrayList<String> getParts () {
+    public ArrayList<Part> getParts () {
         return this.PARTS;
     }
 
-    public void addPart (String part) {
+    public void addPart (Part part) {
         PARTS.add(part);
     }
 }

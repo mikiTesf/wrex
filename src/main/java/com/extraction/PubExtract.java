@@ -24,7 +24,7 @@ public class PubExtract {
         return publicationName;
     }
 
-    public void setPublicationName(String publicationName) {
+    void setPublicationName(String publicationName) {
         this.publicationName = publicationName;
     }
 
@@ -32,7 +32,7 @@ public class PubExtract {
         return publicationImage;
     }
 
-    public void setPublicationImage(ImageIcon publicationImage) {
+    void setPublicationImage(ImageIcon publicationImage) {
         this.publicationImage = publicationImage;
     }
 
@@ -40,7 +40,7 @@ public class PubExtract {
         return meetings;
     }
 
-    public void setMeetings(ArrayList<Meeting> meetings) {
+    void setMeetings(ArrayList<Meeting> meetings) {
         this.meetings = meetings;
     }
 }

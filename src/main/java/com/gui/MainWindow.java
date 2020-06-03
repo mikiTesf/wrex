@@ -76,7 +76,8 @@ public class MainWindow extends JFrame {
     private File[] EPUBFiles;
 
     public MainWindow() {
-        Properties PROGRAM_META = new Properties();
+        final Properties PROGRAM_META = new Properties();
+
         try {
             UI_TEXTS.load(getClass().getResourceAsStream("/UITexts.properties"));
             PROGRAM_META.load(getClass().getResourceAsStream("/wrexMeta.properties"));
