@@ -70,8 +70,7 @@ public class PresenterDialog extends JDialog {
             }
         };
         presentersTable.setModel(presentersTableModel);
-        presentersTable.setRowHeight(20);
-
+        presentersTable.setRowHeight(25);
         presentersTableModel.addColumn(UI_TEXTS.getProperty("full.name.column.header"));
         presentersTableModel.addColumn(UI_TEXTS.getProperty("privilege.column.header"));
 
@@ -109,8 +108,9 @@ public class PresenterDialog extends JDialog {
 
         this.updateNamesButton.setVisible(false);
 
-        setPreferredSize(new Dimension(400, 400));
-        pack();
+        final Dimension minimumSize = new Dimension(450, 500);
+        setMinimumSize(minimumSize);
+        setPreferredSize(minimumSize);
         setLocationRelativeTo(parentFrame);
 
         refreshPresentersTable();
@@ -197,8 +197,9 @@ public class PresenterDialog extends JDialog {
 
         int choice = JOptionPane.showConfirmDialog(
                 this,
-                UI_TEXTS.getProperty("are.you.sure"),
-                UI_TEXTS.getProperty("are.you.sure"),
+                UI_TEXTS.getProperty("are.you.sure") + " \""
+                        + presentersTable.getValueAt(selectedRow, 0) + "\"?",
+                "",
                 JOptionPane.YES_NO_OPTION);
 
         if (choice == JOptionPane.NO_OPTION) {
@@ -314,6 +315,7 @@ public class PresenterDialog extends JDialog {
         scrollPane1.setBackground(new Color(-1));
         panel1.add(scrollPane1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         presentersTable = new JTable();
+        presentersTable.setAutoCreateRowSorter(true);
         presentersTable.setAutoResizeMode(4);
         presentersTable.setFillsViewportHeight(true);
         scrollPane1.setViewportView(presentersTable);

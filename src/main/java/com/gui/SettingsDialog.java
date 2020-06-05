@@ -58,16 +58,13 @@ public class SettingsDialog extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        this.sheetTitleFontSizeSpinner.setModel(
-                new SpinnerNumberModel(1, 1, 100, 1));
-        this.meetingSectionTitleFontSizeSpinner.setModel(
-                new SpinnerNumberModel(1, 1, 100, 1));
-        this.partFontSizeSpinner.setModel(
-                new SpinnerNumberModel(1, 1, 100, 1));
-        this.presenterNameFontSizeSpinner.setModel(
-                new SpinnerNumberModel(1, 1, 100, 1));
-        this.labelsFontSizeSpinner.setModel(
-                new SpinnerNumberModel(1, 1, 100, 1));
+        final SpinnerNumberModel SPINNER_NUMBER_MODEL = new SpinnerNumberModel(1, 1, 100, 1);
+
+        this.sheetTitleFontSizeSpinner.setModel(SPINNER_NUMBER_MODEL);
+        this.meetingSectionTitleFontSizeSpinner.setModel(SPINNER_NUMBER_MODEL);
+        this.partFontSizeSpinner.setModel(SPINNER_NUMBER_MODEL);
+        this.presenterNameFontSizeSpinner.setModel(SPINNER_NUMBER_MODEL);
+        this.labelsFontSizeSpinner.setModel(SPINNER_NUMBER_MODEL);
         this.rowHeightSpinner.setModel(
                 new SpinnerNumberModel(1, 1, 999999, 1));
 
@@ -128,7 +125,6 @@ public class SettingsDialog extends JDialog {
         final Dimension minimumSize = new Dimension(300, 350);
         setMinimumSize(minimumSize);
         setPreferredSize(minimumSize);
-        pack();
         setLocationRelativeTo(parentFrame);
     }
 

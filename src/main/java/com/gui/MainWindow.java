@@ -86,12 +86,6 @@ public class MainWindow extends JFrame {
         }
 
         setContentPane(mainPanel);
-        setSize(new Dimension(450, 350));
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle(
-                PROGRAM_META.getProperty("program.name") + " (" + PROGRAM_META.getProperty("program.version") + ")"
-        );
         setIconImage(new ImageIcon(getClass().getResource("/icons/frameIcon.png")).getImage());
         insertMenuBarAndItems();
         // other initial setups
@@ -117,6 +111,16 @@ public class MainWindow extends JFrame {
         } catch (IllegalAccessException | NoSuchFieldException e) {
             System.out.println(e.getMessage());
         }
+
+        setTitle(
+                PROGRAM_META.getProperty("program.name") + " (" + PROGRAM_META.getProperty("program.version") + ")"
+        );
+
+        final Dimension MIN_SIZE = new Dimension(450, 350);
+        setMinimumSize(MIN_SIZE);
+        setPreferredSize(MIN_SIZE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
     }
 
     private void insertMenuBarAndItems() {
@@ -206,7 +210,7 @@ public class MainWindow extends JFrame {
                 return false;
             }
         };
-        tableModel.addColumn(UI_TEXTS.getProperty("publications.column.title"));
+        tableModel.addColumn(UI_TEXTS.getProperty("publications.column.header"));
         publicationTable.setModel(tableModel);
 
         scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
