@@ -2,7 +2,6 @@ package com.excel;
 
 import com.domain.Settings;
 
-import com.extraction.PubExtract;
 import com.meeting.Meeting;
 import com.meeting.MeetingSection;
 
@@ -37,7 +36,6 @@ public class ExcelFileGenerator {
     private int ROW_INDEX = 4;
     private final File DESTINATION;
     private final Properties LANGUAGE_PACK;
-    private final ArrayList<PubExtract> ALL_PUB_EXTRACTS;
     private Settings settings;
     private final XSSFCellStyle PART_STYLE;
     private final XSSFCellStyle LABEL_STYLE;
@@ -46,11 +44,9 @@ public class ExcelFileGenerator {
     private final XSSFCellStyle HALL_DIVIDERS_STYLE;
 
     public ExcelFileGenerator(
-            ArrayList<PubExtract> ALL_PUB_EXTRACTS,
             Properties LANGUAGE_PACK,
             File DESTINATION)
     {
-        this.ALL_PUB_EXTRACTS = ALL_PUB_EXTRACTS;
         this.LANGUAGE_PACK = LANGUAGE_PACK;
         this.DESTINATION   = DESTINATION;
         WORKBOOK           = new XSSFWorkbook();
@@ -154,7 +150,7 @@ public class ExcelFileGenerator {
             sheet.addMergedRegion(new CellRangeAddress
                     (row.getRowNum(), row.getRowNum(), COL_INDEX + 1, COL_INDEX + 2));
         } else {
-            // If there is no hall dividing header (Main Hall, Second Hall), then the last two
+            // If there is a hall dividing header (Main Hall, Second Hall), then the last two
             // cells must be formatted with the `PRESENTER_NAME_STYLE` cellStyle. The cellStyle
             // assignment at the end of this method ensures that the last cell always get's the
             // PRESENTER_NAME_STYLE cellStyle regardless of hall dividing headers.
@@ -212,7 +208,7 @@ public class ExcelFileGenerator {
         ROW_INDEX += 3;
     }
 
-    private void addPopulatedSheet(ArrayList<Meeting> meetings, String publicationName) {
+    public void addPopulatedSheet(ArrayList<Meeting> meetings, String publicationName) {
         XSSFSheet sheet = WORKBOOK.createSheet(publicationName);
 
         int meetingCount = 0;
@@ -239,11 +235,7 @@ public class ExcelFileGenerator {
         resizeColumnsAndFixPageSize(sheet);
     }
 
-    public void makeExcel(String fileName) throws IOException {
-        for (PubExtract pubExtract : ALL_PUB_EXTRACTS) {
-            addPopulatedSheet(pubExtract.getMeetings(), pubExtract.getPublicationName());
-        }
-
+    public void saveExcelDocument(String fileName) throws IOException {
         FileOutputStream out = new FileOutputStream(new File
                 (DESTINATION.getPath() + File.separator + fileName));
         WORKBOOK.write(out);

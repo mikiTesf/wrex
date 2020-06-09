@@ -16,6 +16,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -69,6 +70,7 @@ public class MainWindow extends JFrame {
     private JLabel statusLabel;
     private JComboBox<String> languageComboBox;
     private JPanel controlsPanel;
+    private JProgressBar progressBar;
     private final JFileChooser FILE_CHOOSER;
 
     private final Properties UI_TEXTS = new Properties();
@@ -90,6 +92,9 @@ public class MainWindow extends JFrame {
         insertMenuBarAndItems();
         // other initial setups
         generateButton.setEnabled(false);
+        progressBar.setMaximum(100);
+        progressBar.setStringPainted(true);
+        progressBar.setVisible(false);
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -166,7 +171,7 @@ public class MainWindow extends JFrame {
             }
         });
 
-        JMenuItem howToItem = new JMenuItem(UI_TEXTS.getProperty("howto.menu.item.text"));
+        JMenuItem howToItem = new JMenuItem(UI_TEXTS.getProperty("howTo.menu.item.text"));
         howToItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -341,28 +346,57 @@ public class MainWindow extends JFrame {
         @Override
         protected Void doInBackground() {
             toggleButtons();
-            statusLabel.setText(UI_TEXTS.getProperty("status.label.generating.text"));
+            // Each publication has 2 operations associated with it. The first one is reading the
+            // necessary entries and the second one is creating an excel sheet for each extract.
+            // That is why the length of `EPUBFiles` needs to be multiplied by 2. The 1 added to
+            // `UNIT_PROGRESS` below is for the saving operation.
+            final int UNIT_PROGRESS = 100 / (2 * EPUBFiles.length) + 1;
+            progressBar.setValue(0);
+            progressBar.setVisible(true);
 
-            final ArrayList<PubExtract> ALL_PUB_EXTRACTS;
+            final ArrayList<PubExtract> ALL_PUB_EXTRACTS = new ArrayList<>();
 
-            try {
-                ALL_PUB_EXTRACTS = EXTRACTOR.getPublicationExtracts(EPUBFiles);
-            } catch (ZipException e) {
-                GENERATION_STATUS = ZIP_FORMAT_ERROR;
-                return null;
-            } catch (IOException e1) {
-                GENERATION_STATUS = COULD_NOT_READ_FILE_ERROR;
-                return null;
+            for (File epubFile : EPUBFiles) {
+                statusLabel.setText(
+                        UI_TEXTS.getProperty("reading.meeting.files.from") + " '" + epubFile.getName() + "'");
+                try {
+                    ALL_PUB_EXTRACTS.add(EXTRACTOR.getPublicationExtracts(epubFile));
+                } catch (IllegalStateException e1) {
+                    JOptionPane.showMessageDialog(
+                            THIS_FRAME,
+                            UI_TEXTS.getProperty("could.not.parse.the.content.in") +
+                            " '" + epubFile.getName() + "'. " +
+                            UI_TEXTS.getProperty("please.contact.the.developer.message"),
+                            UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
+                } catch (ZipException e2) {
+                    GENERATION_STATUS = ZIP_FORMAT_ERROR;
+                    return null;
+                } catch (IOException e3) {
+                    GENERATION_STATUS = COULD_NOT_READ_FILE_ERROR;
+                    return null;
+                }
+
+                progressBar.setValue(progressBar.getValue() + UNIT_PROGRESS);
+            }
+
+            ExcelFileGenerator excelFileGenerator = new ExcelFileGenerator(LANGUAGE_PACK, DESTINATION);
+            for (PubExtract pubExtract : ALL_PUB_EXTRACTS) {
+                statusLabel.setText(
+                        UI_TEXTS.getProperty("adding.an.Excel.sheet.for") + " '" + pubExtract.getPublicationName() + "'");
+                excelFileGenerator.addPopulatedSheet
+                        (pubExtract.getMeetings(), pubExtract.getPublicationName());
+                progressBar.setValue(progressBar.getValue() + UNIT_PROGRESS);
             }
 
             try {
-                new ExcelFileGenerator(ALL_PUB_EXTRACTS, LANGUAGE_PACK, DESTINATION)
-                        .makeExcel(SAVE_NAME);
+                statusLabel.setText(UI_TEXTS.getProperty("saving.Excel.file"));
+                excelFileGenerator.saveExcelDocument(SAVE_NAME);
+                progressBar.setValue(progressBar.getValue() + UNIT_PROGRESS);
+                statusLabel.setText(UI_TEXTS.getProperty("status.label.generation.finished.text"));
                 // If the above operation does not throw any Exceptions, then it can be confidently
                 // concluded that the generation process went smoothly without any problems. Hence
                 // the assignment of `SUCCESS` to `GENERATION_STATUS`.
                 GENERATION_STATUS = SUCCESS;
-
             } catch (IOException e1) {
                 GENERATION_STATUS = COULD_NOT_SAVE_FILE_ERROR;
                 return null;
@@ -387,10 +421,8 @@ public class MainWindow extends JFrame {
                 case COULD_NOT_SAVE_FILE_ERROR:
                     JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("could.not.save.document.message"),
                             UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
-                    statusLabel.setText("");
                     break;
                 case SUCCESS:
-                    statusLabel.setText(UI_TEXTS.getProperty("status.label.generation.finished.text"));
                     JOptionPane.showMessageDialog
                             (THIS_FRAME, UI_TEXTS.getProperty("generation.successful.message"),
                                     UI_TEXTS.getProperty("done.message.dialogue.title"), JOptionPane.INFORMATION_MESSAGE);
@@ -401,6 +433,7 @@ public class MainWindow extends JFrame {
             }
 
             statusLabel.setText("");
+            progressBar.setVisible(false);
         }
 
         private void toggleButtons() {
@@ -441,7 +474,7 @@ public class MainWindow extends JFrame {
         publicationTable.setToolTipText("");
         scrollPane.setViewportView(publicationTable);
         controlsPanel = new JPanel();
-        controlsPanel.setLayout(new GridLayoutManager(2, 5, new Insets(0, 0, 0, 0), -1, -1));
+        controlsPanel.setLayout(new GridLayoutManager(3, 5, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.add(controlsPanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         openButton = new JButton();
         openButton.setIcon(new ImageIcon(getClass().getResource("/icons/openFile.png")));
@@ -452,19 +485,21 @@ public class MainWindow extends JFrame {
         this.$$$loadButtonText$$$(generateButton, ResourceBundle.getBundle("UITexts").getString("generate.button.text"));
         controlsPanel.add(generateButton, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         statusLabel = new JLabel();
-        statusLabel.setEnabled(false);
+        statusLabel.setEnabled(true);
         Font statusLabelFont = this.$$$getFont$$$(null, -1, 11, statusLabel.getFont());
         if (statusLabelFont != null) statusLabel.setFont(statusLabelFont);
-        statusLabel.setHorizontalAlignment(0);
+        statusLabel.setHorizontalAlignment(2);
         statusLabel.setHorizontalTextPosition(0);
         statusLabel.setText("Label");
-        controlsPanel.add(statusLabel, new GridConstraints(1, 0, 1, 5, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        controlsPanel.add(statusLabel, new GridConstraints(1, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         languageComboBox = new JComboBox();
         controlsPanel.add(languageComboBox, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer1 = new Spacer();
         controlsPanel.add(spacer1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         final Spacer spacer2 = new Spacer();
         controlsPanel.add(spacer2, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        progressBar = new JProgressBar();
+        controlsPanel.add(progressBar, new GridConstraints(2, 0, 1, 5, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

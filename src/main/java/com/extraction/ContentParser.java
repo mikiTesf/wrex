@@ -117,7 +117,14 @@ class ContentParser {
         return meetingSection;
     }
 
-    void setMeetingContents(ArrayList<String> meetingContents) {
+    // The `IllegalStateException` being thrown indicates that the content reader returned an empty array
+    // of meeting contents. This happens when the Classes or IDs in the DOM of the meeting files identifying
+    // the different components of in a given publication have changed.
+    void setMeetingContents(ArrayList<String> meetingContents) throws IllegalStateException {
+        if (meetingContents.size() == 0) {
+            throw new IllegalStateException();
+        }
+
         this.meetingContents = meetingContents;
         this.parseXHTML();
     }
