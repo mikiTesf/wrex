@@ -2,7 +2,6 @@ package com.extraction;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class Extractor {
 
@@ -14,22 +13,15 @@ public class Extractor {
         this.CONTENT_PARSER = new ContentParser(filterForMinute);
     }
 
-    public ArrayList<PubExtract> getPublicationExtracts(File[] publicationFiles)
-        throws IOException
+    public PubExtract getPublicationExtracts(File pubFile)
+        throws IOException, IllegalStateException
     {
-        ArrayList<PubExtract> publicationsExtracts = new ArrayList<>();
+        PubExtract pubExtract = new PubExtract();
+        CONTENT_PARSER.setMeetingContents(CONTENT_READER.getContentsOfRelevantEntriesAsStrings(pubFile));
+        pubExtract.setPublicationName(
+                pubFile.getName().replaceAll("\\.[eE][pP][uU][bB]", ""));
+        pubExtract.setMeetings(CONTENT_PARSER.getMeetings());
 
-        for (File epubFile : publicationFiles) {
-            PubExtract pubExtract = new PubExtract();
-            CONTENT_PARSER.setMeetingContents(CONTENT_READER.getContentsOfRelevantEntriesAsStrings(epubFile));
-
-            pubExtract.setPublicationName(
-                    epubFile.getName().replaceAll("\\.[e|E][p|P][u|U][b|B]", ""));
-            pubExtract.setPublicationImage(CONTENT_READER.getCoverImage());
-            pubExtract.setMeetings(CONTENT_PARSER.getMeetings());
-            publicationsExtracts.add(pubExtract);
-        }
-
-        return publicationsExtracts;
+        return pubExtract;
     }
 }
