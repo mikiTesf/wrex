@@ -56,7 +56,7 @@
             <properties>
               <horizontalAlignment value="2"/>
               <horizontalTextPosition value="2"/>
-              <text resource-bundle="UITexts" key="howto.text"/>
+              <text resource-bundle="UITexts" key="howTo.text"/>
               <toolTipText value=""/>
             </properties>
           </component>
