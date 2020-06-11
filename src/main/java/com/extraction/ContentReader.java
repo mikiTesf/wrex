@@ -39,17 +39,17 @@ class ContentReader {
 
     private boolean unnecessaryFile(String fileName) {
         return
-                fileName.contains("mimetype")        ||
-                    fileName.contains("META-INF")    ||
-                    fileName.contains("css")         ||
-                    fileName.contains("images")      ||
-                    fileName.contains("extracted")   ||
-                    // different numbers appear after "pagenav"
-                    fileName.contains("pagenav")     ||
-                    fileName.contains("content.opf") ||
-                    fileName.contains("cover.xhtml") ||
-                    // both "toc.ncx" and "toc.xhtml"
-                    fileName.contains("toc.");
+                fileName.contains("mimetype")    ||
+                fileName.contains("META-INF")    ||
+                fileName.contains("css")         ||
+                fileName.contains("images")      ||
+                fileName.contains("extracted")   ||
+                // different numbers appear after "pagenav"
+                fileName.contains("pagenav")     ||
+                fileName.contains("content.opf") ||
+                fileName.contains("cover.xhtml") ||
+                // both "toc.ncx" and "toc.xhtml"
+                fileName.contains("toc.");
     }
 
     private byte[] getEntryBytes(InputStream inputStream) throws IOException {

@@ -148,7 +148,11 @@ public class Settings {
         return new Settings(16, 15, 16, 16, 16, 600, false, false);
     }
 
-    public static Settings getLastSavedSettings() throws SQLException {
-        return settingsDao.queryForId(1);
+    public static Settings getLastSavedSettings() {
+        try {
+            return settingsDao.queryForId(1);
+        } catch (SQLException e) {
+            return getDefaultSettings();
+        }
     }
 }

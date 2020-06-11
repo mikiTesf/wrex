@@ -58,13 +58,11 @@ public class SettingsDialog extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        final SpinnerNumberModel SPINNER_NUMBER_MODEL = new SpinnerNumberModel(1, 1, 100, 1);
-
-        this.sheetTitleFontSizeSpinner.setModel(SPINNER_NUMBER_MODEL);
-        this.meetingSectionTitleFontSizeSpinner.setModel(SPINNER_NUMBER_MODEL);
-        this.partFontSizeSpinner.setModel(SPINNER_NUMBER_MODEL);
-        this.presenterNameFontSizeSpinner.setModel(SPINNER_NUMBER_MODEL);
-        this.labelsFontSizeSpinner.setModel(SPINNER_NUMBER_MODEL);
+        this.sheetTitleFontSizeSpinner.setModel(new SpinnerNumberModel(1, 1, 100, 1));
+        this.meetingSectionTitleFontSizeSpinner.setModel(new SpinnerNumberModel(1, 1, 100, 1));
+        this.partFontSizeSpinner.setModel(new SpinnerNumberModel(1, 1, 100, 1));
+        this.presenterNameFontSizeSpinner.setModel(new SpinnerNumberModel(1, 1, 100, 1));
+        this.labelsFontSizeSpinner.setModel(new SpinnerNumberModel(1, 1, 100, 1));
         this.rowHeightSpinner.setModel(
                 new SpinnerNumberModel(1, 1, 999999, 1));
 
@@ -116,11 +114,7 @@ public class SettingsDialog extends JDialog {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        try {
-            this.setFieldsToSettingsDetails(Settings.getLastSavedSettings());
-        } catch (SQLException e) {
-            this.setFieldsToSettingsDetails(Settings.getDefaultSettings());
-        }
+        this.setFieldsToSettingsDetails(Settings.getLastSavedSettings());
 
         final Dimension minimumSize = new Dimension(300, 350);
         setMinimumSize(minimumSize);

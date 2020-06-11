@@ -1,20 +1,23 @@
 package com.extraction;
 
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Properties;
 
 import com.meeting.MeetingSection;
 import com.meeting.Meeting;
 
-import com.meeting.Part;
-import com.meeting.SectionKind;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import static com.meeting.SectionKind.*;
+import com.meeting.Part;
+import com.meeting.SectionKind;
+import static com.meeting.SectionKind.IMPROVE_IN_MINISTRY;
+import static com.meeting.SectionKind.LIVING_AS_CHRISTIANS;
+import static com.meeting.SectionKind.TREASURES;
 
 class ContentParser {
     private ArrayList<Document> meetingExtracts;
@@ -119,7 +122,7 @@ class ContentParser {
 
     // The `IllegalStateException` being thrown indicates that the content reader returned an empty array
     // of meeting contents. This happens when the Classes or IDs in the DOM of the meeting files identifying
-    // the different components of in a given publication have changed.
+    // the different components of meetings in a given publication have changed.
     void setMeetingContents(ArrayList<String> meetingContents) throws IllegalStateException {
         if (meetingContents.size() == 0) {
             throw new IllegalStateException();

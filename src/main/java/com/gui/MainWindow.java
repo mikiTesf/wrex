@@ -1,5 +1,6 @@
 package com.gui;
 
+import com.domain.Settings;
 import com.excel.ExcelFileGenerator;
 
 import javax.swing.AbstractButton;
@@ -72,6 +73,7 @@ public class MainWindow extends JFrame {
     private JPanel controlsPanel;
     private JProgressBar progressBar;
     private final JFileChooser FILE_CHOOSER;
+    private Settings settings;
 
     private final Properties UI_TEXTS = new Properties();
 
@@ -318,6 +320,7 @@ public class MainWindow extends JFrame {
                     return;
                 }
 
+                settings = Settings.getLastSavedSettings();
                 new UIController(DESTINATION, SAVE_NAME, LANGUAGE_PACK).execute();
             }
         });
@@ -364,9 +367,9 @@ public class MainWindow extends JFrame {
                 } catch (IllegalStateException e1) {
                     JOptionPane.showMessageDialog(
                             THIS_FRAME,
-                            UI_TEXTS.getProperty("could.not.parse.the.content.in") +
-                            " '" + epubFile.getName() + "'. " +
-                            UI_TEXTS.getProperty("please.contact.the.developer.message"),
+                            String.format(
+                                    UI_TEXTS.getProperty("could.not.parse.content.message"),
+                                    String.format("<ul><li>%s</li></ul>", epubFile.getName())),
                             UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
                 } catch (ZipException e2) {
                     GENERATION_STATUS = ZIP_FORMAT_ERROR;
@@ -377,6 +380,11 @@ public class MainWindow extends JFrame {
                 }
 
                 progressBar.setValue(progressBar.getValue() + UNIT_PROGRESS);
+            }
+
+            if (settings.askToAssignPresenters()) {
+                new AssignmentDialog(THIS_FRAME, LANGUAGE_PACK, ALL_PUB_EXTRACTS).setVisible(true);
+                // TODO: The presenters assigned on the dialog must be returned in some way (a Map for example)
             }
 
             ExcelFileGenerator excelFileGenerator = new ExcelFileGenerator(LANGUAGE_PACK, DESTINATION);
@@ -461,9 +469,9 @@ public class MainWindow extends JFrame {
         mainPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
         scrollPane = new JScrollPane();
         scrollPane.setBackground(new Color(-1));
-        mainPanel.add(scrollPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        mainPanel.add(scrollPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         publicationTable = new JTable();
-        publicationTable.setAutoCreateRowSorter(false);
+        publicationTable.setAutoCreateRowSorter(true);
         publicationTable.setAutoResizeMode(4);
         publicationTable.setEnabled(true);
         publicationTable.setFillsViewportHeight(true);

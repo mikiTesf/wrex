@@ -10,7 +10,7 @@
     <children>
       <scrollpane id="7f9df" binding="scrollPane">
         <constraints>
-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <background color="-1"/>
@@ -20,7 +20,7 @@
           <component id="25085" class="javax.swing.JTable" binding="publicationTable" default-binding="true">
             <constraints/>
             <properties>
-              <autoCreateRowSorter value="false"/>
+              <autoCreateRowSorter value="true"/>
               <autoResizeMode value="4"/>
               <enabled value="true"/>
               <fillsViewportHeight value="true"/>

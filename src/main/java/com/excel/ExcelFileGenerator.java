@@ -25,8 +25,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import java.sql.SQLException;
-
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -36,7 +34,7 @@ public class ExcelFileGenerator {
     private int ROW_INDEX = 4;
     private final File DESTINATION;
     private final Properties LANGUAGE_PACK;
-    private Settings settings;
+    private final Settings SETTINGS;
     private final XSSFCellStyle PART_STYLE;
     private final XSSFCellStyle LABEL_STYLE;
     private final XSSFCellStyle PRESENTER_NAME_STYLE;
@@ -50,18 +48,12 @@ public class ExcelFileGenerator {
         this.LANGUAGE_PACK = LANGUAGE_PACK;
         this.DESTINATION   = DESTINATION;
         WORKBOOK           = new XSSFWorkbook();
-
-        try {
-            settings = Settings.getLastSavedSettings();
-        } catch (SQLException e) {
-            settings = Settings.getDefaultSettings();
-        }
-
-        PART_STYLE = getCellStyle(false, false, settings.getPartFontSize(), false);
-        LABEL_STYLE = getCellStyle(false, false, settings.getLabelsFontSize(), false);
-        PRESENTER_NAME_STYLE = getCellStyle(false, true, settings.getPresenterNameFontSize(), false);
-        SECTION_TITLE_STYLE = getCellStyle(true, false, settings.getMeetingSectionTitleFontSize(), true);
-        HALL_DIVIDERS_STYLE = getCellStyle(true, true, settings.getLabelsFontSize(), false);
+        SETTINGS = Settings.getLastSavedSettings();
+        PART_STYLE = getCellStyle(false, false, SETTINGS.getPartFontSize(), false);
+        LABEL_STYLE = getCellStyle(false, false, SETTINGS.getLabelsFontSize(), false);
+        PRESENTER_NAME_STYLE = getCellStyle(false, true, SETTINGS.getPresenterNameFontSize(), false);
+        SECTION_TITLE_STYLE = getCellStyle(true, false, SETTINGS.getMeetingSectionTitleFontSize(), true);
+        HALL_DIVIDERS_STYLE = getCellStyle(true, true, SETTINGS.getLabelsFontSize(), false);
     }
 
     private void insertPageTitle(XSSFSheet sheet) {
@@ -76,7 +68,7 @@ public class ExcelFileGenerator {
         // set the header of the page
         row.createCell(COL_INDEX).setCellValue(fullTitle);
         row.getCell(COL_INDEX).setCellStyle(getCellStyle
-                (false, true, settings.getSheetTitleFontSize(), true));
+                (false, true, SETTINGS.getSheetTitleFontSize(), true));
         sheet.addMergedRegion(new CellRangeAddress
                 (row.getRowNum(), row.getRowNum(), COL_INDEX, COL_INDEX + 8));
     }
@@ -86,7 +78,7 @@ public class ExcelFileGenerator {
         Row row = getRowIfExists(ROW_INDEX, sheet);
         row.getCell(COL_INDEX).setCellValue(weekSpan);
         row.getCell(COL_INDEX).setCellStyle(getCellStyle
-                (false, false, settings.getLabelsFontSize(),true));
+                (false, false, SETTINGS.getLabelsFontSize(),true));
         sheet.setColumnWidth(COL_INDEX, 1250);
         sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), COL_INDEX, COL_INDEX + 2));
         // 6th row has the chairman's name
@@ -114,7 +106,7 @@ public class ExcelFileGenerator {
             partTitle = part.getPartTitle();
 
             if (partTitle.contains(LANGUAGE_PACK.getProperty("bible_reading")) &&
-                    settings.hasHallDividers())
+                    SETTINGS.hasHallDividers())
             {
                 insertHallDivisionHeaders(row);
                 row = getRowIfExists(++ROW_INDEX, sheet);
@@ -131,13 +123,13 @@ public class ExcelFileGenerator {
         Row row = getRowIfExists(++ROW_INDEX, sheet);
         insertSectionTitle(sheet, improveInMinistry, row);
 
-        if (settings.hasHallDividers()) {
+        if (SETTINGS.hasHallDividers()) {
             insertHallDivisionHeaders(row);
         }
         // the number of parts is not fixed for all months hence the for loop
         for (Part part : improveInMinistry.getParts()) {
             row = getRowIfExists(++ROW_INDEX, sheet);
-            insertPart(sheet, part.getPartTitle(), settings.hasHallDividers(), row);
+            insertPart(sheet, part.getPartTitle(), SETTINGS.hasHallDividers(), row);
             addThinBordersToCellsInRow(row, COL_INDEX + 1, true);
         }
     }
@@ -181,7 +173,7 @@ public class ExcelFileGenerator {
     private void insertSectionTitle(Sheet sheet, MeetingSection meetingSection, Row row) {
         final int LAST_COL;
 
-        if (meetingSection.getSECTION_KIND() == SectionKind.IMPROVE_IN_MINISTRY && settings.hasHallDividers()) {
+        if (meetingSection.getSECTION_KIND() == SectionKind.IMPROVE_IN_MINISTRY && SETTINGS.hasHallDividers()) {
             LAST_COL = COL_INDEX + 1;
         } else {
             LAST_COL = COL_INDEX + 3;
@@ -289,8 +281,7 @@ public class ExcelFileGenerator {
 
     private void resizeColumnsAndFixPageSize(XSSFSheet sheet) {
         final double MARGIN_LENGTH = 0.393701; // 0.393701 inch = 1 cm
-        final int FIRST_COLUMN = 1;
-        final int LAST_COLUMN = 9;
+        final int LAST_COLUMN = sheet.getRow(ROW_INDEX).getLastCellNum();
 
         sheet.getPrintSetup().setPaperSize(PrintSetup.A4_PAPERSIZE);
         sheet.setMargin(Sheet.LeftMargin, MARGIN_LENGTH);
@@ -299,7 +290,7 @@ public class ExcelFileGenerator {
         sheet.setMargin(Sheet.BottomMargin, MARGIN_LENGTH);
         sheet.setFitToPage(true);
 
-        for (int column = FIRST_COLUMN; column <= LAST_COLUMN; column++) {
+        for (int column = COL_INDEX; column <= LAST_COLUMN; column++) {
             sheet.autoSizeColumn(column, false);
         }
     }

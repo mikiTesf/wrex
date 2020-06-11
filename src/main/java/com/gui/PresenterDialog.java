@@ -147,7 +147,7 @@ public class PresenterDialog extends JDialog {
         } catch (SQLException e1) {
             JOptionPane.showMessageDialog(
                     this,
-                    UI_TEXTS.getProperty("could.not.save.new.presenter"),
+                    UI_TEXTS.getProperty("could.not.save.presenter.details"),
                     UI_TEXTS.getProperty("problem.message.dialogue.title"),
                     JOptionPane.ERROR_MESSAGE);
             return;
