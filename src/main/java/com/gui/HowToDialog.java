@@ -4,29 +4,44 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
+import javax.swing.AbstractButton;
 import javax.swing.JFrame;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JComponent;
-import javax.swing.JSeparator;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.ScrollPaneConstants;
 
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
+
 public class HowToDialog extends JDialog {
+    private final JDialog THIS_DIALOG = this;
     private JPanel contentPane;
     private JButton buttonOK;
+    private JTabbedPane tabbedPane;
+    private JButton generateTemplateButton;
 
     HowToDialog(JFrame parentFrame) {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
+
+        generateTemplateButton.setEnabled(false);
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -34,7 +49,61 @@ public class HowToDialog extends JDialog {
             }
         });
 
-        final Dimension minimumSize = new Dimension(500, 350);
+        final Properties UI_TEXTS = new Properties();
+        try {
+            UI_TEXTS.load(getClass().getResourceAsStream("/UITexts.properties"));
+        } catch (IOException e) {
+        }
+
+        JPanel addLanguageTabPanel = new JPanel();
+        addLanguageTabPanel.add(new JLabel(UI_TEXTS.getProperty("howTo.add.language.instructions"), JLabel.LEFT));
+
+        JScrollPane scrollPane = new JScrollPane(
+                addLanguageTabPanel,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        tabbedPane.add(UI_TEXTS.getProperty("howTo.add.language.pack.tab.title"), scrollPane);
+
+        tabbedPane.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+
+                if (tabbedPane.getSelectedIndex() == 1) {
+                    generateTemplateButton.setEnabled(true);
+                } else {
+                    generateTemplateButton.setEnabled(false);
+                }
+            }
+        });
+
+        generateTemplateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                generateTemplateButton.setEnabled(false);
+                try {
+                    FileOutputStream fileOutputStream = new FileOutputStream(new File("newLang.lang"));
+                    Properties langPackTemplate = new Properties();
+                    langPackTemplate.load(getClass().getResourceAsStream("/langPackTemplate.properties"));
+                    langPackTemplate.store(fileOutputStream, null);
+                } catch (IOException e1) {
+                    JOptionPane.showMessageDialog(
+                            THIS_DIALOG,
+                            UI_TEXTS.getProperty("could.not.create.template.message"),
+                            UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                            JOptionPane.ERROR_MESSAGE);
+                }
+
+                JOptionPane.showMessageDialog(
+                        THIS_DIALOG,
+                        UI_TEXTS.getProperty("generated.lang.template.file.message"),
+                        UI_TEXTS.getProperty("done.message.dialogue.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
+                generateTemplateButton.setEnabled(true);
+            }
+        });
+
+        final Dimension minimumSize = new Dimension(600, 600);
         setMinimumSize(minimumSize);
         setPreferredSize(minimumSize);
         setLocationRelativeTo(parentFrame);
@@ -58,27 +127,24 @@ public class HowToDialog extends JDialog {
         contentPane = new JPanel();
         contentPane.setLayout(new GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
         final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel1.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
         contentPane.add(panel1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, 1, null, null, null, 0, false));
         final Spacer spacer1 = new Spacer();
         panel1.add(spacer1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
-        final JPanel panel2 = new JPanel();
-        panel2.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        panel1.add(panel2, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         buttonOK = new JButton();
         buttonOK.setText("OK");
-        panel2.add(buttonOK, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JPanel panel3 = new JPanel();
-        panel3.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        contentPane.add(panel3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        panel1.add(buttonOK, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        generateTemplateButton = new JButton();
+        this.$$$loadButtonText$$$(generateTemplateButton, ResourceBundle.getBundle("UITexts").getString("generate.template.button.text"));
+        panel1.add(generateTemplateButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        tabbedPane = new JTabbedPane();
+        contentPane.add(tabbedPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
+        final JPanel panel2 = new JPanel();
+        panel2.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        tabbedPane.addTab(ResourceBundle.getBundle("UITexts").getString("howTo.use.wrex.tab.title"), panel2);
         final JLabel label1 = new JLabel();
-        label1.setHorizontalAlignment(2);
-        label1.setHorizontalTextPosition(2);
-        this.$$$loadLabelText$$$(label1, ResourceBundle.getBundle("UITexts").getString("howTo.text"));
-        label1.setToolTipText("");
-        panel3.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        final JSeparator separator1 = new JSeparator();
-        panel3.add(separator1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        this.$$$loadLabelText$$$(label1, ResourceBundle.getBundle("UITexts").getString("howTo.use.WREX.instructions"));
+        panel2.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
@@ -104,6 +170,33 @@ public class HowToDialog extends JDialog {
         component.setText(result.toString());
         if (haveMnemonic) {
             component.setDisplayedMnemonic(mnemonic);
+            component.setDisplayedMnemonicIndex(mnemonicIndex);
+        }
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    private void $$$loadButtonText$$$(AbstractButton component, String text) {
+        StringBuffer result = new StringBuffer();
+        boolean haveMnemonic = false;
+        char mnemonic = '\0';
+        int mnemonicIndex = -1;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '&') {
+                i++;
+                if (i == text.length()) break;
+                if (!haveMnemonic && text.charAt(i) != '&') {
+                    haveMnemonic = true;
+                    mnemonic = text.charAt(i);
+                    mnemonicIndex = result.length();
+                }
+            }
+            result.append(text.charAt(i));
+        }
+        component.setText(result.toString());
+        if (haveMnemonic) {
+            component.setMnemonic(mnemonic);
             component.setDisplayedMnemonicIndex(mnemonicIndex);
         }
     }

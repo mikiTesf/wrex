@@ -1,6 +1,6 @@
 package com.gui;
 
-import com.domain.Settings;
+//import com.domain.Settings;
 import com.excel.ExcelFileGenerator;
 
 import javax.swing.AbstractButton;
@@ -73,7 +73,7 @@ public class MainWindow extends JFrame {
     private JPanel controlsPanel;
     private JProgressBar progressBar;
     private final JFileChooser FILE_CHOOSER;
-    private Settings settings;
+//    private Settings settings;
 
     private final Properties UI_TEXTS = new Properties();
 
@@ -243,20 +243,26 @@ public class MainWindow extends JFrame {
                     generateButton.setEnabled(true);
 
                     for (File EPUBFile : EPUBFiles) {
-                        // strip the ".epub" part of the name
+                        // Strip the extension from the file's name
                         String nameToDisplayInTable = EPUBFile.getName()
-                                .replaceAll("\\.epub", "");
-                        // insert a '/' between the year and month of its due date
-                        nameToDisplayInTable = new StringBuilder(nameToDisplayInTable)
-                                .insert(nameToDisplayInTable.length() - 2, '/')
-                                .toString();
-                        // enclose the language identifying letter of the publication
-                        // with parenthesis (this also gets rid of the underscores)
-                        nameToDisplayInTable = nameToDisplayInTable
-                                .replaceFirst("_", " (")
-                                // the following `replaceFirst(...)` only replaces the last underscore
-                                // as there will only be one left after the above replacement is done
-                                .replaceFirst("_", ") ");
+                                .replaceAll("\\..*", "");
+                        // The following check helps avoid a `StringIndexOutOfBoundsException` on the line
+                        // where a '/' is inserted between the publication's year and month. If, for example,
+                        // the selected EPUB file was not an MWB and just had one character in its name, the
+                        // if check below saves WREX from encountering the exception mentioned above.
+                        if (nameToDisplayInTable.matches("^mwb_[A-Z]+_[0-9]{6}$")) {
+                            // Insert a '/' between the year and month of its due date.
+                            nameToDisplayInTable = new StringBuilder(nameToDisplayInTable)
+                                    .insert(nameToDisplayInTable.length() - 2, '/')
+                                    .toString();
+                            // Enclose the language identifying letter of the publication
+                            // with parenthesis (this also gets rid of the underscores).
+                            nameToDisplayInTable = nameToDisplayInTable
+                                    .replaceFirst("_", " (")
+                                    // The following `replaceFirst(...)` only replaces the last underscore
+                                    // as there will only be one left after the above replacement is done.
+                                    .replaceFirst("_", ") ");
+                        }
                         tableModel.addRow(new String[]{nameToDisplayInTable});
                     }
                 }
@@ -304,6 +310,15 @@ public class MainWindow extends JFrame {
                     FileInputStream input = new FileInputStream
                             ("languages" + File.separator + languageComboBox.getSelectedItem().toString().toLowerCase() + ".lang");
                     LANGUAGE_PACK.load(new InputStreamReader(input, StandardCharsets.UTF_8));
+
+                    if (!languagePackIsValid(LANGUAGE_PACK)) {
+                        JOptionPane.showMessageDialog(
+                                THIS_FRAME,
+                                UI_TEXTS.getProperty("invalid.language.pack.message"),
+                                UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                 } catch (FileNotFoundException e1) {
                     JOptionPane.showMessageDialog(
                             THIS_FRAME,
@@ -320,12 +335,31 @@ public class MainWindow extends JFrame {
                     return;
                 }
 
-                settings = Settings.getLastSavedSettings();
+//                settings = Settings.getLastSavedSettings();
                 new UIController(DESTINATION, SAVE_NAME, LANGUAGE_PACK).execute();
             }
         });
 
         setVisible(true);
+    }
+
+    private boolean languagePackIsValid(Properties languagePack) {
+        Properties langPackTemplate = new Properties();
+        try {
+            langPackTemplate.load(getClass().getResourceAsStream("/langPackTemplate.properties"));
+        } catch (IOException e) { }
+
+        if (languagePack.keySet().size() != langPackTemplate.keySet().size()) {
+            return false;
+        }
+
+        for (Object key : langPackTemplate.keySet()) {
+            if (!languagePack.containsKey(key)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private class UIController extends SwingWorker<Void, Void> {
@@ -382,10 +416,10 @@ public class MainWindow extends JFrame {
                 progressBar.setValue(progressBar.getValue() + UNIT_PROGRESS);
             }
 
-            if (settings.askToAssignPresenters()) {
-                new AssignmentDialog(THIS_FRAME, LANGUAGE_PACK, ALL_PUB_EXTRACTS).setVisible(true);
-                // TODO: The presenters assigned on the dialog must be returned in some way (a Map for example)
-            }
+//            if (settings.askToAssignPresenters()) {
+//                new AssignmentDialog(THIS_FRAME, LANGUAGE_PACK, ALL_PUB_EXTRACTS).setVisible(true);
+//                // TODO: The presenters assigned on the dialog must be returned in some way (a Map for example)
+//            }
 
             ExcelFileGenerator excelFileGenerator = new ExcelFileGenerator(LANGUAGE_PACK, DESTINATION);
             for (PubExtract pubExtract : ALL_PUB_EXTRACTS) {
