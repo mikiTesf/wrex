@@ -59,7 +59,8 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
-import static com.gui.GenerationStatus.*;
+import static com.gui.MainWindow.GenerationStatus.*;
+
 
 public class MainWindow extends JFrame {
     private final JFrame THIS_FRAME = this;
@@ -78,6 +79,16 @@ public class MainWindow extends JFrame {
     private final Properties UI_TEXTS = new Properties();
 
     private File[] EPUBFiles;
+
+    // These values are used in the GUI to identify what kind of message dialog should
+    // be displayed when an exception is caught.
+    enum GenerationStatus {
+        SUCCESS,
+        ZIP_FORMAT_ERROR,
+        COULD_NOT_READ_FILE_ERROR,
+        COULD_NOT_SAVE_FILE_ERROR
+    }
+
 
     public MainWindow() {
         final Properties PROGRAM_META = new Properties();
