@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
 import java.awt.Dimension;
@@ -91,7 +92,7 @@ public class HowToDialog extends JDialog {
             }
         });
 
-        final Dimension minimumSize = new Dimension(600, 700);
+        final Dimension minimumSize = new Dimension(570, 500);
         setMinimumSize(minimumSize);
         setPreferredSize(minimumSize);
         setLocationRelativeTo(parentFrame);
@@ -136,9 +137,13 @@ public class HowToDialog extends JDialog {
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         tabbedPane.addTab(ResourceBundle.getBundle("UITexts").getString("howTo.add.language.pack.tab.title"), panel3);
+        final JScrollPane scrollPane1 = new JScrollPane();
+        panel3.add(scrollPane1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         final JLabel label2 = new JLabel();
+        label2.setHorizontalAlignment(2);
         this.$$$loadLabelText$$$(label2, ResourceBundle.getBundle("UITexts").getString("howTo.add.language.instructions"));
-        panel3.add(label2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        label2.setVerticalAlignment(1);
+        scrollPane1.setViewportView(label2);
     }
 
     /**

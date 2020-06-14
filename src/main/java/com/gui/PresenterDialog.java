@@ -147,13 +147,13 @@ public class PresenterDialog extends JDialog {
                 return;
         }
 
-        try {
-            Presenter presenter = new Presenter(
-                    insertedFirstName,
-                    insertedMiddleName,
-                    insertedLastName,
-                    (Privilege) privilegeComboBox.getSelectedItem());
+        Presenter presenter = new Presenter(
+                insertedFirstName,
+                insertedMiddleName,
+                insertedLastName,
+                (Privilege) privilegeComboBox.getSelectedItem());
 
+        try {
             if (isUpdate) {
                 presenter.setId(this.rowToIdMap.get(presentersTable.getSelectedRow()));
                 Presenter.presenterDao.update(presenter);

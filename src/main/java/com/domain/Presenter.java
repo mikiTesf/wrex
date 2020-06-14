@@ -6,8 +6,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+
 
 @DatabaseTable(tableName = "presenter")
 public class Presenter {
@@ -89,13 +88,5 @@ public class Presenter {
 
     public static void save(Presenter presenter) throws SQLException {
         presenterDao.createIfNotExists(presenter);
-    }
-
-    public static List<Presenter> getAllPresenters() {
-        try {
-            return presenterDao.queryForAll();
-        } catch (SQLException e) {
-            return new ArrayList<>();
-        }
     }
 }
