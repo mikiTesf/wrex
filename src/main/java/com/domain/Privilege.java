@@ -3,7 +3,8 @@ package com.domain;
 public enum Privilege {
     ELDER("Elder"),
     MINISTERIAL_SERVANT("Ministerial Servant"),
-    PUBLISHER("Publisher");
+    PUBLISHER("Publisher"),
+    UNBAPTIZED_PUBLISHER("Unbaptized Publisher");
 
     private final String text;
 
