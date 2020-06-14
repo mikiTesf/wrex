@@ -17,10 +17,10 @@ public class Presenter {
     @DatabaseField(columnName = "first_name", defaultValue = "", canBeNull = false)
     private String firstName;
 
-    @DatabaseField(columnName = "middle_name", defaultValue = "", canBeNull = false)
+    @DatabaseField(columnName = "middle_name", defaultValue = "")
     private String middleName;
 
-    @DatabaseField(columnName = "last_name", defaultValue = "")
+    @DatabaseField(columnName = "last_name", defaultValue = "", canBeNull = false)
     private String lastName;
 
     @DatabaseField(columnName = "privilege", canBeNull = false)

@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import static com.gui.PresenterDialog.NewNamesErrors.*;
+
 public class PresenterDialog extends JDialog {
     private JTextField firstNameTextField;
     private JTextField middleNameTextField;
@@ -52,6 +54,12 @@ public class PresenterDialog extends JDialog {
 
     private final Properties UI_TEXTS = new Properties();
     private final HashMap<Integer, Integer> rowToIdMap = new HashMap<>();
+
+    enum NewNamesErrors {
+        FIRST_OR_LAST_NAME_EMPTY,
+        SPECIAL_CHARACTERS_IN_NAME,
+        GOOD_INPUT
+    }
 
     PresenterDialog(JFrame parentFrame) {
         try {
@@ -122,13 +130,21 @@ public class PresenterDialog extends JDialog {
         String insertedMiddleName = middleNameTextField.getText();
         String insertedLastName = lastNameTextField.getText();
 
-        if (!inputIsValid(insertedFirstName, insertedMiddleName, insertedLastName)) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    UI_TEXTS.getProperty("name.contains.special.characters"),
-                    UI_TEXTS.getProperty("problem.message.dialogue.title"),
-                    JOptionPane.ERROR_MESSAGE);
-            return;
+        switch (inputIsValid(insertedFirstName, insertedMiddleName, insertedLastName)) {
+            case FIRST_OR_LAST_NAME_EMPTY:
+                JOptionPane.showMessageDialog(
+                        this,
+                        UI_TEXTS.getProperty("first.or.last.name.empty.message"),
+                        UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            case SPECIAL_CHARACTERS_IN_NAME:
+                JOptionPane.showMessageDialog(
+                        this,
+                        UI_TEXTS.getProperty("name.contains.special.characters.message"),
+                        UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                        JOptionPane.ERROR_MESSAGE);
+                return;
         }
 
         try {
@@ -147,7 +163,7 @@ public class PresenterDialog extends JDialog {
         } catch (SQLException e1) {
             JOptionPane.showMessageDialog(
                     this,
-                    UI_TEXTS.getProperty("could.not.save.presenter.details"),
+                    UI_TEXTS.getProperty("could.not.save.presenter.details.message"),
                     UI_TEXTS.getProperty("problem.message.dialogue.title"),
                     JOptionPane.ERROR_MESSAGE);
             return;
@@ -157,7 +173,7 @@ public class PresenterDialog extends JDialog {
         clearInputFields();
         JOptionPane.showMessageDialog(
                 this,
-                UI_TEXTS.getProperty("new.presenter.details.saved"),
+                UI_TEXTS.getProperty("new.presenter.details.saved.message"),
                 UI_TEXTS.getProperty("done.message.dialogue.title"),
                 JOptionPane.INFORMATION_MESSAGE);
     }
@@ -225,18 +241,22 @@ public class PresenterDialog extends JDialog {
         onAdd(true);
     }
 
-    private boolean inputIsValid(String insertedFirstName, String insertedMiddleName, String insertedLastName) {
+    private NewNamesErrors inputIsValid(String insertedFirstName, String insertedMiddleName, String insertedLastName) {
+        // Middle names can be empty. Only First and last names are mandatory.
+        if (insertedFirstName.equals("") || insertedLastName.equals("")) {
+            return FIRST_OR_LAST_NAME_EMPTY;
+        }
 
         String specialCharactersPattern = "[/\\\\+\\-=\\[\\]#$%!^&*()_?@\"{};':|,.<> 0-9]*";
 
-        // Last names can be empty. Only First and middle names are mandatory.
-        if (insertedFirstName.equals("") || insertedMiddleName.equals("")) {
-            return false;
-        }
+        boolean namesDoNotContainSpecialCharacters =
+            (insertedFirstName.length() == insertedFirstName.replaceAll(specialCharactersPattern, "").length()) &&
+            (insertedMiddleName.length() == insertedMiddleName.replaceAll(specialCharactersPattern, "").length()) &&
+            (insertedLastName.length() == insertedLastName.replaceAll(specialCharactersPattern, "").length());
 
-        return (insertedFirstName.length() == insertedFirstName.replaceAll(specialCharactersPattern, "").length()) &&
-                (insertedMiddleName.length() == insertedMiddleName.replaceAll(specialCharactersPattern, "").length()) &&
-                (insertedLastName.length() == insertedLastName.replaceAll(specialCharactersPattern, "").length());
+        if (!namesDoNotContainSpecialCharacters) return SPECIAL_CHARACTERS_IN_NAME;
+
+        return GOOD_INPUT;
     }
 
     private void clearInputFields() {
@@ -260,7 +280,7 @@ public class PresenterDialog extends JDialog {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(
                     this,
-                    UI_TEXTS.getProperty("could.not.fetch.presenter.details"),
+                    UI_TEXTS.getProperty("could.not.fetch.presenter.details.message"),
                     UI_TEXTS.getProperty("problem.message.dialogue.title"),
                     JOptionPane.ERROR_MESSAGE);
         }
