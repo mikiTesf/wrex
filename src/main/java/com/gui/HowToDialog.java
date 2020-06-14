@@ -12,9 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.ScrollPaneConstants;
 
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -52,17 +50,7 @@ public class HowToDialog extends JDialog {
         final Properties UI_TEXTS = new Properties();
         try {
             UI_TEXTS.load(getClass().getResourceAsStream("/UITexts.properties"));
-        } catch (IOException e) {
-        }
-
-        JPanel addLanguageTabPanel = new JPanel();
-        addLanguageTabPanel.add(new JLabel(UI_TEXTS.getProperty("howTo.add.language.instructions"), JLabel.LEFT));
-
-        JScrollPane scrollPane = new JScrollPane(
-                addLanguageTabPanel,
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        tabbedPane.add(UI_TEXTS.getProperty("howTo.add.language.pack.tab.title"), scrollPane);
+        } catch (IOException e) { /* TODO: Internal Error Message */}
 
         tabbedPane.addMouseListener(new MouseAdapter() {
             @Override
@@ -82,7 +70,7 @@ public class HowToDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 generateTemplateButton.setEnabled(false);
                 try {
-                    FileOutputStream fileOutputStream = new FileOutputStream(new File("newLang.lang"));
+                    FileOutputStream fileOutputStream = new FileOutputStream(new File("new.lang"));
                     Properties langPackTemplate = new Properties();
                     langPackTemplate.load(getClass().getResourceAsStream("/langPackTemplate.properties"));
                     langPackTemplate.store(fileOutputStream, null);
@@ -103,7 +91,7 @@ public class HowToDialog extends JDialog {
             }
         });
 
-        final Dimension minimumSize = new Dimension(600, 600);
+        final Dimension minimumSize = new Dimension(600, 700);
         setMinimumSize(minimumSize);
         setPreferredSize(minimumSize);
         setLocationRelativeTo(parentFrame);
@@ -145,6 +133,12 @@ public class HowToDialog extends JDialog {
         final JLabel label1 = new JLabel();
         this.$$$loadLabelText$$$(label1, ResourceBundle.getBundle("UITexts").getString("howTo.use.WREX.instructions"));
         panel2.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JPanel panel3 = new JPanel();
+        panel3.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        tabbedPane.addTab(ResourceBundle.getBundle("UITexts").getString("howTo.add.language.pack.tab.title"), panel3);
+        final JLabel label2 = new JLabel();
+        this.$$$loadLabelText$$$(label2, ResourceBundle.getBundle("UITexts").getString("howTo.add.language.instructions"));
+        panel3.add(label2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
