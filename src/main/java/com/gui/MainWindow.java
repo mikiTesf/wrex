@@ -89,7 +89,6 @@ public class MainWindow extends JFrame {
         COULD_NOT_SAVE_FILE_ERROR
     }
 
-
     public MainWindow() {
         final Properties PROGRAM_META = new Properties();
 
@@ -170,8 +169,17 @@ public class MainWindow extends JFrame {
             }
         });
 
+        JMenuItem refreshLanguagesItem = new JMenuItem(UI_TEXTS.getProperty("refresh.languages.menu.item.text"));
+        refreshLanguagesItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refreshLanguageComboBox();
+            }
+        });
+
         fileMenu.add(presentersItem);
         fileMenu.add(settingsItem);
+        fileMenu.add(refreshLanguagesItem);
         fileMenu.add(exitItem);
 
         JMenu helpMenu = new JMenu(UI_TEXTS.getProperty("help.menu.text"));
@@ -202,22 +210,7 @@ public class MainWindow extends JFrame {
     }
 
     public void setupAndDrawUI() {
-        // fill `languageComboBox` with the available language(s)
-        File languageFolder = new File("languages" + File.separator);
-        if (!languageFolder.exists()) {
-            // noinspection ResultOfMethodCallIgnored
-            languageFolder.mkdir();
-        }
-        File[] availableLanguages = languageFolder.listFiles();
-        // noinspection ConstantConditions
-        Arrays.sort(availableLanguages);
-        for (File languagePack : availableLanguages) {
-            String language = languagePack.getName().toLowerCase();
-            language = language.replaceFirst
-                    (language.charAt(0) + "", Character.toUpperCase(language.charAt(0)) + "");
-            language = language.substring(0, language.indexOf(".lang"));
-            languageComboBox.addItem(language);
-        }
+        this.refreshLanguageComboBox();
         // I got nothing to say about the next line of code
         FILE_CHOOSER.setDragEnabled(false);
         // setup table properties
@@ -352,6 +345,28 @@ public class MainWindow extends JFrame {
         });
 
         setVisible(true);
+    }
+
+    private void refreshLanguageComboBox() {
+        languageComboBox.removeAllItems();
+        // fill `languageComboBox` with the available language(s)
+        File languageFolder = new File("languages" + File.separator);
+        if (!languageFolder.exists()) {
+            // noinspection ResultOfMethodCallIgnored
+            languageFolder.mkdir();
+        }
+        File[] availableLanguages = languageFolder.listFiles();
+        // noinspection ConstantConditions
+        Arrays.sort(availableLanguages);
+        for (File languagePack : availableLanguages) {
+            String language = languagePack.getName().toLowerCase();
+            if (language.matches("^[a-zA-Z_]+( )?[a-zA-Z_0-9]+\\.lang$")) {
+                language = language.replaceFirst
+                        (language.charAt(0) + "", Character.toUpperCase(language.charAt(0)) + "");
+                language = language.substring(0, language.indexOf(".lang"));
+                languageComboBox.addItem(language);
+            }
+        }
     }
 
     private boolean languagePackIsValid(Properties languagePack) {
