@@ -36,9 +36,8 @@ public class AboutDialog extends JDialog {
             }
         });
 
-        final Dimension MIN_SIZE = new Dimension(350, 300);
-        setMinimumSize(MIN_SIZE);
-        setPreferredSize(MIN_SIZE);
+        setMinimumSize(new Dimension(350, 300));
+        pack();
         setLocationRelativeTo(parentFrame);
     }
 

@@ -8,7 +8,7 @@ public class Extractor {
     private final ContentReader CONTENT_READER;
     private final ContentParser CONTENT_PARSER;
 
-    public Extractor(String filterForMinute) {
+    public Extractor(String filterForMinute) throws IOException {
         this.CONTENT_READER = new ContentReader();
         this.CONTENT_PARSER = new ContentParser(filterForMinute);
     }

@@ -92,9 +92,8 @@ public class HowToDialog extends JDialog {
             }
         });
 
-        final Dimension minimumSize = new Dimension(570, 500);
-        setMinimumSize(minimumSize);
-        setPreferredSize(minimumSize);
+        setMinimumSize(new Dimension(570, 500));
+        pack();
         setLocationRelativeTo(parentFrame);
     }
 

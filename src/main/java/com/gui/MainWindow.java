@@ -11,7 +11,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -69,7 +68,6 @@ public class MainWindow extends JFrame {
     private JPanel mainPanel;
     private JTable publicationTable;
     private JScrollPane scrollPane;
-    private JLabel statusLabel;
     private JComboBox<String> languageComboBox;
     private JPanel controlsPanel;
     private JProgressBar progressBar;
@@ -96,25 +94,28 @@ public class MainWindow extends JFrame {
             UI_TEXTS.load(getClass().getResourceAsStream("/UITexts.properties"));
             PROGRAM_META.load(getClass().getResourceAsStream("/wrexMeta.properties"));
         } catch (IOException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    THIS_FRAME,
+                    "An unknown problem has occurred.",
+                    "Problem",
+                    JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
         }
 
         setContentPane(mainPanel);
         setIconImage(new ImageIcon(getClass().getResource("/icons/frameIcon.png")).getImage());
         insertMenuBarAndItems();
-        // other initial setups
+        // Other initial setups
         generateButton.setEnabled(false);
         progressBar.setMaximum(100);
         progressBar.setStringPainted(true);
         progressBar.setVisible(false);
 
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
             UIManager.put("FileChooser.readOnly", Boolean.TRUE);
         } catch (ClassNotFoundException | InstantiationException |
-                IllegalAccessException | UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
-        }
+                IllegalAccessException | UnsupportedLookAndFeelException ignore) { }
 
         FILE_CHOOSER = new JFileChooser();
 
@@ -129,13 +130,10 @@ public class MainWindow extends JFrame {
             System.out.println(e.getMessage());
         }
 
-        setTitle(
-                PROGRAM_META.getProperty("program.name") + " (" + PROGRAM_META.getProperty("program.version") + ")"
-        );
+        setTitle(PROGRAM_META.getProperty("program.name") + " (" + PROGRAM_META.getProperty("program.version") + ")");
 
-        final Dimension MIN_SIZE = new Dimension(450, 350);
-        setMinimumSize(MIN_SIZE);
-        setPreferredSize(MIN_SIZE);
+        setMinimumSize(new Dimension(450, 350));
+        pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
     }
@@ -210,7 +208,7 @@ public class MainWindow extends JFrame {
     }
 
     public void setupAndDrawUI() {
-        this.refreshLanguageComboBox();
+        refreshLanguageComboBox();
         // I got nothing to say about the next line of code
         FILE_CHOOSER.setDragEnabled(false);
         // setup table properties
@@ -226,8 +224,6 @@ public class MainWindow extends JFrame {
 
         scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
-        statusLabel.setText("");
-
         FileNameExtensionFilter filter = new FileNameExtensionFilter
                 (UI_TEXTS.getProperty("jfilechooser.publication.filter.description"), "epub");
 
@@ -238,18 +234,16 @@ public class MainWindow extends JFrame {
                 FILE_CHOOSER.setMultiSelectionEnabled(true);
                 FILE_CHOOSER.setCurrentDirectory(new File(System.getProperty("user.home")));
                 FILE_CHOOSER.setFileFilter(filter);
-                FILE_CHOOSER.showOpenDialog(THIS_FRAME);
-                final File[] SELECTED_FILES_TEST = FILE_CHOOSER.getSelectedFiles();
 
-                if (SELECTED_FILES_TEST.length != 0) {
-                    EPUBFiles = SELECTED_FILES_TEST;
+                if (FILE_CHOOSER.showOpenDialog(THIS_FRAME) == JFileChooser.APPROVE_OPTION) {
+                    EPUBFiles = FILE_CHOOSER.getSelectedFiles();
                     tableModel.setRowCount(0);
                     generateButton.setEnabled(true);
 
                     for (File EPUBFile : EPUBFiles) {
                         // Strip the extension from the file's name
                         String nameToDisplayInTable = EPUBFile.getName()
-                                .replaceAll("\\..*", "");
+                                .replaceAll("\\.[^.]+$", "");
                         // The following check helps avoid a `StringIndexOutOfBoundsException` on the line
                         // where a '/' is inserted between the publication's year and month. If, for example,
                         // the selected EPUB file was not an MWB and just had one character in its name, the
@@ -348,16 +342,38 @@ public class MainWindow extends JFrame {
     }
 
     private void refreshLanguageComboBox() {
-        languageComboBox.removeAllItems();
-        // fill `languageComboBox` with the available language(s)
         File languageFolder = new File("languages" + File.separator);
         if (!languageFolder.exists()) {
             // noinspection ResultOfMethodCallIgnored
             languageFolder.mkdir();
         }
+
         File[] availableLanguages = languageFolder.listFiles();
-        // noinspection ConstantConditions
+
+        if (availableLanguages == null || availableLanguages.length == 0) {
+            JOptionPane.showMessageDialog(
+                    THIS_FRAME,
+                    UI_TEXTS.getProperty("no.language.files.found.message"),
+                    "",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        languageComboBox.removeAllItems();
+
+        for (File languagePack : availableLanguages) {
+            String nameInSmallCase = languagePack.getName().toLowerCase();
+            if (!languagePack.getName().equals(nameInSmallCase)) {
+                // noinspection ResultOfMethodCallIgnored
+                languagePack.renameTo(
+                        new File(languagePack.getParent() + File.separator + nameInSmallCase));
+            }
+        }
+
+        availableLanguages = languageFolder.listFiles();
+        // The following line sorts the languages alphabetically
         Arrays.sort(availableLanguages);
+
         for (File languagePack : availableLanguages) {
             String language = languagePack.getName().toLowerCase();
             if (language.matches("^[a-zA-Z_]+( )?[a-zA-Z_0-9]+\\.lang$")) {
@@ -373,7 +389,14 @@ public class MainWindow extends JFrame {
         Properties langPackTemplate = new Properties();
         try {
             langPackTemplate.load(getClass().getResourceAsStream("/langPackTemplate.properties"));
-        } catch (IOException e) { }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
+                    UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                    JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
 
         if (languagePack.keySet().size() != langPackTemplate.keySet().size()) {
             return false;
@@ -397,13 +420,22 @@ public class MainWindow extends JFrame {
         // the value for `GENERATION_STATUS` is set in the `catch` blocks of the corresponding error(s)
         private GenerationStatus GENERATION_STATUS;
         private final Properties LANGUAGE_PACK;
-        private final Extractor EXTRACTOR;
+        private Extractor EXTRACTOR;
 
         private UIController(File DESTINATION, String SAVE_NAME, Properties LANGUAGE_PACK) {
             this.DESTINATION = DESTINATION;
             this.SAVE_NAME = SAVE_NAME;
             this.LANGUAGE_PACK = LANGUAGE_PACK;
-            EXTRACTOR = new Extractor(LANGUAGE_PACK.getProperty("filter_for_minute"));
+            try {
+                EXTRACTOR = new Extractor(LANGUAGE_PACK.getProperty("filter_for_minute"));
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(
+                        THIS_FRAME,
+                        UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
+                        UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                        JOptionPane.ERROR_MESSAGE);
+                System.exit(0);
+            }
         }
 
         @Override
@@ -412,25 +444,29 @@ public class MainWindow extends JFrame {
             // Each publication has 2 operations associated with it. The first one is reading the
             // necessary entries and the second one is creating an excel sheet for each extract.
             // That is why the length of `EPUBFiles` needs to be multiplied by 2. The 1 added to
-            // `UNIT_PROGRESS` below is for the saving operation.
-            final int UNIT_PROGRESS = 100 / (2 * EPUBFiles.length) + 1;
-            progressBar.setValue(0);
+            // the product is for the final saving operation.
+            final int UNIT_PROGRESS = 100 / (2 * EPUBFiles.length + 1);
             progressBar.setVisible(true);
+            progressBar.setValue(0);
 
             final ArrayList<PubExtract> ALL_PUB_EXTRACTS = new ArrayList<>();
+            StringBuilder unparsedFileNames = new StringBuilder();
 
             for (File epubFile : EPUBFiles) {
-                statusLabel.setText(
+                progressBar.setString(
                         UI_TEXTS.getProperty("reading.meeting.files.from") + " '" + epubFile.getName() + "'");
                 try {
                     ALL_PUB_EXTRACTS.add(EXTRACTOR.getPublicationExtracts(epubFile));
                 } catch (IllegalStateException e1) {
-                    JOptionPane.showMessageDialog(
-                            THIS_FRAME,
-                            String.format(
-                                    UI_TEXTS.getProperty("could.not.parse.content.message"),
-                                    String.format("<ul><li>%s</li></ul>", epubFile.getName())),
-                            UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
+                    String fileName = epubFile.getName();
+                    // 60 was chosen because the longest line in did.not.find.meeting.content.message
+                    // is 65 characters. This would make the displayed name of a faulty file compact.
+                    // If the file's name is any longer it would make the dialog displaying the message
+                    // ugly and unorganized.
+                    if (fileName.length() > 60) {
+                        fileName = fileName.substring(0, 55) + "...";
+                    }
+                    unparsedFileNames.append("<li>").append(fileName).append("</li>");
                 } catch (ZipException e2) {
                     GENERATION_STATUS = ZIP_FORMAT_ERROR;
                     return null;
@@ -442,6 +478,16 @@ public class MainWindow extends JFrame {
                 progressBar.setValue(progressBar.getValue() + UNIT_PROGRESS);
             }
 
+            if (!unparsedFileNames.toString().equals("")) {
+                JOptionPane.showMessageDialog(
+                        THIS_FRAME,
+                        String.format(
+                                UI_TEXTS.getProperty("did.not.find.meeting.content.message"),
+                                unparsedFileNames.toString()),
+                        UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
 //            if (settings.askToAssignPresenters()) {
 //                new AssignmentDialog(THIS_FRAME, LANGUAGE_PACK, ALL_PUB_EXTRACTS).setVisible(true);
 //                // TODO: The presenters assigned on the dialog must be returned in some way (a Map for example)
@@ -449,18 +495,17 @@ public class MainWindow extends JFrame {
 
             ExcelFileGenerator excelFileGenerator = new ExcelFileGenerator(LANGUAGE_PACK, DESTINATION);
             for (PubExtract pubExtract : ALL_PUB_EXTRACTS) {
-                statusLabel.setText(
+                progressBar.setString(
                         UI_TEXTS.getProperty("adding.an.Excel.sheet.for") + " '" + pubExtract.getPublicationName() + "'");
                 excelFileGenerator.addPopulatedSheet
                         (pubExtract.getMeetings(), pubExtract.getPublicationName());
                 progressBar.setValue(progressBar.getValue() + UNIT_PROGRESS);
             }
 
+            progressBar.setString(UI_TEXTS.getProperty("saving.Excel.file"));
+
             try {
-                statusLabel.setText(UI_TEXTS.getProperty("saving.Excel.file"));
                 excelFileGenerator.saveExcelDocument(SAVE_NAME);
-                progressBar.setValue(progressBar.getValue() + UNIT_PROGRESS);
-                statusLabel.setText(UI_TEXTS.getProperty("status.label.generation.finished.text"));
                 // If the above operation does not throw any Exceptions, then it can be confidently
                 // concluded that the generation process went smoothly without any problems. Hence
                 // the assignment of `SUCCESS` to `GENERATION_STATUS`.
@@ -469,6 +514,13 @@ public class MainWindow extends JFrame {
                 GENERATION_STATUS = COULD_NOT_SAVE_FILE_ERROR;
                 return null;
             }
+
+            // `UNIT_PROGRESS` may be smaller than the required value to set the progress bar at
+            // its maximum due to its type (`int` divisions are not exact). That would leave the
+            // progress bar at an incomplete position while all operations are actually complete.
+            // Therefore, after the last operation is complete, the progress bar will be set to its maximum.
+            progressBar.setValue(progressBar.getMaximum());
+            progressBar.setString(UI_TEXTS.getProperty("status.label.generation.finished.text"));
 
             return null;
         }
@@ -500,7 +552,6 @@ public class MainWindow extends JFrame {
                             UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
             }
 
-            statusLabel.setText("");
             progressBar.setVisible(false);
         }
 
@@ -526,7 +577,7 @@ public class MainWindow extends JFrame {
      */
     private void $$$setupUI$$$() {
         mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
+        mainPanel.setLayout(new GridLayoutManager(2, 1, new Insets(10, 5, 10, 5), -1, -1));
         scrollPane = new JScrollPane();
         scrollPane.setBackground(new Color(-1));
         mainPanel.add(scrollPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
@@ -542,7 +593,7 @@ public class MainWindow extends JFrame {
         publicationTable.setToolTipText("");
         scrollPane.setViewportView(publicationTable);
         controlsPanel = new JPanel();
-        controlsPanel.setLayout(new GridLayoutManager(3, 5, new Insets(0, 0, 0, 0), -1, -1));
+        controlsPanel.setLayout(new GridLayoutManager(2, 5, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.add(controlsPanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         openButton = new JButton();
         openButton.setIcon(new ImageIcon(getClass().getResource("/icons/openFile.png")));
@@ -552,22 +603,14 @@ public class MainWindow extends JFrame {
         generateButton.setIcon(new ImageIcon(getClass().getResource("/icons/generateExcel.png")));
         this.$$$loadButtonText$$$(generateButton, ResourceBundle.getBundle("UITexts").getString("generate.button.text"));
         controlsPanel.add(generateButton, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        statusLabel = new JLabel();
-        statusLabel.setEnabled(true);
-        Font statusLabelFont = this.$$$getFont$$$(null, -1, 11, statusLabel.getFont());
-        if (statusLabelFont != null) statusLabel.setFont(statusLabelFont);
-        statusLabel.setHorizontalAlignment(2);
-        statusLabel.setHorizontalTextPosition(0);
-        statusLabel.setText("Label");
-        controlsPanel.add(statusLabel, new GridConstraints(1, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         languageComboBox = new JComboBox();
-        controlsPanel.add(languageComboBox, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        controlsPanel.add(languageComboBox, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(120, -1), null, null, 0, false));
         final Spacer spacer1 = new Spacer();
         controlsPanel.add(spacer1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         final Spacer spacer2 = new Spacer();
         controlsPanel.add(spacer2, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         progressBar = new JProgressBar();
-        controlsPanel.add(progressBar, new GridConstraints(2, 0, 1, 5, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        controlsPanel.add(progressBar, new GridConstraints(1, 0, 1, 5, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

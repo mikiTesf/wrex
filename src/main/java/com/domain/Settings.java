@@ -45,9 +45,7 @@ public class Settings {
             if (settingsDao.queryForId(1) == null) {
                 settingsDao.create(getDefaultSettings());
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException ignore) { }
     }
 
     public Settings() {}

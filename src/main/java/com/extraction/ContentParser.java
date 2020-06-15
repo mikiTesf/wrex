@@ -26,11 +26,9 @@ class ContentParser {
     private final String FILTER_FOR_MINUTE;
     private final Properties ELEMENT_SELECTORS = new Properties();
 
-    ContentParser(String filterForMinute) {
+    ContentParser(String filterForMinute) throws IOException {
         this.FILTER_FOR_MINUTE = filterForMinute;
-        try {
-            this.ELEMENT_SELECTORS.load(getClass().getResourceAsStream("/elementSelectors.properties"));
-        } catch (IOException e) { e.printStackTrace(); }
+        this.ELEMENT_SELECTORS.load(getClass().getResourceAsStream("/elementSelectors.properties"));
     }
 
     private void parseXHTML() {

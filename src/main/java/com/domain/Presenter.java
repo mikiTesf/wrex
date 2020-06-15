@@ -30,9 +30,7 @@ public class Presenter {
     static {
         try {
             presenterDao = DaoManager.createDao(DBConnection.connectionSource, Presenter.class);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException ignore) { }
     }
 
     public Presenter() {}

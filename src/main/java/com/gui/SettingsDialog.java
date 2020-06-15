@@ -13,6 +13,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
@@ -28,7 +29,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 public class SettingsDialog extends JDialog {
@@ -53,6 +56,8 @@ public class SettingsDialog extends JDialog {
     private JLabel addHallDivisionRowLabel;
     private JCheckBox addHallDivisionRowCheckbox;
 
+    private final Properties UI_TEXTS = new Properties();
+
     SettingsDialog(JFrame parentFrame) {
         setContentPane(contentPane);
         setModal(true);
@@ -65,6 +70,16 @@ public class SettingsDialog extends JDialog {
         this.labelsFontSizeSpinner.setModel(new SpinnerNumberModel(1, 1, 100, 1));
         this.rowHeightSpinner.setModel(
                 new SpinnerNumberModel(1, 1, 999999, 1));
+
+        try {
+            UI_TEXTS.load(getClass().getResourceAsStream("/UITexts.properties"));
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "An unknown problem has occurred.",
+                    "Problem",
+                    JOptionPane.ERROR_MESSAGE);
+        }
 
         final MouseAdapter mouseAdapter = new MouseAdapter() {
             public void mouseEntered(MouseEvent me) {
@@ -116,9 +131,8 @@ public class SettingsDialog extends JDialog {
 
         this.setFieldsToSettingsDetails(Settings.getLastSavedSettings());
 
-        final Dimension minimumSize = new Dimension(300, 350);
-        setMinimumSize(minimumSize);
-        setPreferredSize(minimumSize);
+        setMinimumSize(new Dimension(300, 350));
+        pack();
         setLocationRelativeTo(parentFrame);
     }
 
@@ -137,7 +151,11 @@ public class SettingsDialog extends JDialog {
         try {
             Settings.settingsDao.update(settings);
         } catch (SQLException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    this,
+                    UI_TEXTS.getProperty("could.not.save.settings.message"),
+                    UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                    JOptionPane.ERROR_MESSAGE);
         }
 
         dispose();
@@ -177,7 +195,7 @@ public class SettingsDialog extends JDialog {
      */
     private void $$$setupUI$$$() {
         contentPane = new JPanel();
-        contentPane.setLayout(new GridLayoutManager(3, 1, new Insets(10, 10, 10, 10), -1, -1));
+        contentPane.setLayout(new GridLayoutManager(3, 1, new Insets(10, 5, 10, 5), -1, -1));
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
         contentPane.add(panel1, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, 1, null, null, null, 0, false));

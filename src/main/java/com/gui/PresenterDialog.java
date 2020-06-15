@@ -65,7 +65,12 @@ public class PresenterDialog extends JDialog {
         try {
             UI_TEXTS.load(getClass().getResourceAsStream("/UITexts.properties"));
         } catch (IOException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "An unknown problem has occurred.",
+                    "Problem",
+                    JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
         }
 
         setContentPane(mainPanel);
@@ -116,9 +121,8 @@ public class PresenterDialog extends JDialog {
 
         this.updateNamesButton.setVisible(false);
 
-        final Dimension minimumSize = new Dimension(450, 500);
-        setMinimumSize(minimumSize);
-        setPreferredSize(minimumSize);
+        setMinimumSize(new Dimension(450, 500));
+        pack();
         setLocationRelativeTo(parentFrame);
 
         refreshPresentersTable();
@@ -186,11 +190,7 @@ public class PresenterDialog extends JDialog {
             return;
         }
 
-        this.presentersTable.setEnabled(false);
-        this.updateNamesButton.setVisible(true);
-        this.addPresenterButton.setEnabled(false);
-        this.deletePresenterButton.setEnabled(false);
-        this.editPresenterButton.setEnabled(false);
+        toggleButtons();
 
         try {
             Presenter presenter = Presenter.presenterDao.queryForId(rowToIdMap.get(selectedRow));
@@ -199,7 +199,11 @@ public class PresenterDialog extends JDialog {
             this.lastNameTextField.setText(presenter.getLastName());
             this.privilegeComboBox.setSelectedItem(presenter.getPrivilege());
         } catch (SQLException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    this,
+                    UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
+                    UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -213,8 +217,8 @@ public class PresenterDialog extends JDialog {
 
         int choice = JOptionPane.showConfirmDialog(
                 this,
-                UI_TEXTS.getProperty("are.you.sure") + " \""
-                        + presentersTable.getValueAt(selectedRow, 0) + "\"?",
+                String.format(UI_TEXTS.getProperty("are.you.sure"),
+                        presentersTable.getValueAt(selectedRow, 0)),
                 "",
                 JOptionPane.YES_NO_OPTION);
 
@@ -224,7 +228,13 @@ public class PresenterDialog extends JDialog {
 
         try {
             Presenter.presenterDao.deleteById(rowToIdMap.get(selectedRow));
-        } catch (SQLException ignore) {
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
+                    UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                    JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
         presentersTableModel.removeRow(selectedRow);
@@ -232,12 +242,7 @@ public class PresenterDialog extends JDialog {
 
     // on `updateNamesButton` clicked
     private void onUpdate() {
-        this.presentersTable.setEnabled(true);
-        this.updateNamesButton.setVisible(false);
-        this.addPresenterButton.setEnabled(true);
-        this.deletePresenterButton.setEnabled(true);
-        this.editPresenterButton.setEnabled(true);
-
+        toggleButtons();
         onAdd(true);
     }
 
@@ -250,13 +255,21 @@ public class PresenterDialog extends JDialog {
         String specialCharactersPattern = "[/\\\\+\\-=\\[\\]#$%!^&*()_?@\"{};':|,.<> 0-9]*";
 
         boolean namesDoNotContainSpecialCharacters =
-            (insertedFirstName.length() == insertedFirstName.replaceAll(specialCharactersPattern, "").length()) &&
-            (insertedMiddleName.length() == insertedMiddleName.replaceAll(specialCharactersPattern, "").length()) &&
-            (insertedLastName.length() == insertedLastName.replaceAll(specialCharactersPattern, "").length());
+             (insertedFirstName.length() == insertedFirstName.replaceAll(specialCharactersPattern, "").length()) &&
+             (insertedMiddleName.length() == insertedMiddleName.replaceAll(specialCharactersPattern, "").length()) &&
+             (insertedLastName.length() == insertedLastName.replaceAll(specialCharactersPattern, "").length());
 
         if (!namesDoNotContainSpecialCharacters) return SPECIAL_CHARACTERS_IN_NAME;
 
         return GOOD_INPUT;
+    }
+
+    private void toggleButtons() {
+        this.presentersTable.setEnabled(!this.presentersTable.isEnabled());
+        this.updateNamesButton.setVisible(!this.updateNamesButton.isVisible());
+        this.addPresenterButton.setEnabled(!this.addPresenterButton.isEnabled());
+        this.deletePresenterButton.setEnabled(!this.deletePresenterButton.isEnabled());
+        this.editPresenterButton.setEnabled(!this.editPresenterButton.isEnabled());
     }
 
     private void clearInputFields() {
@@ -302,7 +315,7 @@ public class PresenterDialog extends JDialog {
      */
     private void $$$setupUI$$$() {
         mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
+        mainPanel.setLayout(new GridLayoutManager(2, 1, new Insets(10, 5, 10, 5), -1, -1));
         mainPanel.setEnabled(true);
         namesPanel = new JPanel();
         namesPanel.setLayout(new GridLayoutManager(4, 2, new Insets(0, 0, 0, 0), -1, -1));
