@@ -1,5 +1,8 @@
 package com.extraction;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -12,10 +15,10 @@ import java.util.zip.ZipFile;
 
 class ContentReader {
 
-    ArrayList<String> getContentsOfRelevantEntriesAsStrings(File epubPublication)
+    ArrayList<Document> getMeetingFileDOMs(File epubPublication)
             throws IOException
     {
-        final ArrayList<String> MEETINGS_CONTENTS = new ArrayList<>();
+        final ArrayList<String> MEETINGS_CONTENT = new ArrayList<>();
 
             ZipFile epubArchive = new ZipFile(epubPublication);
 
@@ -31,10 +34,10 @@ class ContentReader {
                     !entryContent.contains("ministry")  ||
                     !entryContent.contains("christianLiving")) continue;
 
-                MEETINGS_CONTENTS.add(entryContent);
+                MEETINGS_CONTENT.add(entryContent);
             }
 
-        return MEETINGS_CONTENTS;
+        return parseXHTML(MEETINGS_CONTENT);
     }
 
     private boolean unnecessaryFile(String fileName) {
@@ -63,5 +66,15 @@ class ContentReader {
         }
 
         return buffer.toByteArray();
+    }
+
+    private ArrayList<Document> parseXHTML(ArrayList<String> meetingsContent) {
+        ArrayList<Document> meetingDOMs = new ArrayList<>();
+
+        for (Object meetingContent : meetingsContent) {
+            meetingDOMs.add(Jsoup.parse(meetingContent.toString()));
+        }
+
+        return meetingDOMs;
     }
 }

@@ -17,7 +17,7 @@ public class Extractor {
         throws IOException, IllegalStateException
     {
         PubExtract pubExtract = new PubExtract();
-        CONTENT_PARSER.setMeetingContents(CONTENT_READER.getContentsOfRelevantEntriesAsStrings(pubFile));
+        CONTENT_PARSER.setMeetingContents(CONTENT_READER.getMeetingFileDOMs(pubFile));
         pubExtract.setPublicationName(
                 pubFile.getName().replaceAll("\\.[eE][pP][uU][bB]", ""));
         pubExtract.setMeetings(CONTENT_PARSER.getMeetings());
