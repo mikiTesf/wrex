@@ -107,6 +107,7 @@ public class MainWindow extends JFrame {
         insertMenuBarAndItems();
         // Other initial setups
         generateButton.setEnabled(false);
+        progressBar.setMinimum(0);
         progressBar.setMaximum(100);
         progressBar.setStringPainted(true);
         progressBar.setVisible(false);
@@ -221,6 +222,7 @@ public class MainWindow extends JFrame {
         };
         tableModel.addColumn(UI_TEXTS.getProperty("publications.column.header"));
         publicationTable.setModel(tableModel);
+        publicationTable.setToolTipText(null);
 
         scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
@@ -445,9 +447,9 @@ public class MainWindow extends JFrame {
             // necessary entries and the second one is creating an excel sheet for each extract.
             // That is why the length of `EPUBFiles` needs to be multiplied by 2. The 1 added to
             // the product is for the final saving operation.
-            final int UNIT_PROGRESS = 100 / (2 * EPUBFiles.length + 1);
+            final int UNIT_PROGRESS = progressBar.getMaximum() / (2 * EPUBFiles.length + 1);
             progressBar.setVisible(true);
-            progressBar.setValue(0);
+            progressBar.setValue(progressBar.getMinimum());
 
             final ArrayList<PubExtract> ALL_PUB_EXTRACTS = new ArrayList<>();
             StringBuilder unparsedFileNames = new StringBuilder();

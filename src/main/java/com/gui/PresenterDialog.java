@@ -51,6 +51,7 @@ public class PresenterDialog extends JDialog {
     private JPanel namesPanel;
     private JComboBox<Privilege> privilegeComboBox;
     private JLabel privilegeLabel;
+    private JButton cancelButton;
 
     private final Properties UI_TEXTS = new Properties();
     private final HashMap<Integer, Integer> rowToIdMap = new HashMap<>();
@@ -119,7 +120,15 @@ public class PresenterDialog extends JDialog {
             }
         });
 
+        this.cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
+
         this.updateNamesButton.setVisible(false);
+        this.cancelButton.setVisible(false);
 
         setMinimumSize(new Dimension(450, 500));
         pack();
@@ -246,6 +255,11 @@ public class PresenterDialog extends JDialog {
         onAdd(true);
     }
 
+    private void onCancel() {
+        clearInputFields();
+        toggleButtons();
+    }
+
     private NewNamesErrors inputIsValid(String insertedFirstName, String insertedMiddleName, String insertedLastName) {
         // Middle names can be empty. Only First and last names are mandatory.
         if (insertedFirstName.equals("") || insertedLastName.equals("")) {
@@ -255,9 +269,9 @@ public class PresenterDialog extends JDialog {
         String specialCharactersPattern = "[/\\\\+\\-=\\[\\]#$%!^&*()_?@\"{};':|,.<> 0-9]*";
 
         boolean namesDoNotContainSpecialCharacters =
-             (insertedFirstName.length() == insertedFirstName.replaceAll(specialCharactersPattern, "").length()) &&
-             (insertedMiddleName.length() == insertedMiddleName.replaceAll(specialCharactersPattern, "").length()) &&
-             (insertedLastName.length() == insertedLastName.replaceAll(specialCharactersPattern, "").length());
+                (insertedFirstName.length() == insertedFirstName.replaceAll(specialCharactersPattern, "").length()) &&
+                        (insertedMiddleName.length() == insertedMiddleName.replaceAll(specialCharactersPattern, "").length()) &&
+                        (insertedLastName.length() == insertedLastName.replaceAll(specialCharactersPattern, "").length());
 
         if (!namesDoNotContainSpecialCharacters) return SPECIAL_CHARACTERS_IN_NAME;
 
@@ -267,7 +281,8 @@ public class PresenterDialog extends JDialog {
     private void toggleButtons() {
         this.presentersTable.setEnabled(!this.presentersTable.isEnabled());
         this.updateNamesButton.setVisible(!this.updateNamesButton.isVisible());
-        this.addPresenterButton.setEnabled(!this.addPresenterButton.isEnabled());
+        this.cancelButton.setVisible(!this.cancelButton.isVisible());
+        this.addPresenterButton.setVisible(!this.addPresenterButton.isVisible());
         this.deletePresenterButton.setEnabled(!this.deletePresenterButton.isEnabled());
         this.editPresenterButton.setEnabled(!this.editPresenterButton.isEnabled());
     }
@@ -285,7 +300,10 @@ public class PresenterDialog extends JDialog {
         try {
             for (Presenter presenter : Presenter.presenterDao.queryForAll()) {
                 this.presentersTableModel.addRow(new Object[]{
-                        presenter.getFirstName() + " " + presenter.getMiddleName() + " " + presenter.getLastName(),
+                        (presenter.getFirstName() + " " + presenter.getMiddleName() + " " + presenter.getLastName())
+                                // The replacement is neccessary because this helps remove the extra space that slips into
+                                // the displayed name (between first and last names) when a Publisher's middle name is empty.
+                                .replaceAll("( ){2}", " "),
                         presenter.getPrivilege()
                 });
                 rowToIdMap.put(presentersTableModel.getRowCount() - 1, presenter.getId());
@@ -364,16 +382,19 @@ public class PresenterDialog extends JDialog {
         final Spacer spacer1 = new Spacer();
         panel2.add(spacer1, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         final JPanel panel3 = new JPanel();
-        panel3.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
+        panel3.setLayout(new GridLayoutManager(1, 4, new Insets(0, 0, 0, 0), -1, -1));
         panel1.add(panel3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         addPresenterButton = new JButton();
         this.$$$loadButtonText$$$(addPresenterButton, ResourceBundle.getBundle("UITexts").getString("add.presenter.button.text"));
-        panel3.add(addPresenterButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel3.add(addPresenterButton, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer2 = new Spacer();
         panel3.add(spacer2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         updateNamesButton = new JButton();
         this.$$$loadButtonText$$$(updateNamesButton, ResourceBundle.getBundle("UITexts").getString("update.names.button.text"));
         panel3.add(updateNamesButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        cancelButton = new JButton();
+        this.$$$loadButtonText$$$(cancelButton, ResourceBundle.getBundle("UITexts").getString("cancel.update.button.text"));
+        panel3.add(cancelButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
