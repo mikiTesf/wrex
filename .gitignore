@@ -12,3 +12,4 @@ build/
 sample_mwb/
 sample_results/
 *.xlsx
+wrex.wdb

@@ -1,9 +1,15 @@
-import com.gui.GUI;
+import com.domain.DBConnection;
+import com.gui.CommonUIResources;
+import com.gui.MainWindow;
 
 class App {
 
     public static void main(String[] args) {
-        GUI gui = new GUI();
-        gui.setupAndDrawUI();
+
+        DBConnection.initializeDBTables();
+        new CommonUIResources().initializeUIResources();
+
+        MainWindow mainWindow = new MainWindow();
+        mainWindow.setupAndDrawUI();
     }
 }

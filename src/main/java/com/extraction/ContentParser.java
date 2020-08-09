@@ -1,44 +1,33 @@
 package com.extraction;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Properties;
-
-import com.meeting.MeetingSection;
 import com.meeting.Meeting;
-
+import com.meeting.MeetingSection;
+import com.meeting.Part;
 import com.meeting.SectionKind;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import static com.meeting.SectionKind.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Properties;
 
-public class ContentParser {
+import static com.meeting.SectionKind.IMPROVE_IN_MINISTRY;
+import static com.meeting.SectionKind.LIVING_AS_CHRISTIANS;
+import static com.meeting.SectionKind.TREASURES;
+
+class ContentParser {
     private ArrayList<Document> meetingExtracts;
     private Element sectionElement;
-    private ArrayList<String> meetingContents;
     private final String FILTER_FOR_MINUTE;
     private final Properties ELEMENT_SELECTORS = new Properties();
 
-    public ContentParser(String filterForMinute) {
+    ContentParser(String filterForMinute) throws IOException {
         this.FILTER_FOR_MINUTE = filterForMinute;
-        try {
-            this.ELEMENT_SELECTORS.load(getClass().getResourceAsStream("/elementSelectors.properties"));
-        } catch (IOException e) { e.printStackTrace(); }
+        this.ELEMENT_SELECTORS.load(getClass().getResourceAsStream("/elementSelectors.properties"));
     }
 
-    private void parseXHTML() {
-        meetingExtracts = new ArrayList<>();
-        Object[] meetingContents = this.meetingContents.toArray();
-
-        for (Object meetingContent : meetingContents) {
-            meetingExtracts.add(Jsoup.parse(meetingContent.toString()));
-        }
-    }
-
-    public ArrayList<Meeting> getMeetings() {
+    ArrayList<Meeting> getMeetings() {
         ArrayList<Meeting> meetings = new ArrayList<>();
 
         for (Document meetingDocument : meetingExtracts) {
@@ -97,7 +86,7 @@ public class ContentParser {
         sectionElement.selectFirst(ELEMENT_SELECTORS.getProperty("presentations.group.selector.element"));
         presentations.addAll(sectionElement.getElementsByTag(ELEMENT_SELECTORS.getProperty("presentation.selector.element")));
 
-        if (meetingSection.getSECTION_KIND() == LIVING_AS_CHRISTIANS) {
+        if (sectionKind == LIVING_AS_CHRISTIANS) {
             presentations.remove(0); // transition song element
             presentations.remove(presentations.size() - 1); // concluding song and prayer element
             presentations.remove(presentations.size() - 1); // next week preview element
@@ -110,14 +99,20 @@ public class ContentParser {
             if (!topic.contains(FILTER_FOR_MINUTE)) continue;
 
             topic = topic.substring(0, topic.indexOf(FILTER_FOR_MINUTE)) + FILTER_FOR_MINUTE + ")";
-            meetingSection.addPart(topic);
+            meetingSection.addPart(new Part(topic, ""));
         }
 
         return meetingSection;
     }
 
-    public void setMeetingContents(ArrayList<String> meetingContents) {
-        this.meetingContents = meetingContents;
-        this.parseXHTML();
+    // The `IllegalStateException` being thrown indicates that the content reader returned an empty array
+    // of meeting contents. This happens when the Classes or IDs in the DOM of the meeting files identifying
+    // the different components of meetings in a given publication have changed.
+    void setMeetingContents(ArrayList<Document> meetingDOMs) throws IllegalStateException {
+        if (meetingDOMs.size() == 0) {
+            throw new IllegalStateException();
+        }
+
+        this.meetingExtracts = meetingDOMs;
     }
 }

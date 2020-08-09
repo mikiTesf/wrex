@@ -9,6 +9,9 @@ dependencies {
     compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.0.1'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
     compile group: 'com.intellij', name: 'forms_rt', version: '7.0.3'
+    compile 'org.xerial:sqlite-jdbc:3.8.7'
+    compile 'com.j256.ormlite:ormlite-jdbc:5.1'
+    compile 'com.j256.ormlite:ormlite-core:5.1'
 }
 
 sourceCompatibility = 1.8
@@ -20,11 +23,11 @@ jar {
     manifest {
         attributes "Main-Class" : "App"
     }
-    
+
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
-    
+
     baseName = 'wrex'
-    version  = '0.3'
+    version  = '0.4'
 }
