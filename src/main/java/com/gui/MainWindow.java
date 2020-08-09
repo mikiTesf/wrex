@@ -52,10 +52,11 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.zip.ZipException;
 
-import static com.gui.MainWindow.GenerationStatus.COULD_NOT_READ_FILE_ERROR;
-import static com.gui.MainWindow.GenerationStatus.COULD_NOT_SAVE_FILE_ERROR;
 import static com.gui.MainWindow.GenerationStatus.SUCCESS;
 import static com.gui.MainWindow.GenerationStatus.ZIP_FORMAT_ERROR;
+import static com.gui.MainWindow.GenerationStatus.COULD_NOT_READ_FILE_ERROR;
+import static com.gui.MainWindow.GenerationStatus.COULD_NOT_SAVE_FILE_ERROR;
+import static com.gui.MainWindow.GenerationStatus.NON_MWB_FILE_ERROR;
 
 
 public class MainWindow extends JFrame {
@@ -80,7 +81,8 @@ public class MainWindow extends JFrame {
         SUCCESS,
         ZIP_FORMAT_ERROR,
         COULD_NOT_READ_FILE_ERROR,
-        COULD_NOT_SAVE_FILE_ERROR
+        COULD_NOT_SAVE_FILE_ERROR,
+        NON_MWB_FILE_ERROR
     }
 
     public MainWindow() {
@@ -461,6 +463,10 @@ public class MainWindow extends JFrame {
                         JOptionPane.ERROR_MESSAGE);
             }
 
+            if (ALL_PUB_EXTRACTS.size() == 0) {
+                GENERATION_STATUS = NON_MWB_FILE_ERROR;
+                return null;
+            }
 
             if (settings.askToAssignPresenters()) {
                 new AssignmentDialog(THIS_FRAME, ALL_PUB_EXTRACTS).setVisible(true);
@@ -488,10 +494,10 @@ public class MainWindow extends JFrame {
                 return null;
             }
 
-            // `UNIT_PROGRESS` may be smaller than the required value to set the progress bar at
-            // its maximum due to its type (`int` divisions are not exact). That would leave the
-            // progress bar at an incomplete position while all operations are actually complete.
-            // Therefore, after the last operation is complete, the progress bar will be set to its maximum.
+            // `UNIT_PROGRESS` may be smaller than the required value to set the progress bar at its maximum due
+            // to its type (`int` divisions are not exact). That would leave the progress bar at an incomplete
+            // position while all operations are actually complete. Therefore, after the last operation is complete,
+            // the progress bar will be set to its maximum.
             progressBar.setValue(progressBar.getMaximum());
             progressBar.setString(CommonUIResources.UI_TEXTS.getProperty("status.label.generation.finished.text"));
 
@@ -519,6 +525,10 @@ public class MainWindow extends JFrame {
                     JOptionPane.showMessageDialog
                             (THIS_FRAME, CommonUIResources.UI_TEXTS.getProperty("generation.successful.message"),
                                     CommonUIResources.UI_TEXTS.getProperty("done.message.dialogue.title"), JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                case NON_MWB_FILE_ERROR:
+                    // The error message shown after the program fails to find meeting content in an EPUB file provides
+                    // enough information about the error so it is unnecessary to show the same message here, again.
                     break;
                 default:
                     JOptionPane.showMessageDialog(THIS_FRAME, CommonUIResources.UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),

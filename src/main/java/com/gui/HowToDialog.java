@@ -75,6 +75,7 @@ public class HowToDialog extends JDialog {
                             CommonUIResources.UI_TEXTS.getProperty("could.not.create.template.message"),
                             CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                             JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
 
                 JOptionPane.showMessageDialog(

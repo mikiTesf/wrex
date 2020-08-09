@@ -19,7 +19,7 @@ public class Extractor {
         PubExtract pubExtract = new PubExtract();
         CONTENT_PARSER.setMeetingContents(CONTENT_READER.getMeetingFileDOMs(pubFile));
         pubExtract.setPublicationName(
-                pubFile.getName().replaceAll("\\.[eE][pP][uU][bB]", ""));
+                pubFile.getName().replaceAll("\\.[eE][pP][uU][bB]$", ""));
         pubExtract.setMeetings(CONTENT_PARSER.getMeetings());
 
         return pubExtract;
