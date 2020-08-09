@@ -20,7 +20,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.ToolTipManager;
 import javax.swing.border.TitledBorder;
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,9 +28,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Properties;
 import java.util.ResourceBundle;
 
 public class SettingsDialog extends JDialog {
@@ -56,8 +53,6 @@ public class SettingsDialog extends JDialog {
     private JLabel addHallDivisionRowLabel;
     private JCheckBox addHallDivisionRowCheckbox;
 
-    private final Properties UI_TEXTS = new Properties();
-
     SettingsDialog(JFrame parentFrame) {
         setContentPane(contentPane);
         setModal(true);
@@ -70,16 +65,6 @@ public class SettingsDialog extends JDialog {
         this.labelsFontSizeSpinner.setModel(new SpinnerNumberModel(1, 1, 100, 1));
         this.rowHeightSpinner.setModel(
                 new SpinnerNumberModel(1, 1, 999999, 1));
-
-        try {
-            UI_TEXTS.load(getClass().getResourceAsStream("/UITexts.properties"));
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "An unknown problem has occurred.",
-                    "Problem",
-                    JOptionPane.ERROR_MESSAGE);
-        }
 
         final MouseAdapter mouseAdapter = new MouseAdapter() {
             public void mouseEntered(MouseEvent me) {
@@ -131,8 +116,8 @@ public class SettingsDialog extends JDialog {
 
         this.setFieldsToSettingsDetails(Settings.getLastSavedSettings());
 
-        setMinimumSize(new Dimension(300, 350));
         pack();
+        setResizable(false);
         setLocationRelativeTo(parentFrame);
     }
 
@@ -153,8 +138,8 @@ public class SettingsDialog extends JDialog {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(
                     this,
-                    UI_TEXTS.getProperty("could.not.save.settings.message"),
-                    UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                    CommonUIResources.UI_TEXTS.getProperty("could.not.save.settings.message"),
+                    CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                     JOptionPane.ERROR_MESSAGE);
         }
 
@@ -270,6 +255,7 @@ public class SettingsDialog extends JDialog {
         askToAssignPresentersLabel.setToolTipText("");
         panel4.add(askToAssignPresentersLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         askToAssignPresentersCheckBox = new JCheckBox();
+        askToAssignPresentersCheckBox.setEnabled(false);
         askToAssignPresentersCheckBox.setText("");
         askToAssignPresentersCheckBox.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.ask.to.assign.presenter.field"));
         panel4.add(askToAssignPresentersCheckBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));

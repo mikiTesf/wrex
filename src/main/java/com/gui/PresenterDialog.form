@@ -102,7 +102,7 @@
               <component id="872cc" class="javax.swing.JTable" binding="presentersTable">
                 <constraints/>
                 <properties>
-                  <autoCreateRowSorter value="true"/>
+                  <autoCreateRowSorter value="false"/>
                   <autoResizeMode value="4"/>
                   <fillsViewportHeight value="true"/>
                 </properties>

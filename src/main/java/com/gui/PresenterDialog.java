@@ -6,33 +6,33 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.AbstractButton;
-import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JTable;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.ResourceBundle;
 
-import static com.gui.PresenterDialog.NewNamesErrors.*;
+import static com.gui.PresenterDialog.NewNamesErrors.FIRST_OR_LAST_NAME_EMPTY;
+import static com.gui.PresenterDialog.NewNamesErrors.GOOD_INPUT;
+import static com.gui.PresenterDialog.NewNamesErrors.SPECIAL_CHARACTERS_IN_NAME;
 
 public class PresenterDialog extends JDialog {
     private JTextField firstNameTextField;
@@ -53,7 +53,6 @@ public class PresenterDialog extends JDialog {
     private JLabel privilegeLabel;
     private JButton cancelButton;
 
-    private final Properties UI_TEXTS = new Properties();
     private final HashMap<Integer, Integer> rowToIdMap = new HashMap<>();
 
     enum NewNamesErrors {
@@ -63,17 +62,6 @@ public class PresenterDialog extends JDialog {
     }
 
     PresenterDialog(JFrame parentFrame) {
-        try {
-            UI_TEXTS.load(getClass().getResourceAsStream("/UITexts.properties"));
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "An unknown problem has occurred.",
-                    "Problem",
-                    JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
-        }
-
         setContentPane(mainPanel);
         setModal(true);
 
@@ -85,8 +73,8 @@ public class PresenterDialog extends JDialog {
         };
         presentersTable.setModel(presentersTableModel);
         presentersTable.setRowHeight(25);
-        presentersTableModel.addColumn(UI_TEXTS.getProperty("full.name.column.header"));
-        presentersTableModel.addColumn(UI_TEXTS.getProperty("privilege.column.header"));
+        presentersTableModel.addColumn(CommonUIResources.UI_TEXTS.getProperty("full.name.column.header"));
+        presentersTableModel.addColumn(CommonUIResources.UI_TEXTS.getProperty("privilege.column.header"));
 
         for (Privilege privilege : Privilege.values()) {
             privilegeComboBox.addItem(privilege);
@@ -130,10 +118,8 @@ public class PresenterDialog extends JDialog {
         this.updateNamesButton.setVisible(false);
         this.cancelButton.setVisible(false);
 
-        setMinimumSize(new Dimension(450, 500));
-        pack();
+        setMinimumSize(new Dimension(550, 600));
         setLocationRelativeTo(parentFrame);
-
         refreshPresentersTable();
     }
 
@@ -147,15 +133,15 @@ public class PresenterDialog extends JDialog {
             case FIRST_OR_LAST_NAME_EMPTY:
                 JOptionPane.showMessageDialog(
                         this,
-                        UI_TEXTS.getProperty("first.or.last.name.empty.message"),
-                        UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                        CommonUIResources.UI_TEXTS.getProperty("first.or.last.name.empty.message"),
+                        CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                         JOptionPane.ERROR_MESSAGE);
                 return;
             case SPECIAL_CHARACTERS_IN_NAME:
                 JOptionPane.showMessageDialog(
                         this,
-                        UI_TEXTS.getProperty("name.contains.special.characters.message"),
-                        UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                        CommonUIResources.UI_TEXTS.getProperty("name.contains.special.characters.message"),
+                        CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                         JOptionPane.ERROR_MESSAGE);
                 return;
         }
@@ -176,8 +162,8 @@ public class PresenterDialog extends JDialog {
         } catch (SQLException e1) {
             JOptionPane.showMessageDialog(
                     this,
-                    UI_TEXTS.getProperty("could.not.save.presenter.details.message"),
-                    UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                    CommonUIResources.UI_TEXTS.getProperty("could.not.save.presenter.details.message"),
+                    CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -186,8 +172,8 @@ public class PresenterDialog extends JDialog {
         clearInputFields();
         JOptionPane.showMessageDialog(
                 this,
-                UI_TEXTS.getProperty("new.presenter.details.saved.message"),
-                UI_TEXTS.getProperty("done.message.dialogue.title"),
+                CommonUIResources.UI_TEXTS.getProperty("new.presenter.details.saved.message"),
+                CommonUIResources.UI_TEXTS.getProperty("done.message.dialogue.title"),
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -210,8 +196,8 @@ public class PresenterDialog extends JDialog {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(
                     this,
-                    UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
-                    UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                    CommonUIResources.UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
+                    CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -226,7 +212,7 @@ public class PresenterDialog extends JDialog {
 
         int choice = JOptionPane.showConfirmDialog(
                 this,
-                String.format(UI_TEXTS.getProperty("are.you.sure"),
+                String.format(CommonUIResources.UI_TEXTS.getProperty("are.you.sure"),
                         presentersTable.getValueAt(selectedRow, 0)),
                 "",
                 JOptionPane.YES_NO_OPTION);
@@ -240,8 +226,8 @@ public class PresenterDialog extends JDialog {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(
                     this,
-                    UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
-                    UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                    CommonUIResources.UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
+                    CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -311,8 +297,8 @@ public class PresenterDialog extends JDialog {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(
                     this,
-                    UI_TEXTS.getProperty("could.not.fetch.presenter.details.message"),
-                    UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                    CommonUIResources.UI_TEXTS.getProperty("could.not.fetch.presenter.details.message"),
+                    CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -366,7 +352,7 @@ public class PresenterDialog extends JDialog {
         scrollPane1.setBackground(new Color(-1));
         panel1.add(scrollPane1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         presentersTable = new JTable();
-        presentersTable.setAutoCreateRowSorter(true);
+        presentersTable.setAutoCreateRowSorter(false);
         presentersTable.setAutoResizeMode(4);
         presentersTable.setFillsViewportHeight(true);
         scrollPane1.setViewportView(presentersTable);

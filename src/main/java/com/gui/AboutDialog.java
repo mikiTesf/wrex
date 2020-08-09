@@ -37,7 +37,6 @@ public class AboutDialog extends JDialog {
         });
 
         setMinimumSize(new Dimension(350, 300));
-        pack();
         setLocationRelativeTo(parentFrame);
     }
 

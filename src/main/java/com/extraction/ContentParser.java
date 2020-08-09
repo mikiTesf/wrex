@@ -1,19 +1,17 @@
 package com.extraction;
 
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.Properties;
-
-import com.meeting.MeetingSection;
 import com.meeting.Meeting;
-
+import com.meeting.MeetingSection;
+import com.meeting.Part;
+import com.meeting.SectionKind;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.meeting.Part;
-import com.meeting.SectionKind;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Properties;
+
 import static com.meeting.SectionKind.IMPROVE_IN_MINISTRY;
 import static com.meeting.SectionKind.LIVING_AS_CHRISTIANS;
 import static com.meeting.SectionKind.TREASURES;
@@ -88,7 +86,7 @@ class ContentParser {
         sectionElement.selectFirst(ELEMENT_SELECTORS.getProperty("presentations.group.selector.element"));
         presentations.addAll(sectionElement.getElementsByTag(ELEMENT_SELECTORS.getProperty("presentation.selector.element")));
 
-        if (meetingSection.getSECTION_KIND() == LIVING_AS_CHRISTIANS) {
+        if (sectionKind == LIVING_AS_CHRISTIANS) {
             presentations.remove(0); // transition song element
             presentations.remove(presentations.size() - 1); // concluding song and prayer element
             presentations.remove(presentations.size() - 1); // next week preview element

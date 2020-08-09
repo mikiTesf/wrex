@@ -1,7 +1,12 @@
 package com.gui;
 
-//import com.domain.Settings;
+import com.domain.Settings;
 import com.excel.ExcelFileGenerator;
+import com.extraction.Extractor;
+import com.extraction.PubExtract;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -26,24 +31,19 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.FileChooserUI;
 import javax.swing.table.DefaultTableModel;
-
-import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
 import java.lang.reflect.Field;
-
 import java.nio.charset.StandardCharsets;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,13 +52,10 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.zip.ZipException;
 
-import com.extraction.Extractor;
-import com.extraction.PubExtract;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
-
-import static com.gui.MainWindow.GenerationStatus.*;
+import static com.gui.MainWindow.GenerationStatus.COULD_NOT_READ_FILE_ERROR;
+import static com.gui.MainWindow.GenerationStatus.COULD_NOT_SAVE_FILE_ERROR;
+import static com.gui.MainWindow.GenerationStatus.SUCCESS;
+import static com.gui.MainWindow.GenerationStatus.ZIP_FORMAT_ERROR;
 
 
 public class MainWindow extends JFrame {
@@ -72,9 +69,8 @@ public class MainWindow extends JFrame {
     private JPanel controlsPanel;
     private JProgressBar progressBar;
     private final JFileChooser FILE_CHOOSER;
-//    private Settings settings;
-
-    private final Properties UI_TEXTS = new Properties();
+    private Settings settings;
+    private String lastFileChooserPath = System.getProperty("user.home");
 
     private File[] EPUBFiles;
 
@@ -88,20 +84,6 @@ public class MainWindow extends JFrame {
     }
 
     public MainWindow() {
-        final Properties PROGRAM_META = new Properties();
-
-        try {
-            UI_TEXTS.load(getClass().getResourceAsStream("/UITexts.properties"));
-            PROGRAM_META.load(getClass().getResourceAsStream("/wrexMeta.properties"));
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(
-                    THIS_FRAME,
-                    "An unknown problem has occurred.",
-                    "Problem",
-                    JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
-        }
-
         setContentPane(mainPanel);
         setIconImage(new ImageIcon(getClass().getResource("/icons/frameIcon.png")).getImage());
         insertMenuBarAndItems();
@@ -131,10 +113,10 @@ public class MainWindow extends JFrame {
             System.out.println(e.getMessage());
         }
 
-        setTitle(PROGRAM_META.getProperty("program.name") + " (" + PROGRAM_META.getProperty("program.version") + ")");
+        setTitle(CommonUIResources.PROGRAM_META.getProperty("program.name") +
+                " (" + CommonUIResources.PROGRAM_META.getProperty("program.version") + ")");
 
-        setMinimumSize(new Dimension(450, 350));
-        pack();
+        setMinimumSize(new Dimension(500, 500));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
     }
@@ -142,9 +124,9 @@ public class MainWindow extends JFrame {
     private void insertMenuBarAndItems() {
         JMenuBar menuBar = new JMenuBar();
 
-        JMenu fileMenu = new JMenu(UI_TEXTS.getProperty("file.menu.text"));
+        JMenu fileMenu = new JMenu(CommonUIResources.UI_TEXTS.getProperty("file.menu.text"));
 
-        JMenuItem exitItem = new JMenuItem(UI_TEXTS.getProperty("exit.menu.item.text"));
+        JMenuItem exitItem = new JMenuItem(CommonUIResources.UI_TEXTS.getProperty("exit.menu.item.text"));
         exitItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -152,7 +134,7 @@ public class MainWindow extends JFrame {
             }
         });
 
-        JMenuItem presentersItem = new JMenuItem(UI_TEXTS.getProperty("presenters.menu.item.text"));
+        JMenuItem presentersItem = new JMenuItem(CommonUIResources.UI_TEXTS.getProperty("presenters.menu.item.text"));
         presentersItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -160,7 +142,7 @@ public class MainWindow extends JFrame {
             }
         });
 
-        JMenuItem settingsItem = new JMenuItem(UI_TEXTS.getProperty("settings.menu.item.text"));
+        JMenuItem settingsItem = new JMenuItem(CommonUIResources.UI_TEXTS.getProperty("settings.menu.item.text"));
         settingsItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -168,7 +150,7 @@ public class MainWindow extends JFrame {
             }
         });
 
-        JMenuItem refreshLanguagesItem = new JMenuItem(UI_TEXTS.getProperty("refresh.languages.menu.item.text"));
+        JMenuItem refreshLanguagesItem = new JMenuItem(CommonUIResources.UI_TEXTS.getProperty("refresh.languages.menu.item.text"));
         refreshLanguagesItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -181,9 +163,9 @@ public class MainWindow extends JFrame {
         fileMenu.add(refreshLanguagesItem);
         fileMenu.add(exitItem);
 
-        JMenu helpMenu = new JMenu(UI_TEXTS.getProperty("help.menu.text"));
+        JMenu helpMenu = new JMenu(CommonUIResources.UI_TEXTS.getProperty("help.menu.text"));
 
-        JMenuItem aboutItem = new JMenuItem(UI_TEXTS.getProperty("about.menu.item.text"));
+        JMenuItem aboutItem = new JMenuItem(CommonUIResources.UI_TEXTS.getProperty("about.menu.item.text"));
         aboutItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -191,7 +173,7 @@ public class MainWindow extends JFrame {
             }
         });
 
-        JMenuItem howToItem = new JMenuItem(UI_TEXTS.getProperty("howTo.menu.item.text"));
+        JMenuItem howToItem = new JMenuItem(CommonUIResources.UI_TEXTS.getProperty("howTo.menu.item.text"));
         howToItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -220,25 +202,26 @@ public class MainWindow extends JFrame {
                 return false;
             }
         };
-        tableModel.addColumn(UI_TEXTS.getProperty("publications.column.header"));
+        tableModel.addColumn(CommonUIResources.UI_TEXTS.getProperty("publications.column.header"));
         publicationTable.setModel(tableModel);
         publicationTable.setToolTipText(null);
 
         scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
         FileNameExtensionFilter filter = new FileNameExtensionFilter
-                (UI_TEXTS.getProperty("jfilechooser.publication.filter.description"), "epub");
+                (CommonUIResources.UI_TEXTS.getProperty("jfilechooser.publication.filter.description"), "epub");
 
         openButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 FILE_CHOOSER.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 FILE_CHOOSER.setMultiSelectionEnabled(true);
-                FILE_CHOOSER.setCurrentDirectory(new File(System.getProperty("user.home")));
+                FILE_CHOOSER.setCurrentDirectory(new File(lastFileChooserPath));
                 FILE_CHOOSER.setFileFilter(filter);
 
                 if (FILE_CHOOSER.showOpenDialog(THIS_FRAME) == JFileChooser.APPROVE_OPTION) {
                     EPUBFiles = FILE_CHOOSER.getSelectedFiles();
+                    lastFileChooserPath = EPUBFiles[0].getAbsolutePath();
                     tableModel.setRowCount(0);
                     generateButton.setEnabled(true);
 
@@ -295,7 +278,7 @@ public class MainWindow extends JFrame {
                     for (File file : files) {
                         if (file.getName().contains(SAVE_NAME)) {
                             int choice = JOptionPane.showConfirmDialog
-                                    (THIS_FRAME, UI_TEXTS.getProperty("jfilechooser.overwrite.duplicate.file.message"),
+                                    (THIS_FRAME, CommonUIResources.UI_TEXTS.getProperty("jfilechooser.overwrite.duplicate.file.message"),
                                             "", JOptionPane.YES_NO_OPTION);
                             if (choice == JOptionPane.YES_OPTION) break;
                             if (choice == JOptionPane.NO_OPTION) return;
@@ -314,28 +297,28 @@ public class MainWindow extends JFrame {
                     if (!languagePackIsValid(LANGUAGE_PACK)) {
                         JOptionPane.showMessageDialog(
                                 THIS_FRAME,
-                                UI_TEXTS.getProperty("invalid.language.pack.message"),
-                                UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                                CommonUIResources.UI_TEXTS.getProperty("invalid.language.pack.message"),
+                                CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                                 JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                 } catch (FileNotFoundException e1) {
                     JOptionPane.showMessageDialog(
                             THIS_FRAME,
-                            UI_TEXTS.getProperty("language.pack.renamed.or.deleted.message"),
-                            UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                            CommonUIResources.UI_TEXTS.getProperty("language.pack.renamed.or.deleted.message"),
+                            CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 } catch (IOException e2) {
                     JOptionPane.showMessageDialog(
                             THIS_FRAME,
-                            UI_TEXTS.getProperty("language.pack.unreadable.message"),
-                            UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                            CommonUIResources.UI_TEXTS.getProperty("language.pack.unreadable.message"),
+                            CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-//                settings = Settings.getLastSavedSettings();
+                settings = Settings.getLastSavedSettings();
                 new UIController(DESTINATION, SAVE_NAME, LANGUAGE_PACK).execute();
             }
         });
@@ -355,7 +338,7 @@ public class MainWindow extends JFrame {
         if (availableLanguages == null || availableLanguages.length == 0) {
             JOptionPane.showMessageDialog(
                     THIS_FRAME,
-                    UI_TEXTS.getProperty("no.language.files.found.message"),
+                    CommonUIResources.UI_TEXTS.getProperty("no.language.files.found.message"),
                     "",
                     JOptionPane.WARNING_MESSAGE);
             return;
@@ -388,23 +371,11 @@ public class MainWindow extends JFrame {
     }
 
     private boolean languagePackIsValid(Properties languagePack) {
-        Properties langPackTemplate = new Properties();
-        try {
-            langPackTemplate.load(getClass().getResourceAsStream("/langPackTemplate.properties"));
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
-                    UI_TEXTS.getProperty("problem.message.dialogue.title"),
-                    JOptionPane.ERROR_MESSAGE);
+        if (languagePack.keySet().size() != CommonUIResources.LANG_PACK_TEMPLATE.keySet().size()) {
             return false;
         }
 
-        if (languagePack.keySet().size() != langPackTemplate.keySet().size()) {
-            return false;
-        }
-
-        for (Object key : langPackTemplate.keySet()) {
+        for (Object key : CommonUIResources.LANG_PACK_TEMPLATE.keySet()) {
             if (!languagePack.containsKey(key)) {
                 return false;
             }
@@ -433,8 +404,8 @@ public class MainWindow extends JFrame {
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(
                         THIS_FRAME,
-                        UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
-                        UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                        CommonUIResources.UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
+                        CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                         JOptionPane.ERROR_MESSAGE);
                 System.exit(0);
             }
@@ -456,7 +427,7 @@ public class MainWindow extends JFrame {
 
             for (File epubFile : EPUBFiles) {
                 progressBar.setString(
-                        UI_TEXTS.getProperty("reading.meeting.files.from") + " '" + epubFile.getName() + "'");
+                        CommonUIResources.UI_TEXTS.getProperty("reading.meeting.files.from") + " '" + epubFile.getName() + "'");
                 try {
                     ALL_PUB_EXTRACTS.add(EXTRACTOR.getPublicationExtracts(epubFile));
                 } catch (IllegalStateException e1) {
@@ -484,27 +455,27 @@ public class MainWindow extends JFrame {
                 JOptionPane.showMessageDialog(
                         THIS_FRAME,
                         String.format(
-                                UI_TEXTS.getProperty("did.not.find.meeting.content.message"),
+                                CommonUIResources.UI_TEXTS.getProperty("did.not.find.meeting.content.message"),
                                 unparsedFileNames.toString()),
-                        UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                        CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                         JOptionPane.ERROR_MESSAGE);
             }
 
-//            if (settings.askToAssignPresenters()) {
-//                new AssignmentDialog(THIS_FRAME, LANGUAGE_PACK, ALL_PUB_EXTRACTS).setVisible(true);
-//                // TODO: The presenters assigned on the dialog must be returned in some way (a Map for example)
-//            }
+
+            if (settings.askToAssignPresenters()) {
+                new AssignmentDialog(THIS_FRAME, ALL_PUB_EXTRACTS).setVisible(true);
+            }
 
             ExcelFileGenerator excelFileGenerator = new ExcelFileGenerator(LANGUAGE_PACK, DESTINATION);
             for (PubExtract pubExtract : ALL_PUB_EXTRACTS) {
                 progressBar.setString(
-                        UI_TEXTS.getProperty("adding.an.Excel.sheet.for") + " '" + pubExtract.getPublicationName() + "'");
+                        CommonUIResources.UI_TEXTS.getProperty("adding.an.Excel.sheet.for") + " '" + pubExtract.getPublicationName() + "'");
                 excelFileGenerator.addPopulatedSheet
                         (pubExtract.getMeetings(), pubExtract.getPublicationName());
                 progressBar.setValue(progressBar.getValue() + UNIT_PROGRESS);
             }
 
-            progressBar.setString(UI_TEXTS.getProperty("saving.Excel.file"));
+            progressBar.setString(CommonUIResources.UI_TEXTS.getProperty("saving.Excel.file"));
 
             try {
                 excelFileGenerator.saveExcelDocument(SAVE_NAME);
@@ -522,7 +493,7 @@ public class MainWindow extends JFrame {
             // progress bar at an incomplete position while all operations are actually complete.
             // Therefore, after the last operation is complete, the progress bar will be set to its maximum.
             progressBar.setValue(progressBar.getMaximum());
-            progressBar.setString(UI_TEXTS.getProperty("status.label.generation.finished.text"));
+            progressBar.setString(CommonUIResources.UI_TEXTS.getProperty("status.label.generation.finished.text"));
 
             return null;
         }
@@ -533,25 +504,25 @@ public class MainWindow extends JFrame {
 
             switch (GENERATION_STATUS) {
                 case ZIP_FORMAT_ERROR:
-                    JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("file.format.error.message"),
-                            UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(THIS_FRAME, CommonUIResources.UI_TEXTS.getProperty("file.format.error.message"),
+                            CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
                     break;
                 case COULD_NOT_READ_FILE_ERROR:
-                    JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("could.not.read.epub.file.message"),
-                            UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(THIS_FRAME, CommonUIResources.UI_TEXTS.getProperty("could.not.read.epub.file.message"),
+                            CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
                     break;
                 case COULD_NOT_SAVE_FILE_ERROR:
-                    JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("could.not.save.document.message"),
-                            UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(THIS_FRAME, CommonUIResources.UI_TEXTS.getProperty("could.not.save.document.message"),
+                            CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
                     break;
                 case SUCCESS:
                     JOptionPane.showMessageDialog
-                            (THIS_FRAME, UI_TEXTS.getProperty("generation.successful.message"),
-                                    UI_TEXTS.getProperty("done.message.dialogue.title"), JOptionPane.INFORMATION_MESSAGE);
+                            (THIS_FRAME, CommonUIResources.UI_TEXTS.getProperty("generation.successful.message"),
+                                    CommonUIResources.UI_TEXTS.getProperty("done.message.dialogue.title"), JOptionPane.INFORMATION_MESSAGE);
                     break;
                 default:
-                    JOptionPane.showMessageDialog(THIS_FRAME, UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
-                            UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(THIS_FRAME, CommonUIResources.UI_TEXTS.getProperty("unknown.problem.has.occurred.message"),
+                            CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"), JOptionPane.ERROR_MESSAGE);
             }
 
             progressBar.setVisible(false);

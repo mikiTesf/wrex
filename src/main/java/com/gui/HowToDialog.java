@@ -5,16 +5,15 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
 import javax.swing.AbstractButton;
-import javax.swing.JFrame;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -34,13 +33,15 @@ public class HowToDialog extends JDialog {
     private JButton buttonOK;
     private JTabbedPane tabbedPane;
     private JButton generateTemplateButton;
+    private JScrollPane scrollPane;
 
     HowToDialog(JFrame parentFrame) {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        generateTemplateButton.setEnabled(false);
+        generateTemplateButton.setVisible(false);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -48,20 +49,15 @@ public class HowToDialog extends JDialog {
             }
         });
 
-        final Properties UI_TEXTS = new Properties();
-        try {
-            UI_TEXTS.load(getClass().getResourceAsStream("/UITexts.properties"));
-        } catch (IOException e) { /* TODO: Internal Error Message */}
-
         tabbedPane.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
 
                 if (tabbedPane.getSelectedIndex() == 1) {
-                    generateTemplateButton.setEnabled(true);
+                    generateTemplateButton.setVisible(true);
                 } else {
-                    generateTemplateButton.setEnabled(false);
+                    generateTemplateButton.setVisible(false);
                 }
             }
         });
@@ -69,31 +65,28 @@ public class HowToDialog extends JDialog {
         generateTemplateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                generateTemplateButton.setEnabled(false);
+                generateTemplateButton.setVisible(false);
                 try {
                     FileOutputStream fileOutputStream = new FileOutputStream(new File("new.lang"));
-                    Properties langPackTemplate = new Properties();
-                    langPackTemplate.load(getClass().getResourceAsStream("/langPackTemplate.properties"));
-                    langPackTemplate.store(fileOutputStream, null);
+                    new Properties(CommonUIResources.LANG_PACK_TEMPLATE).store(fileOutputStream, null);
                 } catch (IOException e1) {
                     JOptionPane.showMessageDialog(
                             THIS_DIALOG,
-                            UI_TEXTS.getProperty("could.not.create.template.message"),
-                            UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                            CommonUIResources.UI_TEXTS.getProperty("could.not.create.template.message"),
+                            CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
                             JOptionPane.ERROR_MESSAGE);
                 }
 
                 JOptionPane.showMessageDialog(
                         THIS_DIALOG,
-                        UI_TEXTS.getProperty("generated.lang.template.file.message"),
-                        UI_TEXTS.getProperty("done.message.dialogue.title"),
+                        CommonUIResources.UI_TEXTS.getProperty("generated.lang.template.file.message"),
+                        CommonUIResources.UI_TEXTS.getProperty("done.message.dialogue.title"),
                         JOptionPane.INFORMATION_MESSAGE);
-                generateTemplateButton.setEnabled(true);
+                generateTemplateButton.setVisible(true);
             }
         });
 
         setMinimumSize(new Dimension(570, 500));
-        pack();
         setLocationRelativeTo(parentFrame);
     }
 
@@ -136,13 +129,13 @@ public class HowToDialog extends JDialog {
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         tabbedPane.addTab(ResourceBundle.getBundle("UITexts").getString("howTo.add.language.pack.tab.title"), panel3);
-        final JScrollPane scrollPane1 = new JScrollPane();
-        panel3.add(scrollPane1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        scrollPane = new JScrollPane();
+        panel3.add(scrollPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         final JLabel label2 = new JLabel();
         label2.setHorizontalAlignment(2);
         this.$$$loadLabelText$$$(label2, ResourceBundle.getBundle("UITexts").getString("howTo.add.language.instructions"));
         label2.setVerticalAlignment(1);
-        scrollPane1.setViewportView(label2);
+        scrollPane.setViewportView(label2);
     }
 
     /**
