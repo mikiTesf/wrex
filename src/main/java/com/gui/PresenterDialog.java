@@ -26,6 +26,7 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -324,24 +325,24 @@ public class PresenterDialog extends JDialog {
         namesPanel = new JPanel();
         namesPanel.setLayout(new GridLayoutManager(4, 2, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.add(namesPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        namesPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), ResourceBundle.getBundle("UITexts").getString("name.fields.border.title"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+        namesPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), this.$$$getMessageFromBundle$$$("UITexts", "name.fields.border.title"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION, null, null));
         firstNameLabel = new JLabel();
-        this.$$$loadLabelText$$$(firstNameLabel, ResourceBundle.getBundle("UITexts").getString("first.name.label.text"));
+        this.$$$loadLabelText$$$(firstNameLabel, this.$$$getMessageFromBundle$$$("UITexts", "first.name.label.text"));
         namesPanel.add(firstNameLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         firstNameTextField = new JTextField();
         namesPanel.add(firstNameTextField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         middleNameLabel = new JLabel();
-        this.$$$loadLabelText$$$(middleNameLabel, ResourceBundle.getBundle("UITexts").getString("middle.name.label.text"));
+        this.$$$loadLabelText$$$(middleNameLabel, this.$$$getMessageFromBundle$$$("UITexts", "middle.name.label.text"));
         namesPanel.add(middleNameLabel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         middleNameTextField = new JTextField();
         namesPanel.add(middleNameTextField, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         lastNameLabel = new JLabel();
-        this.$$$loadLabelText$$$(lastNameLabel, ResourceBundle.getBundle("UITexts").getString("last.name.label.text"));
+        this.$$$loadLabelText$$$(lastNameLabel, this.$$$getMessageFromBundle$$$("UITexts", "last.name.label.text"));
         namesPanel.add(lastNameLabel, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         lastNameTextField = new JTextField();
         namesPanel.add(lastNameTextField, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         privilegeLabel = new JLabel();
-        this.$$$loadLabelText$$$(privilegeLabel, ResourceBundle.getBundle("UITexts").getString("privilege.label.text"));
+        this.$$$loadLabelText$$$(privilegeLabel, this.$$$getMessageFromBundle$$$("UITexts", "privilege.label.text"));
         namesPanel.add(privilegeLabel, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         privilegeComboBox = new JComboBox();
         namesPanel.add(privilegeComboBox, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -360,10 +361,10 @@ public class PresenterDialog extends JDialog {
         panel2.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
         panel1.add(panel2, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         editPresenterButton = new JButton();
-        this.$$$loadButtonText$$$(editPresenterButton, ResourceBundle.getBundle("UITexts").getString("edit.presenter.button.text"));
+        this.$$$loadButtonText$$$(editPresenterButton, this.$$$getMessageFromBundle$$$("UITexts", "edit.presenter.button.text"));
         panel2.add(editPresenterButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         deletePresenterButton = new JButton();
-        this.$$$loadButtonText$$$(deletePresenterButton, ResourceBundle.getBundle("UITexts").getString("remove.presenter.button.text"));
+        this.$$$loadButtonText$$$(deletePresenterButton, this.$$$getMessageFromBundle$$$("UITexts", "remove.presenter.button.text"));
         panel2.add(deletePresenterButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer1 = new Spacer();
         panel2.add(spacer1, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
@@ -371,16 +372,33 @@ public class PresenterDialog extends JDialog {
         panel3.setLayout(new GridLayoutManager(1, 4, new Insets(0, 0, 0, 0), -1, -1));
         panel1.add(panel3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         addPresenterButton = new JButton();
-        this.$$$loadButtonText$$$(addPresenterButton, ResourceBundle.getBundle("UITexts").getString("add.presenter.button.text"));
+        this.$$$loadButtonText$$$(addPresenterButton, this.$$$getMessageFromBundle$$$("UITexts", "add.presenter.button.text"));
         panel3.add(addPresenterButton, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer2 = new Spacer();
         panel3.add(spacer2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         updateNamesButton = new JButton();
-        this.$$$loadButtonText$$$(updateNamesButton, ResourceBundle.getBundle("UITexts").getString("update.names.button.text"));
+        this.$$$loadButtonText$$$(updateNamesButton, this.$$$getMessageFromBundle$$$("UITexts", "update.names.button.text"));
         panel3.add(updateNamesButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         cancelButton = new JButton();
-        this.$$$loadButtonText$$$(cancelButton, ResourceBundle.getBundle("UITexts").getString("cancel.update.button.text"));
+        this.$$$loadButtonText$$$(cancelButton, this.$$$getMessageFromBundle$$$("UITexts", "cancel.update.button.text"));
         panel3.add(cancelButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    }
+
+    private static Method $$$cachedGetBundleMethod$$$ = null;
+
+    private String $$$getMessageFromBundle$$$(String path, String key) {
+        ResourceBundle bundle;
+        try {
+            Class<?> thisClass = this.getClass();
+            if ($$$cachedGetBundleMethod$$$ == null) {
+                Class<?> dynamicBundleClass = thisClass.getClassLoader().loadClass("com.intellij.DynamicBundle");
+                $$$cachedGetBundleMethod$$$ = dynamicBundleClass.getMethod("getBundle", String.class, Class.class);
+            }
+            bundle = (ResourceBundle) $$$cachedGetBundleMethod$$$.invoke(null, path, thisClass);
+        } catch (Exception e) {
+            bundle = ResourceBundle.getBundle(path);
+        }
+        return bundle.getString(key);
     }
 
     /**

@@ -23,6 +23,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
@@ -53,12 +54,7 @@ public class HowToDialog extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-
-                if (tabbedPane.getSelectedIndex() == 1) {
-                    generateTemplateButton.setVisible(true);
-                } else {
-                    generateTemplateButton.setVisible(false);
-                }
+                generateTemplateButton.setVisible(tabbedPane.getSelectedIndex() == 1);
             }
         });
 
@@ -117,26 +113,43 @@ public class HowToDialog extends JDialog {
         buttonOK.setText("OK");
         panel1.add(buttonOK, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         generateTemplateButton = new JButton();
-        this.$$$loadButtonText$$$(generateTemplateButton, ResourceBundle.getBundle("UITexts").getString("generate.template.button.text"));
+        this.$$$loadButtonText$$$(generateTemplateButton, this.$$$getMessageFromBundle$$$("UITexts", "generate.template.button.text"));
         panel1.add(generateTemplateButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         tabbedPane = new JTabbedPane();
         contentPane.add(tabbedPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        tabbedPane.addTab(ResourceBundle.getBundle("UITexts").getString("howTo.use.wrex.tab.title"), panel2);
+        tabbedPane.addTab(this.$$$getMessageFromBundle$$$("UITexts", "howTo.use.wrex.tab.title"), panel2);
         final JLabel label1 = new JLabel();
-        this.$$$loadLabelText$$$(label1, ResourceBundle.getBundle("UITexts").getString("howTo.use.WREX.instructions"));
+        this.$$$loadLabelText$$$(label1, this.$$$getMessageFromBundle$$$("UITexts", "howTo.use.WREX.instructions"));
         panel2.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        tabbedPane.addTab(ResourceBundle.getBundle("UITexts").getString("howTo.add.language.pack.tab.title"), panel3);
+        tabbedPane.addTab(this.$$$getMessageFromBundle$$$("UITexts", "howTo.add.language.pack.tab.title"), panel3);
         scrollPane = new JScrollPane();
         panel3.add(scrollPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         final JLabel label2 = new JLabel();
         label2.setHorizontalAlignment(2);
-        this.$$$loadLabelText$$$(label2, ResourceBundle.getBundle("UITexts").getString("howTo.add.language.instructions"));
+        this.$$$loadLabelText$$$(label2, this.$$$getMessageFromBundle$$$("UITexts", "howTo.add.language.instructions"));
         label2.setVerticalAlignment(1);
         scrollPane.setViewportView(label2);
+    }
+
+    private static Method $$$cachedGetBundleMethod$$$ = null;
+
+    private String $$$getMessageFromBundle$$$(String path, String key) {
+        ResourceBundle bundle;
+        try {
+            Class<?> thisClass = this.getClass();
+            if ($$$cachedGetBundleMethod$$$ == null) {
+                Class<?> dynamicBundleClass = thisClass.getClassLoader().loadClass("com.intellij.DynamicBundle");
+                $$$cachedGetBundleMethod$$$ = dynamicBundleClass.getMethod("getBundle", String.class, Class.class);
+            }
+            bundle = (ResourceBundle) $$$cachedGetBundleMethod$$$.invoke(null, path, thisClass);
+        } catch (Exception e) {
+            bundle = ResourceBundle.getBundle(path);
+        }
+        return bundle.getString(key);
     }
 
     /**

@@ -144,7 +144,7 @@ public class ExcelFileGenerator {
         } else {
             // If there is a hall dividing header (Main Hall, Second Hall), then the last two
             // cells must be formatted with the `PRESENTER_NAME_STYLE` cellStyle. The cellStyle
-            // assignment at the end of this method ensures that the last cell always get's the
+            // assignment at the end of this method ensures that the last cell always gets the
             // PRESENTER_NAME_STYLE cellStyle regardless of hall dividing headers.
             row.getCell(COL_INDEX + 2).setCellStyle(PRESENTER_NAME_STYLE);
         }
@@ -263,7 +263,7 @@ public class ExcelFileGenerator {
 
         XSSFFont font = WORKBOOK.createFont();
         font.setBold(boldFont);
-        font.setFontHeight(fontSize);
+        font.setFontHeightInPoints((short) fontSize);
         cellStyle.setFont(font);
 
         return cellStyle;

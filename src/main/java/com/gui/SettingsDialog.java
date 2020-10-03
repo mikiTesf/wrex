@@ -28,6 +28,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
@@ -196,77 +197,94 @@ public class SettingsDialog extends JDialog {
         buttonCancel.setText("Cancel");
         panel2.add(buttonCancel, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         defaultSettingsButton = new JButton();
-        this.$$$loadButtonText$$$(defaultSettingsButton, ResourceBundle.getBundle("UITexts").getString("default.settings.button.text"));
+        this.$$$loadButtonText$$$(defaultSettingsButton, this.$$$getMessageFromBundle$$$("UITexts", "default.settings.button.text"));
         panel1.add(defaultSettingsButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new GridLayoutManager(6, 3, new Insets(0, 0, 0, 0), -1, -1));
         contentPane.add(panel3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        panel3.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), ResourceBundle.getBundle("UITexts").getString("font.settings.fields.border.title"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+        panel3.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), this.$$$getMessageFromBundle$$$("UITexts", "font.settings.fields.border.title"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION, null, null));
         sheetTitleFontSizeLabel = new JLabel();
-        this.$$$loadLabelText$$$(sheetTitleFontSizeLabel, ResourceBundle.getBundle("UITexts").getString("sheet.title.font.size.label"));
+        this.$$$loadLabelText$$$(sheetTitleFontSizeLabel, this.$$$getMessageFromBundle$$$("UITexts", "sheet.title.font.size.label"));
         panel3.add(sheetTitleFontSizeLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer2 = new Spacer();
         panel3.add(spacer2, new GridConstraints(0, 2, 6, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         sheetTitleFontSizeSpinner = new JSpinner();
-        sheetTitleFontSizeSpinner.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.sheet.title.font.size.field"));
+        sheetTitleFontSizeSpinner.setToolTipText(this.$$$getMessageFromBundle$$$("UITexts", "tooltip.sheet.title.font.size.field"));
         panel3.add(sheetTitleFontSizeSpinner, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         meetingSectionTitleFontSizeLabel = new JLabel();
-        this.$$$loadLabelText$$$(meetingSectionTitleFontSizeLabel, ResourceBundle.getBundle("UITexts").getString("meeting.section.title.font.size.label"));
+        this.$$$loadLabelText$$$(meetingSectionTitleFontSizeLabel, this.$$$getMessageFromBundle$$$("UITexts", "meeting.section.title.font.size.label"));
         panel3.add(meetingSectionTitleFontSizeLabel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         meetingSectionTitleFontSizeSpinner = new JSpinner();
-        meetingSectionTitleFontSizeSpinner.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.meeting.section.title.font.size.field"));
+        meetingSectionTitleFontSizeSpinner.setToolTipText(this.$$$getMessageFromBundle$$$("UITexts", "tooltip.meeting.section.title.font.size.field"));
         panel3.add(meetingSectionTitleFontSizeSpinner, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         partFontSizeLabel = new JLabel();
-        this.$$$loadLabelText$$$(partFontSizeLabel, ResourceBundle.getBundle("UITexts").getString("part.font.size.label"));
+        this.$$$loadLabelText$$$(partFontSizeLabel, this.$$$getMessageFromBundle$$$("UITexts", "part.font.size.label"));
         partFontSizeLabel.setToolTipText("");
         panel3.add(partFontSizeLabel, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         partFontSizeSpinner = new JSpinner();
-        partFontSizeSpinner.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.part.font.size.field"));
+        partFontSizeSpinner.setToolTipText(this.$$$getMessageFromBundle$$$("UITexts", "tooltip.part.font.size.field"));
         panel3.add(partFontSizeSpinner, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         presenterNameFontSizeLabel = new JLabel();
-        this.$$$loadLabelText$$$(presenterNameFontSizeLabel, ResourceBundle.getBundle("UITexts").getString("presenter.name.font.size.label"));
+        this.$$$loadLabelText$$$(presenterNameFontSizeLabel, this.$$$getMessageFromBundle$$$("UITexts", "presenter.name.font.size.label"));
         presenterNameFontSizeLabel.setToolTipText("");
         panel3.add(presenterNameFontSizeLabel, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         presenterNameFontSizeSpinner = new JSpinner();
-        presenterNameFontSizeSpinner.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.presenter.name.font.size.field"));
+        presenterNameFontSizeSpinner.setToolTipText(this.$$$getMessageFromBundle$$$("UITexts", "tooltip.presenter.name.font.size.field"));
         panel3.add(presenterNameFontSizeSpinner, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         labelsFontSizeLabel = new JLabel();
-        this.$$$loadLabelText$$$(labelsFontSizeLabel, ResourceBundle.getBundle("UITexts").getString("labels.font.size.label"));
+        this.$$$loadLabelText$$$(labelsFontSizeLabel, this.$$$getMessageFromBundle$$$("UITexts", "labels.font.size.label"));
         labelsFontSizeLabel.setToolTipText("");
         panel3.add(labelsFontSizeLabel, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         labelsFontSizeSpinner = new JSpinner();
-        labelsFontSizeSpinner.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.labels.font.size.field"));
+        labelsFontSizeSpinner.setToolTipText(this.$$$getMessageFromBundle$$$("UITexts", "tooltip.labels.font.size.field"));
         panel3.add(labelsFontSizeSpinner, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         rowHeightLabel = new JLabel();
-        this.$$$loadLabelText$$$(rowHeightLabel, ResourceBundle.getBundle("UITexts").getString("row.height.label"));
+        this.$$$loadLabelText$$$(rowHeightLabel, this.$$$getMessageFromBundle$$$("UITexts", "row.height.label"));
         rowHeightLabel.setToolTipText("");
         panel3.add(rowHeightLabel, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         rowHeightSpinner = new JSpinner();
-        rowHeightSpinner.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.row.height.label.field"));
+        rowHeightSpinner.setToolTipText(this.$$$getMessageFromBundle$$$("UITexts", "tooltip.row.height.label.field"));
         panel3.add(rowHeightSpinner, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new GridLayoutManager(2, 3, new Insets(0, 0, 0, 0), -1, -1));
         contentPane.add(panel4, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        panel4.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), ResourceBundle.getBundle("UITexts").getString("other.settings.fields.border.title"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+        panel4.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), this.$$$getMessageFromBundle$$$("UITexts", "other.settings.fields.border.title"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION, null, null));
         final Spacer spacer3 = new Spacer();
         panel4.add(spacer3, new GridConstraints(0, 2, 2, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         askToAssignPresentersLabel = new JLabel();
-        this.$$$loadLabelText$$$(askToAssignPresentersLabel, ResourceBundle.getBundle("UITexts").getString("ask.to.assign.presenter.label"));
+        this.$$$loadLabelText$$$(askToAssignPresentersLabel, this.$$$getMessageFromBundle$$$("UITexts", "ask.to.assign.presenter.label"));
         askToAssignPresentersLabel.setToolTipText("");
         panel4.add(askToAssignPresentersLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         askToAssignPresentersCheckBox = new JCheckBox();
         askToAssignPresentersCheckBox.setEnabled(false);
         askToAssignPresentersCheckBox.setText("");
-        askToAssignPresentersCheckBox.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.ask.to.assign.presenter.field"));
+        askToAssignPresentersCheckBox.setToolTipText(this.$$$getMessageFromBundle$$$("UITexts", "tooltip.ask.to.assign.presenter.field"));
         panel4.add(askToAssignPresentersCheckBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         addHallDivisionRowLabel = new JLabel();
-        this.$$$loadLabelText$$$(addHallDivisionRowLabel, ResourceBundle.getBundle("UITexts").getString("add.hall.division.row.label"));
+        this.$$$loadLabelText$$$(addHallDivisionRowLabel, this.$$$getMessageFromBundle$$$("UITexts", "add.hall.division.row.label"));
         addHallDivisionRowLabel.setToolTipText("");
         panel4.add(addHallDivisionRowLabel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         addHallDivisionRowCheckbox = new JCheckBox();
         addHallDivisionRowCheckbox.setText("");
-        addHallDivisionRowCheckbox.setToolTipText(ResourceBundle.getBundle("UITexts").getString("tooltip.hall.division.row.field"));
+        addHallDivisionRowCheckbox.setToolTipText(this.$$$getMessageFromBundle$$$("UITexts", "tooltip.hall.division.row.field"));
         panel4.add(addHallDivisionRowCheckbox, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    }
+
+    private static Method $$$cachedGetBundleMethod$$$ = null;
+
+    private String $$$getMessageFromBundle$$$(String path, String key) {
+        ResourceBundle bundle;
+        try {
+            Class<?> thisClass = this.getClass();
+            if ($$$cachedGetBundleMethod$$$ == null) {
+                Class<?> dynamicBundleClass = thisClass.getClassLoader().loadClass("com.intellij.DynamicBundle");
+                $$$cachedGetBundleMethod$$$ = dynamicBundleClass.getMethod("getBundle", String.class, Class.class);
+            }
+            bundle = (ResourceBundle) $$$cachedGetBundleMethod$$$.invoke(null, path, thisClass);
+        } catch (Exception e) {
+            bundle = ResourceBundle.getBundle(path);
+        }
+        return bundle.getString(key);
     }
 
     /**
