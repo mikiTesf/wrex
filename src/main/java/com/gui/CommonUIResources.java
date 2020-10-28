@@ -12,7 +12,7 @@ public class CommonUIResources {
     public void initializeUIResources() {
         try {
             UI_TEXTS.load(getClass().getResourceAsStream("/UITexts.properties"));
-            PROGRAM_META.load(getClass().getResourceAsStream("/wrexMeta.properties"));
+            PROGRAM_META.load(getClass().getResourceAsStream("/WREXMeta.properties"));
             LANG_PACK_TEMPLATE.load(getClass().getResourceAsStream("/langPackTemplate.properties"));
         } catch (IOException e) {
             JOptionPane.showMessageDialog(

@@ -21,24 +21,14 @@
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
           </hspacer>
-          <grid id="9538f" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-            <margin top="0" left="0" bottom="0" right="0"/>
+          <component id="e7465" class="javax.swing.JButton" binding="buttonOK">
             <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
-            <border type="none"/>
-            <children>
-              <component id="e7465" class="javax.swing.JButton" binding="buttonOK">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="OK"/>
-                </properties>
-              </component>
-            </children>
-          </grid>
+            <properties>
+              <text value="OK"/>
+            </properties>
+          </component>
         </children>
       </grid>
       <grid id="e3588" layout-manager="GridLayoutManager" row-count="7" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -55,7 +45,7 @@
             </constraints>
             <properties>
               <font size="36" style="1"/>
-              <text resource-bundle="wrexMeta" key="program.name"/>
+              <text resource-bundle="WREXMeta" key="program.name"/>
             </properties>
           </component>
           <vspacer id="ec311">
@@ -63,20 +53,20 @@
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
             </constraints>
           </vspacer>
-          <component id="f9b6" class="javax.swing.JLabel">
+          <component id="f9b6" class="javax.swing.JLabel" binding="developerNameLabel">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="wrexMeta" key="written.by"/>
+              <text value=""/>
             </properties>
           </component>
-          <component id="8ed62" class="javax.swing.JLabel" binding="buildDateLabel">
+          <component id="8ed62" class="javax.swing.JLabel" binding="buildCommitLabel">
             <constraints>
               <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="wrexMeta" key="date.built"/>
+              <text value=""/>
             </properties>
           </component>
           <component id="1acef" class="javax.swing.JLabel" binding="versionLabel">
@@ -84,15 +74,15 @@
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="wrexMeta" key="program.version"/>
+              <text value=""/>
             </properties>
           </component>
-          <component id="7e8b1" class="javax.swing.JLabel">
+          <component id="7e8b1" class="javax.swing.JLabel" binding="developerEmailLabel">
             <constraints>
               <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="wrexMeta" key="developer.email"/>
+              <text value=""/>
             </properties>
           </component>
           <component id="34066" class="javax.swing.JSeparator">

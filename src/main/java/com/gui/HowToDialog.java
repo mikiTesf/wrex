@@ -27,6 +27,8 @@ import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import static com.gui.CommonUIResources.UI_TEXTS;
+
 
 public class HowToDialog extends JDialog {
     private final JDialog THIS_DIALOG = this;
@@ -68,16 +70,16 @@ public class HowToDialog extends JDialog {
                 } catch (IOException e1) {
                     JOptionPane.showMessageDialog(
                             THIS_DIALOG,
-                            CommonUIResources.UI_TEXTS.getProperty("could.not.create.template.message"),
-                            CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                            UI_TEXTS.getProperty("could.not.create.template.message"),
+                            UI_TEXTS.getProperty("problem.message.dialogue.title"),
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 JOptionPane.showMessageDialog(
                         THIS_DIALOG,
-                        CommonUIResources.UI_TEXTS.getProperty("generated.lang.template.file.message"),
-                        CommonUIResources.UI_TEXTS.getProperty("done.message.dialogue.title"),
+                        UI_TEXTS.getProperty("generated.lang.template.file.message"),
+                        UI_TEXTS.getProperty("done.message.dialogue.title"),
                         JOptionPane.INFORMATION_MESSAGE);
                 generateTemplateButton.setVisible(true);
             }

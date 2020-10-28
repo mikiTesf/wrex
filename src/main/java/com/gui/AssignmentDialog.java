@@ -36,6 +36,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.gui.CommonUIResources.UI_TEXTS;
+
 public class AssignmentDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
@@ -83,15 +85,15 @@ public class AssignmentDialog extends JDialog {
             // could not fetch presenters message, then bye bye
             JOptionPane.showMessageDialog(
                     this,
-                    CommonUIResources.UI_TEXTS.getProperty("could.not.fetch.presenter.details.message"),
-                    CommonUIResources.UI_TEXTS.getProperty("problem.message.dialogue.title"),
+                    UI_TEXTS.getProperty("could.not.fetch.presenter.details.message"),
+                    UI_TEXTS.getProperty("problem.message.dialogue.title"),
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         createAssignmentTables(pubExtracts);
 
-        setTitle(CommonUIResources.UI_TEXTS.getProperty("assignments.dialog.title"));
+        setTitle(UI_TEXTS.getProperty("assignments.dialog.title"));
         setMinimumSize(new Dimension(650, 650));
         setLocationRelativeTo(parentFrame);
     }
@@ -150,8 +152,8 @@ public class AssignmentDialog extends JDialog {
         assignmentTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
         DefaultTableModel defaultTableModel = new DefaultTableModel();
-        defaultTableModel.addColumn(CommonUIResources.UI_TEXTS.getProperty("part.name.table.column.header"));
-        defaultTableModel.addColumn(CommonUIResources.UI_TEXTS.getProperty("presenter.name.table.column.header"));
+        defaultTableModel.addColumn(UI_TEXTS.getProperty("part.name.table.column.header"));
+        defaultTableModel.addColumn(UI_TEXTS.getProperty("presenter.name.table.column.header"));
         assignmentTable.setModel(defaultTableModel);
 
         return assignmentTable;
