@@ -202,12 +202,13 @@ public class ExcelFileGenerator {
 
     public void addPopulatedSheet(ArrayList<Meeting> meetings, String publicationName) {
         XSSFSheet sheet = WORKBOOK.createSheet(publicationName);
-
         int meetingCount = 0;
+        final int MEETINGS_PER_COLUMN = (int) Math.ceil(meetings.size() / 2.0);
 
         insertPageTitle(sheet);
+
         for (Meeting meeting : meetings) {
-            if (meetingCount == 3) {
+            if (meetingCount == MEETINGS_PER_COLUMN) {
                 COL_INDEX = 6;
                 ROW_INDEX = 4;
             }
