@@ -6,12 +6,13 @@ repositories() {
 }
 
 dependencies {
-    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.0.1'
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '5.0.0'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.14.1'
     compile group: 'com.intellij', name: 'forms_rt', version: '7.0.3'
-    compile 'org.xerial:sqlite-jdbc:3.8.7'
-    compile 'com.j256.ormlite:ormlite-jdbc:5.1'
-    compile 'com.j256.ormlite:ormlite-core:5.1'
+    compile 'org.xerial:sqlite-jdbc:3.36.0.1'
+    compile 'com.j256.ormlite:ormlite-jdbc:5.6'
+    compile 'com.j256.ormlite:ormlite-core:5.6'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
 }
 
 sourceCompatibility = 1.8
