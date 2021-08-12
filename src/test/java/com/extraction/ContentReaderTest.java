@@ -15,21 +15,21 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 class ContentReaderTest {
 
-    File healthyWorkbook = new File(getClass().getResource("/mwb_E_202012.epub").getFile());
-    File textFileWithEPUBExtension = new File(getClass().getResource("/mwb_XX_0000.epub").getFile());
-    final ContentReader CONTENT_READER = new ContentReader();
+    private final File HEALTHY_MWB = new File(getClass().getResource("/mwb_E_202012.epub").getFile());
+    private final File TEXT_FILE_WITH_EPUB_EXTENSION = new File(getClass().getResource("/mwb_XX_0000.epub").getFile());
+    private final ContentReader CONTENT_READER = new ContentReader();
 
     @Test
     @DisplayName("Should finish without throwing an IOException")
     void shouldCompleteWithoutAnException() {
-        assertDoesNotThrow(() -> CONTENT_READER.getMeetingFileDOMs(healthyWorkbook));
+        assertDoesNotThrow(() -> CONTENT_READER.getMeetingFileDOMs(HEALTHY_MWB));
     }
 
     @Test
     @DisplayName("Should throw an IOException for the non-mwb file provided")
     void shouldThrowAnIOException() {
         assertThrows(IOException.class,
-                () -> CONTENT_READER.getMeetingFileDOMs(textFileWithEPUBExtension));
+                () -> CONTENT_READER.getMeetingFileDOMs(TEXT_FILE_WITH_EPUB_EXTENSION));
     }
 
     @Test
@@ -40,7 +40,7 @@ class ContentReaderTest {
         final int MEETING_DOM_COUNT = 4;
 
         try {
-            meetingDOMs = CONTENT_READER.getMeetingFileDOMs(healthyWorkbook);
+            meetingDOMs = CONTENT_READER.getMeetingFileDOMs(HEALTHY_MWB);
         } catch (IOException e) {
             fail();
         }
